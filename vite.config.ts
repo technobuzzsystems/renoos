@@ -1,10 +1,41 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
+import { handleApiRequest } from './server/apiHandler.ts'
+
+function renoosApiPlugin(): Plugin {
+  return {
+    name: 'renoos-api-server',
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        try {
+          const handled = await handleApiRequest(req, res)
+          if (!handled) {
+            next()
+          }
+        } catch (err) {
+          next(err)
+        }
+      })
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        try {
+          const handled = await handleApiRequest(req, res)
+          if (!handled) {
+            next()
+          }
+        } catch (err) {
+          next(err)
+        }
+      })
+    },
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), renoosApiPlugin()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

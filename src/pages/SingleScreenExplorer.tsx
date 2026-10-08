@@ -17,7 +17,7 @@ export interface BookingDatesState {
 }
 
 /**
- * MASTER ORCHESTRATOR: SB Farm Sanctuary Immersive Hotel Experience
+ * MASTER ORCHESTRATOR: Renoos Hotel Immersive Experience
  * Coordinates the 3-stage continuous journey:
  * 1. 360° Hotel Exterior (Hotel3DScene)
  * 2. Grand Lobby & Transparent Concierge (ReceptionScene)
@@ -128,7 +128,7 @@ export const SingleScreenExplorer: React.FC = () => {
               {transitioningMessage}
             </span>
             <span className="text-[10px] font-mono text-cream/70 uppercase tracking-widest block">
-              SB Farm Sanctuary · Western Ghats
+              Renoos Hotel · Luxury Mountain Resort
             </span>
           </div>
         </div>
@@ -141,7 +141,7 @@ export const SingleScreenExplorer: React.FC = () => {
         <div className="flex-1 w-full h-full relative overflow-hidden animate-fade-in">
           <Hotel3DScene
             onEnterReception={() =>
-              handleTransitionTo('reception', 'Walking to Front Desk Lobby...')
+              handleTransitionTo('reception', 'Walking into 360° Reception Lobby...')
             }
           />
         </div>
@@ -153,6 +153,7 @@ export const SingleScreenExplorer: React.FC = () => {
       {currentStage === 'reception' && (
         <div className="flex-1 w-full h-full relative overflow-hidden animate-fade-in">
           <ReceptionScene
+            initialMode="360-lobby"
             initialDates={bookingDates}
             onContinueToRoomPreview={(dates) => {
               setBookingDates(dates)

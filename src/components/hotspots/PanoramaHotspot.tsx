@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Navigation, Sparkles, ArrowRight, ArrowUp } from 'lucide-react'
+import { Sparkles, ArrowRight, ArrowUp, Calendar, Bell, User, MessageCircle } from 'lucide-react'
 import type { Hotspot } from '@/types'
 
 interface PanoramaHotspotProps {
@@ -20,6 +20,7 @@ export const PanoramaHotspot: React.FC<PanoramaHotspotProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false)
   const isNav = hotspot.type === 'navigation'
+  const isConcierge = hotspot.icon === 'concierge' || hotspot.id.includes('receptionist')
 
   const handleClick = (e: React.MouseEvent | React.TouchEvent | React.KeyboardEvent) => {
     e.stopPropagation()
@@ -28,11 +29,32 @@ export const PanoramaHotspot: React.FC<PanoramaHotspotProps> = ({
     }
   }
 
+  // Determine icon to render
+  const renderIcon = () => {
+    if (hotspot.icon === 'calendar') {
+      return <Calendar className="w-4 h-4 text-emerald-300 group-hover:scale-110 transition-transform" />
+    }
+    if (hotspot.icon === 'bell') {
+      return <Bell className="w-4 h-4 text-amber-300 group-hover:scale-110 transition-transform" />
+    }
+    if (hotspot.icon === 'concierge' || hotspot.icon === 'user' || isConcierge) {
+      return <User className="w-4 h-4 text-amber-200 group-hover:scale-110 transition-transform" />
+    }
+    if (hotspot.icon === 'message') {
+      return <MessageCircle className="w-4 h-4 text-amber-300 group-hover:scale-110 transition-transform" />
+    }
+    if (isNav) {
+      return <ArrowUp className="w-4 h-4 text-cream group-hover:text-amber-200 transition-colors" />
+    }
+    return <Sparkles className="w-3.5 h-3.5 text-cream/80 group-hover:text-cream transition-colors" />
+  }
+
   return (
     <div
       className={`relative flex flex-col items-center select-none group ${
         disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
       }`}
+      onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -63,10 +85,15 @@ export const PanoramaHotspot: React.FC<PanoramaHotspotProps> = ({
               <ArrowRight className="w-3 h-3" />
             </div>
           )}
+          {isConcierge && (
+            <div className="p-1 rounded-full bg-amber-400/20 text-amber-200 animate-pulse">
+              <Bell className="w-3 h-3" />
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Interactive Beacon Button - Matching Reference Design */}
+      {/* Interactive Beacon Button */}
       <button
         type="button"
         role="button"
@@ -86,30 +113,43 @@ export const PanoramaHotspot: React.FC<PanoramaHotspotProps> = ({
         className="relative flex items-center justify-center p-1.5 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-amber-300 transition-all duration-300 transform group-hover:scale-105"
       >
         {/* Subtle, soft breathing ring */}
-        {isNav && (
-          <span className="absolute -inset-1.5 rounded-full bg-amber-400/20 animate-pulse pointer-events-none" />
+        {(isNav || isConcierge) && (
+          <span className={`absolute -inset-1.5 rounded-full animate-pulse pointer-events-none ${
+            isConcierge ? 'bg-amber-400/30' : 'bg-amber-400/20'
+          }`} />
+        )}
+        {isConcierge && (
+          <span className="absolute -inset-2.5 rounded-full bg-emerald-400/20 animate-ping pointer-events-none opacity-50" />
         )}
 
         {/* Outer Halo */}
         <span
           className={`relative rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-300 ${
-            isNav
-              ? 'w-9 h-9 bg-black/80 border border-white/40 shadow-xl group-hover:border-amber-300 group-hover:bg-[#1a2d21]'
+            isNav || isConcierge
+              ? 'w-9 h-9 bg-black/80 border shadow-xl'
               : 'w-7 h-7 bg-black/75 border border-white/30 shadow-sm group-hover:border-cream/60'
+          } ${
+            isConcierge
+              ? 'border-amber-300/70 group-hover:border-amber-200 group-hover:bg-[#1a2d21]'
+              : isNav
+              ? 'border-white/40 group-hover:border-amber-300 group-hover:bg-[#1a2d21]'
+              : ''
           }`}
         >
-          {/* Inner Icon */}
-          {isNav ? (
-            <ArrowUp className="w-4 h-4 text-cream group-hover:text-amber-200 transition-colors" />
-          ) : (
-            <Sparkles className="w-3.5 h-3.5 text-cream/80 group-hover:text-cream transition-colors" />
-          )}
+          {renderIcon()}
         </span>
       </button>
 
-      {/* Direction & Space Name Label Pill (Matching Reference Image) */}
-      <div className="mt-1 px-3.5 py-1 rounded-full bg-black/80 border border-white/30 backdrop-blur-md pointer-events-none transition-all duration-300 group-hover:border-amber-300 group-hover:bg-black/95 shadow-md">
-        <span className="text-[10px] font-mono tracking-wider text-cream uppercase whitespace-nowrap font-medium">
+      {/* Direction & Space Name Label Pill */}
+      <div className={`mt-1 px-3.5 py-1 rounded-full border backdrop-blur-md pointer-events-none transition-all duration-300 shadow-md ${
+        isConcierge
+          ? 'bg-[#142319]/90 border-amber-300/60 group-hover:border-amber-300 group-hover:bg-black/95'
+          : 'bg-black/80 border-white/30 group-hover:border-amber-300 group-hover:bg-black/95'
+      }`}>
+        <span className="text-[10px] font-mono tracking-wider text-cream uppercase whitespace-nowrap font-medium flex items-center gap-1.5">
+          {isConcierge && (
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          )}
           {hotspot.title}
         </span>
       </div>

@@ -33,6 +33,7 @@ interface PanoramaViewerProps {
   hideInternalHeader?: boolean
   bottomBarOffsetClass?: string
   hideInternalBottomBar?: boolean
+  onHotspotClick?: (hotspot: Hotspot) => boolean | void
 }
 
 type ValidHotspot = Hotspot & { spherical: { yaw: number; pitch: number } }
@@ -191,6 +192,7 @@ export const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
   hideInternalHeader = false,
   bottomBarOffsetClass,
   hideInternalBottomBar = false,
+  onHotspotClick,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const hotspotElsRef = useRef<Map<string, HTMLDivElement>>(new Map())
@@ -538,13 +540,17 @@ export const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
 
   // Handle hotspot selection & navigation
   const handleSelectHotspot = useCallback((hs: Hotspot) => {
+    if (onHotspotClick) {
+      const handled = onHotspotClick(hs)
+      if (handled) return
+    }
     setSelectedHotspot(hs)
     if (hs.type === 'navigation' && hs.targetSpaceId && onNavigateSpace) {
       setIsTransitioning(true)
       setTransitionTargetTitle(hs.title)
       onNavigateSpace(hs.targetSpaceId)
     }
-  }, [onNavigateSpace])
+  }, [onHotspotClick, onNavigateSpace])
 
   // If this space does not have a real 360 panorama available, show elegant placeholder state
   if (!isAvailable) {
@@ -916,20 +922,12 @@ export const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
 
         {/* Bottom Interactive HUD & Controls Bar */}
         {!hideInternalBottomBar && (
-          <div className={`absolute ${bottomBarOffsetClass || 'bottom-0'} inset-x-0 p-4 sm:p-5 flex items-end justify-between pointer-events-none z-10 bg-gradient-to-t from-black/80 via-black/30 to-transparent`}>
-            {/* Bottom Left: Navigation Guidance */}
-            <div className="hidden sm:flex flex-col gap-1 text-[11px] text-neutral-300 font-light pointer-events-none">
-              <span className="font-mono text-luxury-gold uppercase tracking-widest text-[9px] font-medium">
-                Virtual Room Tour
-              </span>
-              <span>Click golden beacons to navigate between spaces · Drag to look around</span>
-            </div>
-
-            {/* Bottom Right: Floating Controls Dock */}
+          <div className={`absolute ${bottomBarOffsetClass || 'bottom-3 sm:bottom-4'} inset-x-0 px-4 sm:px-5 flex items-end justify-end pointer-events-none z-10`}>
+            {/* Floating Controls Dock */}
             <div
               onPointerDown={(e) => e.stopPropagation()}
               onPointerUp={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 p-1.5 bg-black/80 border border-white/15 rounded-sm backdrop-blur-md shadow-2xl pointer-events-auto ml-auto"
+              className="flex items-center gap-1.5 p-1.5 bg-black/80 border border-white/15 rounded-sm backdrop-blur-md shadow-2xl pointer-events-auto"
             >
             {/* Zoom In */}
             <button

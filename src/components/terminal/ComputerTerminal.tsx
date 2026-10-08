@@ -52,7 +52,7 @@ export const ComputerTerminal: React.FC<ComputerTerminalProps> = ({
 
           <div className="hidden lg:flex items-center gap-1 text-[11px] text-cream/50">
             <Clock className="w-3 h-3 text-emerald-400" />
-            <span>SB FARM PMS v4.2 ONLINE</span>
+            <span>RENOOS HOTEL PMS v4.2 ONLINE</span>
           </div>
         </div>
 
@@ -131,7 +131,7 @@ export const ComputerTerminal: React.FC<ComputerTerminalProps> = ({
           {/* Monitor Bottom Chin / Logo Badge */}
           {!isEdgeToEdge && (
             <div className="absolute bottom-1 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded bg-black/60 border border-white/10 text-[8px] font-mono tracking-widest text-cream/40 uppercase pointer-events-none z-40">
-              SB FARM SANCTUARY · WORKSTATION 01
+              RENOOS HOTEL · WORKSTATION 01
             </div>
           )}
         </div>

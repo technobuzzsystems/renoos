@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react'
 import {
   X,
   CheckCircle2,
-  Calendar,
-  Users,
   ShieldCheck,
   CreditCard,
   QrCode,
@@ -19,12 +17,15 @@ import {
   Clock,
   Lock,
   Gift,
-  FileText,
   Download,
-  Loader2
+  Loader2,
+  AlertCircle,
+  Calendar,
 } from 'lucide-react'
 import type { Room, ConfirmedReservation, GuestDetails, PaymentMethod } from '@/types'
 import { generateReservationPDF, printReservationInvoice } from '@/lib/pdfBillGenerator'
+import { submitBookingToApi } from '@/services/api'
+import { useAuth } from '@/context/AuthContext'
 
 interface BookingModalProps {
   room: Room
@@ -84,6 +85,25 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [confirmedReservation, setConfirmedReservation] = useState<ConfirmedReservation | null>(null)
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
+  const [submissionError, setSubmissionError] = useState<string | null>(null)
+
+  const { user, refreshUserBookings, setIsAuthModalOpen, setIsBookingsModalOpen } = useAuth()
+
+  // Auto-populate guest details when user is logged in
+  useEffect(() => {
+    if (isOpen && user) {
+      const parts = (user.fullName || '').trim().split(/\s+/)
+      const fName = parts[0] || ''
+      const lName = parts.slice(1).join(' ') || ''
+      setGuestDetails((prev) => ({
+        ...prev,
+        firstName: prev.firstName || fName,
+        lastName: prev.lastName || lName,
+        phone: prev.phone || user.phone || '',
+        email: prev.email || user.email || '',
+      }))
+    }
+  }, [isOpen, user])
 
   // Reset or lock scroll when modal opens
   useEffect(() => {
@@ -94,6 +114,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       setStep('guest')
       setErrors({})
       setIsSubmitting(false)
+      setSubmissionError(null)
     }
     return () => {
       document.body.style.overflow = 'unset'
@@ -140,19 +161,17 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const handleProceedToPayment = (e: React.FormEvent) => {
     e.preventDefault()
     if (validateGuestDetails()) {
+      setSubmissionError(null)
       setStep('payment')
     }
   }
 
-  const handleConfirmReservation = () => {
+  const handleConfirmReservation = async () => {
     setIsSubmitting(true)
+    setSubmissionError(null)
 
-    setTimeout(() => {
-      const referenceId = `SBF-2026-${Math.floor(10000 + Math.random() * 90000)}`
-      const newReservation: ConfirmedReservation = {
-        id: `res-${Date.now()}`,
-        bookingReference: referenceId,
-        createdAt: new Date().toISOString(),
+    try {
+      const newReservation = await submitBookingToApi({
         room,
         checkInDate,
         checkOutDate,
@@ -169,13 +188,24 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         guestDetails,
         paymentMethod,
         paymentStatus: paymentMethod === 'pay_at_hotel' ? 'pay_at_checkin' : 'paid',
+        userId: user?.id,
+      })
+
+      // Sync user bookings in global context
+      if (user) {
+        refreshUserBookings().catch((err) => console.warn('Could not refresh bookings:', err))
       }
 
-      // Save to localStorage
+      // Save to localStorage for local guest history
       try {
-        const stored = localStorage.getItem('sb_farm_reservations')
+        const stored =
+          localStorage.getItem('renoos_hotel_reservations') ||
+          localStorage.getItem('sb_farm_reservations')
         const existing = stored ? JSON.parse(stored) : []
-        localStorage.setItem('sb_farm_reservations', JSON.stringify([newReservation, ...existing]))
+        localStorage.setItem(
+          'renoos_hotel_reservations',
+          JSON.stringify([newReservation, ...existing])
+        )
       } catch (err) {
         console.warn('Could not save booking to localStorage:', err)
       }
@@ -187,7 +217,14 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       if (onBookingSuccess) {
         onBookingSuccess(newReservation)
       }
-    }, 1000)
+    } catch (err: any) {
+      console.error('Failed to confirm reservation:', err)
+      setSubmissionError(
+        err.message ||
+          `Room ${room.roomNumber} is unavailable for the selected dates. Another guest has booked this suite.`
+      )
+      setIsSubmitting(false)
+    }
   }
 
   const handleDownloadPDF = () => {
@@ -350,6 +387,37 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   </div>
                 </div>
               </div>
+
+              {/* Account Association Banner */}
+              {user ? (
+                <div className="p-3.5 bg-emerald-50/80 border border-emerald-200/80 rounded-2xl flex items-center justify-between gap-3 text-xs text-emerald-950">
+                  <div className="flex items-center gap-2.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>
+                      Signed in as <strong>{user.fullName || user.phone}</strong> (+91 {user.phone}). This reservation will be linked to your account.
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded-full border border-emerald-300/60 shrink-0 hidden sm:inline">
+                    PMS Linked
+                  </span>
+                </div>
+              ) : (
+                <div className="p-3.5 bg-[#FAF4ED] border border-[#E9DFD0] rounded-2xl flex items-center justify-between gap-3 text-xs text-charcoal">
+                  <div className="flex items-center gap-2.5">
+                    <Sparkles className="w-4 h-4 text-terracotta shrink-0" />
+                    <span className="text-charcoal-muted">
+                      Have a Renoos Hotel account? Sign in with mobile number to auto-fill details and manage your stay.
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsAuthModalOpen(true)}
+                    className="px-3 py-1 bg-forest hover:bg-forest-dark text-cream text-[11px] font-mono uppercase tracking-wider rounded-lg shrink-0 cursor-pointer transition-colors shadow-sm"
+                  >
+                    Sign In
+                  </button>
+                </div>
+              )}
 
               {/* Guest Form Fields */}
               <div className="space-y-4">
@@ -753,7 +821,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                   {/* Security Reassurance */}
                   <div className="flex items-center gap-2 p-3 bg-cream rounded-xl border border-[#E9E4DB] text-xs text-charcoal-muted">
                     <ShieldCheck className="w-4 h-4 text-forest shrink-0" />
-                    <span>256-bit encrypted reservation. Guaranteed lowest rate at SB Farm.</span>
+                    <span>256-bit encrypted reservation. Guaranteed lowest rate at Renoos Hotel.</span>
                   </div>
                 </div>
 
@@ -825,6 +893,20 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 </div>
               </div>
 
+              {/* Submission / Availability Conflict Alert */}
+              {submissionError && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3 text-xs text-red-800 animate-in fade-in slide-in-from-top-1">
+                  <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="font-semibold text-red-900 text-sm">Suite Unavailable for Selected Dates</p>
+                    <p className="font-light leading-relaxed">{submissionError}</p>
+                    <p className="text-[11px] text-red-600 font-mono pt-1">
+                      Notice: Another guest has confirmed this suite for overlapping dates. Please pick alternative dates or select another suite.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-[#E9E4DB]">
                 <button
@@ -891,10 +973,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 <div className="flex flex-wrap items-center justify-between border-b border-[#E9E4DB] pb-4 gap-4">
                   <div>
                     <span className="font-serif text-2xl text-forest font-bold block">
-                      SB FARM
+                      RENOOS HOTEL
                     </span>
                     <span className="text-[10px] tracking-widest uppercase text-sage font-medium">
-                      Farm Sanctuary · Luxury Suite Voucher
+                      Luxury Mountain Resort · Suite Voucher
                     </span>
                   </div>
 
@@ -1042,6 +1124,18 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 >
                   <Printer className="w-4 h-4 text-forest" />
                   <span>Print Tax Invoice</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose()
+                    setIsBookingsModalOpen(true)
+                  }}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#263D2F] hover:bg-[#1B2C22] text-cream text-xs uppercase tracking-wider font-semibold rounded-full shadow-warm transition-all min-h-[44px] cursor-pointer"
+                >
+                  <Calendar className="w-4 h-4 text-amber-200" />
+                  <span>My Reservations</span>
                 </button>
 
                 <button

@@ -1,0 +1,92 @@
+[
+  {
+    "id": "usr-1791455432748-209",
+    "fullName": "Vikramaditya Singhania",
+    "phone": "9885810582",
+    "formattedPhone": "9885810582",
+    "email": "vikram@renooshotel.example",
+    "passwordHash": "b44accd1ea890ff75f722712fbfe0a16f55f214edf30d8c5b740a360c67f88fdb4a969a8939ed1b8408b11a8487db28a817d76246eb5b0cd87c0e8ef5b77d941",
+    "salt": "8af284092d65b7f63e66d76e802f610c",
+    "createdAt": "2026-10-08T10:30:32.748Z"
+  },
+  {
+    "id": "usr-1791455450958-867",
+    "fullName": "Aanya Verma",
+    "phone": "9763124419",
+    "formattedPhone": "9763124419",
+    "email": "aanya@example.com",
+    "passwordHash": "6fde1cfc033d248940accf7847f1f29db32884753ddb37518032139e8db1f15f0d2b1d44182b3c23daf34f955a70612d4a9da28c2186982962ec2f17313e8e45",
+    "salt": "62362a5419657abb414cf4bd5350212b",
+    "createdAt": "2026-10-08T10:30:50.958Z"
+  },
+  {
+    "id": "usr-1791455495289-133",
+    "fullName": "Aanya Verma",
+    "phone": "9780543708",
+    "formattedPhone": "9780543708",
+    "email": "aanya@example.com",
+    "passwordHash": "fc3b24b534c3fd9c5845c8bba78aaccbf61a9fd45e0703f1a802044ec651d0ab046b2eb81ab09ec5c53627b518a67bbf7ce68846ca65d5f74c8012b2ee04ffad",
+    "salt": "80c62c9e28121eed5e8a047bd3915fca",
+    "createdAt": "2026-10-08T10:31:35.290Z"
+  },
+  {
+    "id": "usr-1791455519779-616",
+    "fullName": "Aanya Verma",
+    "phone": "9751019066",
+    "formattedPhone": "9751019066",
+    "email": "aanya@example.com",
+    "passwordHash": "a2198495c1e997ab87b87d77f5f5c6fde5cd7292121eb63858324b857b38d58627edb98bc9ee9d760e37f8e4ee9f9747968d6b6bedd73d6ff6e66851a00c360b",
+    "salt": "7f737dc2a0edff02df4bf11ee7810beb",
+    "createdAt": "2026-10-08T10:31:59.779Z"
+  },
+  {
+    "id": "usr-1791455549239-395",
+    "fullName": "Aanya Verma",
+    "phone": "9716712767",
+    "formattedPhone": "9716712767",
+    "email": "aanya@example.com",
+    "passwordHash": "af161fc1d7c432b45a53e254895f9d2d7141ce96c55da635e4ade5687e80598428d322f79546bfdd74da7f7e3813d8532b78adfd0ea2988587f63670244b9b12",
+    "salt": "8875b9856408cffad6fc23cc97d3c63c",
+    "createdAt": "2026-10-08T10:32:29.239Z"
+  },
+  {
+    "id": "usr-1791455608895-893",
+    "fullName": "Aanya Verma",
+    "phone": "9776984684",
+    "formattedPhone": "9776984684",
+    "email": "aanya@example.com",
+    "passwordHash": "52134cbaeaa6d2e973ce4ad64984e183c3a85f67ebf79e09d1a277296b27520c8303c5a2cd7618f14a66ba806e1856eade69e83bf8ca5350be7e095a7be37108",
+    "salt": "4482965d533d1964f07905b13725423d",
+    "createdAt": "2026-10-08T10:33:28.895Z"
+  },
+  {
+    "id": "usr-1791455814554-617",
+    "fullName": "Sudarshan Bangar",
+    "phone": "7620636449",
+    "formattedPhone": "7620636449",
+    "email": "bangarsudarshan87@gmail.com",
+    "passwordHash": "b2efea78988cd348d9b189ecb54d6ad0bdb7fb3358ff72b51b7ee5fd6d4a7dcfe68438b243c9b1f59eee4e8d0fcaec586850b94bbcc7d2280aa94440f83f4e8d",
+    "salt": "b246e626cf97abd73d495afa0c9db838",
+    "createdAt": "2026-10-08T10:36:54.554Z"
+  },
+  {
+    "id": "usr-1791456557786-873",
+    "fullName": "Vikramaditya Singhania",
+    "phone": "9836549760",
+    "formattedPhone": "9836549760",
+    "email": "vikram@renooshotel.example",
+    "passwordHash": "0f55f0afcc20009f839894ffb0b6d32455483147a31d4e5e551aeeab07c533605607cc63718e95127d2d578e0ce26aa1e14e98745c45e27a25baa6c70277f2f4",
+    "salt": "dc20c5c7cf02c84325d24a95bed7850e",
+    "createdAt": "2026-10-08T10:49:17.786Z"
+  },
+  {
+    "id": "usr-1791456562549-643",
+    "fullName": "Aanya Verma",
+    "phone": "9754648627",
+    "formattedPhone": "9754648627",
+    "email": "aanya@example.com",
+    "passwordHash": "14dbe67dbc3610892edbf3258f4a1502133761ab2fbce660d5bb07bf8d275df7f89d2964b6c429124bfc64ff25f73891f5a7f063201c54b4d3d55ccb3c3632b8",
+    "salt": "e84167a9481c00bb554ecaf4a6fe2bbe",
+    "createdAt": "2026-10-08T10:49:22.549Z"
+  }
+]

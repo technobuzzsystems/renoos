@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Compass, ChevronDown, CalendarCheck } from 'lucide-react'
+import { Menu, X, Compass, ChevronDown, CalendarCheck, ShieldCheck } from 'lucide-react'
 import { ROOMS_DATA } from '@/data/rooms'
+import { GuestAccountButton } from '@/components/auth'
 
 export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -46,17 +47,17 @@ export const Navbar: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          {/* Brand Logo - SB Farm Wordmark */}
+          {/* Brand Logo - Renoos Hotel Wordmark */}
           <Link
             to="/"
             className="group flex flex-col items-start focus:outline-none focus-visible:ring-1 focus-visible:ring-forest"
-            aria-label="SB Farm Homepage"
+            aria-label="Renoos Hotel Homepage"
           >
             <span className="font-serif text-2xl sm:text-3xl tracking-tight text-forest font-semibold group-hover:text-forest-dark transition-colors duration-300">
-              SB Farm
+              Renoos Hotel
             </span>
             <span className="text-[10px] tracking-widest uppercase text-sage font-medium">
-              Farm Sanctuary · India
+              Luxury Mountain Sanctuary · India
             </span>
           </Link>
 
@@ -152,6 +153,17 @@ export const Navbar: React.FC = () => {
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center gap-3">
+            <Link
+              to="/admin"
+              className="p-2 text-charcoal-muted hover:text-forest transition-colors rounded-full hover:bg-forest/5"
+              title="Staff & PMS Admin Portal"
+              aria-label="Staff & PMS Admin Portal"
+            >
+              <ShieldCheck className="w-4 h-4 text-forest/70 hover:text-forest" />
+            </Link>
+
+            <GuestAccountButton variant="light" />
+
             <a
               href="/#book-rooms"
               onClick={handleBookRoomsClick}
@@ -249,6 +261,12 @@ export const Navbar: React.FC = () => {
           </div>
 
           <div className="pt-3 border-t border-[#E9E4DB] space-y-2">
+            <GuestAccountButton
+              variant="light"
+              showTextOnMobile={true}
+              className="w-full justify-center py-3"
+            />
+
             <a
               href="/#book-rooms"
               onClick={handleBookRoomsClick}
@@ -265,6 +283,15 @@ export const Navbar: React.FC = () => {
             >
               <Compass className="w-4 h-4" />
               <span>Explore All Rooms</span>
+            </Link>
+
+            <Link
+              to="/admin"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-2.5 border border-forest/20 text-forest text-xs uppercase tracking-wider font-medium rounded-full hover:bg-forest/5 transition-colors"
+            >
+              <ShieldCheck className="w-4 h-4" />
+              <span>Hotel Staff & PMS Admin</span>
             </Link>
           </div>
         </div>

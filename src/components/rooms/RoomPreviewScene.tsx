@@ -19,6 +19,7 @@ import {
   Wind,
   Bed,
   Layers,
+  AlertTriangle,
 } from 'lucide-react'
 import { ROOMS_DATA } from '@/data/rooms'
 import type { Room, Space, ConfirmedReservation } from '@/types'
@@ -26,7 +27,9 @@ import { PanoramaViewer } from '@/components/panorama/PanoramaViewer'
 import { Model3DViewer } from '@/components/model3d/Model3DViewer'
 import { SpaceSelector } from '@/components/rooms/SpaceSelector'
 import { BookingModal } from '@/components/booking/BookingModal'
+import { GuestAccountButton } from '@/components/auth'
 import { formatArea } from '@/lib/utils'
+import { fetchRoomAvailability, type AvailabilityMap } from '@/services/api'
 
 interface RoomPreviewSceneProps {
   initialRoomId?: string
@@ -67,6 +70,33 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
       ROOMS_DATA[0]
     )
   }, [selectedRoomId])
+
+  // Real-time PMS Room Availability (Multi-User Concurrency Sync)
+  const [availability, setAvailability] = useState<AvailabilityMap>({
+    '201': { available: true },
+    '202': { available: true },
+    '203': { available: true },
+  })
+
+  const refreshAvailability = async () => {
+    try {
+      const data = await fetchRoomAvailability(checkInDate, checkOutDate)
+      setAvailability(data)
+    } catch (err) {
+      console.warn('Availability polling error:', err)
+    }
+  }
+
+  // Poll availability every 4s to sync multi-user bookings in real time
+  useEffect(() => {
+    refreshAvailability()
+    const timer = setInterval(refreshAvailability, 4000)
+    return () => clearInterval(timer)
+  }, [checkInDate, checkOutDate])
+
+  const currentRoomAvail = availability[selectedRoom.roomNumber] || availability[selectedRoom.id]
+  const isCurrentRoomAvailable = currentRoomAvail?.available !== false
+  const conflictingBooking = currentRoomAvail?.conflictingBooking
 
   // Viewing Mode: Photography vs 360° Virtual Tour vs 3D View
   const [viewMode, setViewMode] = useState<'photo' | '360' | '3d'>('360')
@@ -188,7 +218,7 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="font-serif text-base sm:text-lg font-medium text-cream tracking-tight">
-                SB FARM SANCTUARY
+                RENOOS HOTEL
               </span>
               <span className="px-2 py-0.5 rounded-full bg-cream/15 text-cream/90 text-[10px] font-mono uppercase tracking-wider hidden md:inline-block">
                 Suites Preview
@@ -221,75 +251,91 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
           {ROOMS_DATA.map((room) => {
             const isSelected = room.id === selectedRoom.id
             const price = room.pricePerNight || 5200
+            const roomAvail = availability[room.roomNumber] || availability[room.id]
+            const isAvailable = roomAvail?.available !== false
 
             return (
               <button
                 key={room.id}
                 type="button"
                 onClick={() => setSelectedRoomId(room.id)}
-                className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs transition-all ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs transition-all ${
                   isSelected
-                    ? 'bg-cream text-[#16251C] font-semibold shadow-md'
-                    : 'text-cream/70 hover:text-white hover:bg-cream/10'
+                    ? isAvailable
+                      ? 'bg-cream text-[#16251C] font-semibold shadow-md'
+                      : 'bg-red-900/80 text-red-100 border border-red-400 font-semibold shadow-md'
+                    : isAvailable
+                      ? 'text-cream/70 hover:text-white hover:bg-cream/10'
+                      : 'text-red-300/60 hover:text-red-200 hover:bg-red-950/40'
                 }`}
               >
                 <span className="font-mono font-bold">{room.roomNumber}</span>
                 <span className="hidden md:inline font-serif">{room.name}</span>
-                <span
-                  className={`text-[10px] font-mono ${
-                    isSelected ? 'text-[#16251C]/80 font-bold' : 'text-amber-200'
-                  }`}
-                >
-                  ₹{(price).toLocaleString('en-IN')}
-                </span>
+                {isAvailable ? (
+                  <span
+                    className={`text-[10px] font-mono ${
+                      isSelected ? 'text-[#16251C]/80 font-bold' : 'text-amber-200'
+                    }`}
+                  >
+                    ₹{(price).toLocaleString('en-IN')}
+                  </span>
+                ) : (
+                  <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-red-500/30 text-red-200 border border-red-500/50 font-bold">
+                    Booked
+                  </span>
+                )}
               </button>
             )
           })}
         </div>
 
-        {/* Right: Three Viewing Modes Toggle (Photography, 360° Tour, 3D View) */}
-        <div className="flex items-center p-1 bg-[#0f1b13]/80 rounded-2xl border border-cream/20 text-xs font-mono">
-          <button
-            type="button"
-            onClick={() => setViewMode('photo')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
-              viewMode === 'photo'
-                ? 'bg-cream text-[#16251C] font-bold shadow-sm'
-                : 'text-cream/70 hover:text-white'
-            }`}
-          >
-            <Camera className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Photography</span>
-            <span className="sm:hidden">Photo</span>
-          </button>
+        {/* Right: Guest Account Portal & Three Viewing Modes Toggle */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <GuestAccountButton variant="dark" />
 
-          <button
-            type="button"
-            onClick={() => setViewMode('360')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
-              viewMode === '360'
-                ? 'bg-cream text-[#16251C] font-bold shadow-sm'
-                : 'text-cream/70 hover:text-white'
-            }`}
-          >
-            <Compass className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">360° Tour</span>
-            <span className="sm:hidden">360°</span>
-          </button>
+          <div className="flex items-center p-1 bg-[#0f1b13]/80 rounded-2xl border border-cream/20 text-xs font-mono">
+            <button
+              type="button"
+              onClick={() => setViewMode('photo')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
+                viewMode === 'photo'
+                  ? 'bg-cream text-[#16251C] font-bold shadow-sm'
+                  : 'text-cream/70 hover:text-white'
+              }`}
+            >
+              <Camera className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Photography</span>
+              <span className="sm:hidden">Photo</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setViewMode('3d')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
-              viewMode === '3d'
-                ? 'bg-cream text-[#16251C] font-bold shadow-sm'
-                : 'text-cream/70 hover:text-white'
-            }`}
-          >
-            <BoxIcon className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">3D View</span>
-            <span className="sm:hidden">3D</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('360')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
+                viewMode === '360'
+                  ? 'bg-cream text-[#16251C] font-bold shadow-sm'
+                  : 'text-cream/70 hover:text-white'
+              }`}
+            >
+              <Compass className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">360° Tour</span>
+              <span className="sm:hidden">360°</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setViewMode('3d')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
+                viewMode === '3d'
+                  ? 'bg-cream text-[#16251C] font-bold shadow-sm'
+                  : 'text-cream/70 hover:text-white'
+              }`}
+            >
+              <BoxIcon className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">3D View</span>
+              <span className="sm:hidden">3D</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -364,7 +410,6 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
               }}
               hideHotspotList={true}
               hideInternalHeader={true}
-              bottomBarOffsetClass="bottom-20 sm:bottom-24"
               viewportHeightClass="h-full w-full"
               className="h-full w-full"
             />
@@ -397,6 +442,28 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
         />
       </div>
 
+      {/* Unavailability Conflict Notice Strip (if room booked for selected dates) */}
+      {!isCurrentRoomAvailable && (
+        <div className="relative z-30 shrink-0 bg-red-950/95 border-t border-red-500/50 px-4 sm:px-6 py-2.5 flex items-center justify-between text-xs text-red-200 shadow-lg">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 animate-pulse" />
+            <span>
+              <strong className="text-white">Room {selectedRoom.roomNumber} is unavailable</strong>
+              {conflictingBooking ? ` (${conflictingBooking.checkInDate} to ${conflictingBooking.checkOutDate})` : ''} — Another guest has confirmed this suite in the PMS.
+            </span>
+          </div>
+          {onModifyDates && (
+            <button
+              type="button"
+              onClick={onModifyDates}
+              className="underline hover:text-white text-xs font-mono ml-3 cursor-pointer shrink-0 font-medium"
+            >
+              Modify Dates
+            </button>
+          )}
+        </div>
+      )}
+
       {/* =========================================================================
           4. BOTTOM RESERVATION BAR (Pricing breakdown & Instant Booking Modal)
           ========================================================================= */}
@@ -415,6 +482,11 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
           <span className="text-amber-200 font-bold">
             ₹{tariffPerNight.toLocaleString('en-IN')}/nt
           </span>
+          {!isCurrentRoomAvailable && (
+            <span className="px-2 py-0.5 rounded-full bg-red-500/30 border border-red-500/50 text-red-200 text-[10px] font-mono font-bold uppercase">
+              Unavailable
+            </span>
+          )}
         </div>
 
         {/* Right: Tariff Total & Primary Booking CTA */}
@@ -433,11 +505,25 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
 
           <button
             type="button"
+            disabled={!isCurrentRoomAvailable}
             onClick={() => setIsBookingModalOpen(true)}
-            className="py-2.5 sm:py-3 px-5 sm:px-6 rounded-2xl bg-cream hover:bg-white text-[#16251C] text-xs uppercase tracking-wider font-bold shadow-xl flex items-center gap-2 transition-all duration-300 transform hover:scale-105 cursor-pointer"
+            className={`py-2.5 sm:py-3 px-5 sm:px-6 rounded-2xl text-xs uppercase tracking-wider font-bold shadow-xl flex items-center gap-2 transition-all duration-300 ${
+              isCurrentRoomAvailable
+                ? 'bg-cream hover:bg-white text-[#16251C] transform hover:scale-105 cursor-pointer'
+                : 'bg-red-950/70 border border-red-500/40 text-red-300 cursor-not-allowed opacity-90'
+            }`}
           >
-            <span>Book Room {selectedRoom.roomNumber}</span>
-            <ArrowRight className="w-4 h-4 text-[#16251C]" />
+            {isCurrentRoomAvailable ? (
+              <>
+                <span>Book Room {selectedRoom.roomNumber}</span>
+                <ArrowRight className="w-4 h-4 text-[#16251C]" />
+              </>
+            ) : (
+              <>
+                <span>Room {selectedRoom.roomNumber} Booked</span>
+                <span className="text-[10px] font-mono opacity-80">(Unavailable)</span>
+              </>
+            )}
           </button>
         </div>
       </footer>
@@ -456,12 +542,13 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
         nights={nights}
         tariffPerNight={tariffPerNight}
         discount={discount}
-        promoCodeApplied="SBFARM"
+        promoCodeApplied="RENOOS"
         conservationFee={0}
         taxesAndGst={taxesAndGst}
         totalAmount={totalAmount}
         onBookingSuccess={(reservation) => {
           setRecentBooking(reservation)
+          refreshAvailability()
         }}
       />
     </div>

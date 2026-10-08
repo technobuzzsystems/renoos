@@ -16,10 +16,10 @@ export const Footer: React.FC = () => {
           <div className="lg:col-span-2 space-y-4">
             <Link to="/" className="inline-block group">
               <span className="font-serif text-2xl text-forest tracking-wider font-normal group-hover:text-forest-dark transition-colors">
-                SB FARM
+                RENOOS HOTEL
               </span>
               <span className="block text-[11px] uppercase tracking-widest text-terracotta mt-1 font-medium">
-                Farm Sanctuary · India
+                Luxury Nature Sanctuary · India
               </span>
             </Link>
             <p className="text-charcoal-muted text-sm leading-relaxed max-w-sm font-light">
@@ -91,15 +91,15 @@ export const Footer: React.FC = () => {
             <ul className="space-y-3 text-xs">
               <li className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-terracotta shrink-0 mt-0.5" />
-                <span className="text-charcoal-muted">SB Farm Sanctuary, Foothills of the Himalayas, India</span>
+                <span className="text-charcoal-muted">Renoos Hotel, Foothills of the Himalayas, India</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-terracotta shrink-0" />
-                <span className="text-charcoal-muted">+91 (800) 555-SBFARM (Demo)</span>
+                <span className="text-charcoal-muted">+91 (800) 555-RENOOS (Demo)</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-terracotta shrink-0" />
-                <span className="text-charcoal-muted">concierge@sbfarm.demo</span>
+                <span className="text-charcoal-muted">concierge@renooshotel.demo</span>
               </li>
             </ul>
           </div>
@@ -107,9 +107,15 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-[#DFD8CB] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-charcoal-muted/80 text-center sm:text-left">
-          <p>© 2026 SB Farm Sanctuary · India. Designed for 360° Virtual Tour Exploration.</p>
+          <p>© 2026 Renoos Hotel · India. Designed for 360° Virtual Tour Exploration.</p>
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
             <span className="text-charcoal-muted/60 hidden sm:inline">360° Interactive Exploration</span>
+            <Link
+              to="/admin"
+              className="text-forest hover:text-terracotta transition-colors font-medium underline underline-offset-4 flex items-center gap-1.5"
+            >
+              <span>Hotel Staff & PMS Admin</span>
+            </Link>
             <button
               onClick={scrollToTop}
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full hover:bg-cream/50 text-forest hover:text-terracotta font-medium transition-colors focus:outline-none min-h-[36px]"

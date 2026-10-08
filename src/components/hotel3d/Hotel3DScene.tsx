@@ -9,6 +9,7 @@ import {
   RotateCcw,
 } from 'lucide-react'
 import { PanoramaViewer } from '../panorama/PanoramaViewer'
+import { GuestAccountButton } from '@/components/auth'
 
 interface Hotel3DSceneProps {
   onEnterReception: () => void
@@ -16,7 +17,7 @@ interface Hotel3DSceneProps {
 
 /**
  * STAGE 1: Full-Screen 360° Hotel Exterior Virtual Tour
- * Uses real 4K equirectangular panorama of SB Farm Sanctuary's grand entrance pavilion.
+ * Uses real 4K equirectangular panorama of Renoos Hotel's grand entrance pavilion.
  * Features ONE elegant entrance hotspot ("Walk to Reception") and a short cinematic forward
  * dolly/walk-in transition into the grand lobby.
  */
@@ -107,23 +108,23 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
   // True Equirectangular 360 Grounds & Grand Entrance Panorama Configuration (User Uploaded Reference)
   const exteriorPanoramaConfig = useMemo(
     () => ({
-      imageSrc: '/panoramas/hotel/hotel-exterior-360.jpg?v=welcome-360',
+      imageSrc: '/images/Renos Hotel at Golden Hour.png',
       aspectRatio: '2:1' as const,
-      initialFov: 82,
-      minFov: 42,
-      maxFov: 105,
+      initialFov: 90,
+      minFov: 40,
+      maxFov: 110,
       initialPitch: -2,
       initialYaw: 0,
       isPlaceholder: false,
       isAvailable: true,
-      caption: 'SB Farm Sanctuary — 360° Panoramic Hotel Exterior',
+      caption: 'Renoos Hotel — 360° Panoramic Hotel Exterior',
       hotspots: [
         {
           id: 'hs-entrance-walk',
-          title: 'Walk to Reception',
-          description: 'Step into the Grand Lobby to meet concierge and reserve suites',
+          title: 'Walk to Receptionist',
+          description: 'Step through the entrance door into the 360° Grand Lobby',
           type: 'navigation' as const,
-          spherical: { yaw: 0, pitch: -7 },
+          spherical: { yaw: -6.5, pitch: -3.5 },
           targetSpaceId: 'reception',
           category: 'Hotel Entrance',
         },
@@ -152,7 +153,7 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
           onNavigateSpace={() => handleWalkIntoReception()}
           hideHotspotList={true}
           hideInternalHeader={true}
-          bottomBarOffsetClass="bottom-24 sm:bottom-28"
+          bottomBarOffsetClass="bottom-56 sm:bottom-6"
           viewportHeightClass="h-full w-full"
           className="h-full w-full"
         />
@@ -172,7 +173,7 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
               Entering Grand Lobby
             </span>
             <span className="text-[10px] font-mono text-cream/70 uppercase tracking-widest block">
-              Walking into SB Farm Sanctuary...
+              Walking into Renoos Hotel...
             </span>
           </div>
         </div>
@@ -190,20 +191,23 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
           <div>
             <div className="flex items-center gap-2">
               <h1 className="font-serif text-lg sm:text-xl text-cream font-medium tracking-tight">
-                SB FARM SANCTUARY
+                RENOOS HOTEL
               </h1>
               <span className="px-2 py-0.5 rounded-full bg-cream/15 border border-cream/20 text-cream/90 text-[10px] font-mono uppercase tracking-wider">
                 360° Exterior
               </span>
             </div>
             <p className="text-xs text-cream/70 font-light font-mono">
-              Western Ghats Nature Resort · India
+              Luxury Mountain Resort · India
             </p>
           </div>
         </div>
 
-        {/* Top Controls: Sound Ambience & Direct Walk In */}
+        {/* Top Controls: Sound Ambience, Guest Account & Direct Walk In */}
         <div className="pointer-events-auto flex items-center gap-2 sm:gap-3">
+          {/* Guest Account / Portal Trigger */}
+          <GuestAccountButton variant="dark" />
+
           {/* Nature Breeze Ambience Toggle */}
           <button
             type="button"
@@ -231,7 +235,7 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
             className="px-4 py-2 rounded-full bg-cream hover:bg-white text-[#16251C] font-semibold text-xs font-mono flex items-center gap-1.5 transition-all shadow-lg cursor-pointer transform hover:scale-105"
           >
             <Compass className="w-3.5 h-3.5 text-[#16251C]" />
-            <span>Walk to Reception</span>
+            <span>Walk to Receptionist</span>
             <ArrowRight className="w-3 h-3 text-[#16251C]" />
           </button>
         </div>
@@ -255,7 +259,7 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
           </div>
 
           <p className="text-xs text-cream/80 font-light leading-relaxed">
-            Drag to explore the 360° sanctuary grounds. When you are ready, click the entrance hotspot to walk into the Grand Lobby and meet the receptionist.
+            Drag to explore the 360° sanctuary grounds. When you are ready, click the entrance door spot to walk into the 360° Grand Lobby and meet the receptionist.
           </p>
 
           <button
@@ -264,15 +268,10 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
             className="w-full py-3 px-5 bg-cream hover:bg-white text-[#16251C] font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-xl flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-[1.01] cursor-pointer"
           >
             <Compass className="w-4 h-4 text-[#16251C]" />
-            <span>Walk to Reception & Book Rooms</span>
+            <span>Walk to Receptionist & Book Rooms</span>
             <ArrowRight className="w-4 h-4 text-[#16251C]" />
           </button>
         </div>
-      </div>
-
-      {/* Floating 360 Interaction Pill */}
-      <div className="hidden sm:block absolute bottom-28 left-6 pointer-events-none z-10 text-[10px] font-mono text-cream/70 bg-[#16251C]/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-cream/15 shadow-md">
-        🖱️ Drag to look around 360° · Click "Walk to Reception" hotspot to enter
       </div>
     </div>
   )

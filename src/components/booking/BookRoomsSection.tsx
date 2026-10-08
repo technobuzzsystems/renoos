@@ -25,6 +25,7 @@ import {
   Camera,
   Image,
   Move,
+  AlertTriangle,
 } from 'lucide-react'
 import { ROOMS_DATA } from '@/data/rooms'
 import type { Room, ConfirmedReservation } from '@/types'
@@ -32,6 +33,7 @@ import { SectionHeader } from '@/components/common'
 import { PanoramaViewer } from '../panorama/PanoramaViewer'
 import { BookingModal } from './BookingModal'
 import { formatArea } from '@/lib/utils'
+import { fetchRoomAvailability, type AvailabilityMap } from '@/services/api'
 
 interface BookRoomsSectionProps {
   id?: string
@@ -110,7 +112,9 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
   const [recentBooking, setRecentBooking] = useState<ConfirmedReservation | null>(() => {
     try {
-      const stored = localStorage.getItem('sb_farm_reservations')
+      const stored =
+        localStorage.getItem('renoos_hotel_reservations') ||
+        localStorage.getItem('sb_farm_reservations')
       if (stored) {
         const parsed = JSON.parse(stored)
         return parsed[0] || null
@@ -120,6 +124,29 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
     }
     return null
   })
+
+  // Real-time PMS Room Availability (Multi-User Concurrency Sync)
+  const [availability, setAvailability] = useState<AvailabilityMap>({
+    '201': { available: true },
+    '202': { available: true },
+    '203': { available: true },
+  })
+
+  const refreshAvailability = async () => {
+    try {
+      const data = await fetchRoomAvailability(checkInDate, checkOutDate)
+      setAvailability(data)
+    } catch (err) {
+      console.warn('Availability polling error:', err)
+    }
+  }
+
+  // Poll availability every 4s to sync bookings made across multiple browsers/users
+  useEffect(() => {
+    refreshAvailability()
+    const timer = setInterval(refreshAvailability, 4000)
+    return () => clearInterval(timer)
+  }, [checkInDate, checkOutDate])
 
   // Calculate nights
   const nights = useMemo(() => {
@@ -169,6 +196,10 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
     return found || availableRooms[0] || ROOMS_DATA[0]
   }, [selectedRoomId, availableRooms])
 
+  const selectedRoomAvail = availability[selectedRoom.roomNumber] || availability[selectedRoom.id]
+  const isSelectedRoomAvailable = selectedRoomAvail?.available !== false
+  const selectedConflictingBooking = selectedRoomAvail?.conflictingBooking
+
   // Reset selected space key when selected room changes if space doesn't exist
   const currentRoomSpaces = useMemo(() => {
     return Object.entries(selectedRoom.spaces)
@@ -205,11 +236,11 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
     const code = promoInput.trim().toUpperCase()
     if (!code) return
 
-    if (code === 'SBFARM' || code === 'SANCTUARY' || code === 'WELCOME10') {
+    if (code === 'RENOOS' || code === 'RENOOS10' || code === 'SBFARM' || code === 'SANCTUARY' || code === 'WELCOME10') {
       setAppliedPromo(code)
       setPromoError(null)
     } else {
-      setPromoError('Invalid code. Try "SBFARM" for 10% discount.')
+      setPromoError('Invalid code. Try "RENOOS" for 10% discount.')
     }
   }
 
@@ -434,6 +465,8 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
                 const isSelected = room.id === selectedRoom.id
                 const roomPrice = getRoomPrice(room)
                 const roomTotal = roomPrice * nights
+                const roomAvail = availability[room.roomNumber] || availability[room.id]
+                const isRoomAvailable = roomAvail?.available !== false
 
                 return (
                   <div
@@ -458,6 +491,12 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
                         <Check className="w-3 h-3 text-terracotta-light" />
                         <span className="hidden lg:inline">Previewing on Right</span>
                         <span className="lg:hidden">Selected · View Details Below</span>
+                      </div>
+                    )}
+
+                    {!isRoomAvailable && (
+                      <div className="absolute -top-3 left-4 sm:left-6 px-2.5 py-0.5 bg-red-800 text-red-100 text-[9px] uppercase font-mono tracking-wider font-bold rounded-full shadow-sm">
+                        Booked for Dates
                       </div>
                     )}
 
@@ -540,12 +579,20 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
                       <div className="flex items-center gap-2 w-full sm:w-auto">
                         <span
                           className={`inline-flex items-center justify-center gap-1.5 px-4 py-2.5 w-full sm:w-auto min-h-[44px] text-xs uppercase tracking-wider font-semibold rounded-full transition-all ${
-                            isSelected
-                              ? 'bg-forest text-cream shadow-sm'
-                              : 'bg-ivory text-forest hover:bg-forest/10 border border-[#E9E4DB]'
+                            !isRoomAvailable
+                              ? 'bg-red-50 text-red-700 border border-red-200'
+                              : isSelected
+                                ? 'bg-forest text-cream shadow-sm'
+                                : 'bg-ivory text-forest hover:bg-forest/10 border border-[#E9E4DB]'
                           }`}
                         >
-                          <span>{isSelected ? '360° & Preview Active' : 'Select Room'}</span>
+                          <span>
+                            {!isRoomAvailable
+                              ? 'Unavailable'
+                              : isSelected
+                                ? '360° & Preview Active'
+                                : 'Select Room'}
+                          </span>
                           <ChevronRight className="w-3.5 h-3.5" />
                         </span>
                       </div>
@@ -942,16 +989,45 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
                 </div>
               </div>
 
+              {/* Unavailability Conflict Banner */}
+              {!isSelectedRoomAvailable && (
+                <div className="p-3.5 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-2.5 text-xs text-red-800">
+                  <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5 animate-pulse" />
+                  <div>
+                    <span className="font-semibold block text-red-900">
+                      Room {selectedRoom.roomNumber} is Unavailable for Selected Dates
+                    </span>
+                    <span className="font-light">
+                      {selectedConflictingBooking
+                        ? `Reserved from ${selectedConflictingBooking.checkInDate} to ${selectedConflictingBooking.checkOutDate}. `
+                        : ''}
+                      Another guest has already confirmed this suite in the PMS. Please select different dates or pick another suite.
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {/* Primary Action Buttons */}
               <div className="space-y-3 pt-1">
                 <button
                   type="button"
+                  disabled={!isSelectedRoomAvailable}
                   onClick={() => setIsBookingModalOpen(true)}
-                  className="w-full inline-flex items-center justify-center gap-2 py-4 bg-forest hover:bg-forest-dark text-cream text-xs sm:text-sm uppercase tracking-wider font-semibold rounded-full shadow-warm transition-all duration-300 group"
+                  className={`w-full inline-flex items-center justify-center gap-2 py-4 text-xs sm:text-sm uppercase tracking-wider font-semibold rounded-full shadow-warm transition-all duration-300 ${
+                    isSelectedRoomAvailable
+                      ? 'bg-forest hover:bg-forest-dark text-cream group'
+                      : 'bg-red-950/70 border border-red-500/40 text-red-300 cursor-not-allowed opacity-90'
+                  }`}
                 >
                   <FileCheck2 className="w-4 h-4 text-cream" />
-                  <span>Proceed to Reserve Room {selectedRoom.roomNumber}</span>
-                  <ArrowRight className="w-4 h-4 text-cream transform group-hover:translate-x-1 transition-transform" />
+                  <span>
+                    {isSelectedRoomAvailable
+                      ? `Proceed to Reserve Room ${selectedRoom.roomNumber}`
+                      : `Room ${selectedRoom.roomNumber} Booked (Unavailable)`}
+                  </span>
+                  {isSelectedRoomAvailable && (
+                    <ArrowRight className="w-4 h-4 text-cream transform group-hover:translate-x-1 transition-transform" />
+                  )}
                 </button>
 
                 <div className="text-center">
@@ -983,6 +1059,7 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
         totalAmount={totalAmount}
         onBookingSuccess={(res) => {
           setRecentBooking(res)
+          refreshAvailability()
         }}
       />
     </section>

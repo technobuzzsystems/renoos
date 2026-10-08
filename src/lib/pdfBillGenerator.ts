@@ -68,7 +68,7 @@ export function generateReservationPDF(reservation: ConfirmedReservation): void 
   doc.setTextColor(255, 255, 255)
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(18)
-  doc.text('SB FARM SANCTUARY', margin, 13)
+  doc.text('RENOOS HOTEL', margin, 13)
 
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(8)
@@ -353,7 +353,7 @@ export function generateReservationPDF(reservation: ConfirmedReservation): void 
   doc.text('• Check-in begins at 14:00 hrs. Early arrival is subject to villa availability. Check-out is scheduled by 12:00 hrs.', margin + 4, y + 14.5)
   doc.text('• Free cancellation is honored up to 48 hours prior to check-in date. Full refund credited within 3-5 business days.', margin + 4, y + 19)
   doc.text('• Touchless Digital Access: Present booking reference or display this PDF on your device for immediate keycard encoding.', margin + 4, y + 23.5)
-  doc.text('• SB Farm Sanctuary maintains total silent acoustic isolation between 22:00 and 07:00 hrs for restful tranquility.', margin + 4, y + 28)
+  doc.text('• Renoos Hotel maintains total silent acoustic isolation between 22:00 and 07:00 hrs for restful tranquility.', margin + 4, y + 28)
 
   y += 36
 
@@ -365,20 +365,20 @@ export function generateReservationPDF(reservation: ConfirmedReservation): void 
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(7)
   doc.setTextColor(cForest[0], cForest[1], cForest[2])
-  doc.text('SB FARM SANCTUARY RESIDENCES', margin, y + 3)
+  doc.text('RENOOS HOTEL RESIDENCES', margin, y + 3)
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(cMuted[0], cMuted[1], cMuted[2])
   doc.text('Digitally Authenticated Hospitality Voucher · No Physical Stamp Required', margin, y + 7)
 
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(cTerracotta[0], cTerracotta[1], cTerracotta[2])
-  doc.text('SANCTUARY CONCIERGE DESK', pageWidth - margin, y + 3, { align: 'right' })
+  doc.text('HOTEL CONCIERGE DESK', pageWidth - margin, y + 3, { align: 'right' })
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(cMuted[0], cMuted[1], cMuted[2])
-  doc.text('+91 (800) 555-SBFARM · concierge@sbfarm.demo', pageWidth - margin, y + 7, { align: 'right' })
+  doc.text('+91 (800) 555-RENOOS · concierge@renooshotel.demo', pageWidth - margin, y + 7, { align: 'right' })
 
   // Save the document with clean, professional filename
-  const filename = `SB_Farm_Bill_${reservation.bookingReference}.pdf`
+  const filename = `Renoos_Hotel_Bill_${reservation.bookingReference}.pdf`
   doc.save(filename)
 }
 
@@ -601,7 +601,7 @@ export function printReservationInvoice(reservation: ConfirmedReservation): void
 
   <div class="header">
     <div>
-      <h1>SB FARM SANCTUARY</h1>
+      <h1>RENOOS HOTEL</h1>
       <p>AN ARCHITECTURAL RETREAT OF RESTORATIVE HOSPITALITY</p>
       <p>Foothills of the Himalayas · Uttarakhand, India · GSTIN: 05AAACS1234F1Z8</p>
     </div>
@@ -711,8 +711,8 @@ export function printReservationInvoice(reservation: ConfirmedReservation): void
   </div>
 
   <div class="footer">
-    <div>SB FARM SANCTUARY RESIDENCES · Authorized Electronic Tax Invoice</div>
-    <div>Concierge: +91 (800) 555-SBFARM · concierge@sbfarm.demo</div>
+    <div>RENOOS HOTEL RESIDENCES · Authorized Electronic Tax Invoice</div>
+    <div>Concierge: +91 (800) 555-RENOOS · concierge@renooshotel.demo</div>
   </div>
 
   <script>

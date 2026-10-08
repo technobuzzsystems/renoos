@@ -10,7 +10,7 @@ export const ROOMS_DATA: Room[] = [
     description:
       'An intimate sanctuary of tranquil textures, brushed brass accents, and serene courtyard views, crafted for discerning travelers seeking quiet elegance.',
     longDescription:
-      'Designed in collaboration with world-renowned architects, Room 201 embodies understated opulence. Natural light washes across handcrafted oak floors, contrasting gently with blackened steel and warm linen textiles. The suite integrates intuitive touch-panel environmental controls, acoustic glazing for complete stillness, and custom furnishings created exclusively for SB Farm.',
+      'Designed in collaboration with world-renowned architects, Room 201 embodies understated opulence. Natural light washes across handcrafted oak floors, contrasting gently with blackened steel and warm linen textiles. The suite integrates intuitive touch-panel environmental controls, acoustic glazing for complete stillness, and custom furnishings created exclusively for Renoos Hotel.',
     area: 48,
     guestCapacity: 2,
     bedType: 'King Bed (800-thread Egyptian Cotton)',
@@ -409,7 +409,7 @@ export const ROOMS_DATA: Room[] = [
             '/panoramas/garden/garden-4.avif',
             '/panoramas/garden/garden-1.avif',
           ],
-          alt: 'SB Farm Lakeside Estate Garden Grounds',
+          alt: 'Renoos Hotel Lakeside Estate Garden Grounds',
         },
         panorama: {
           imageSrc: '/panoramas/garden/garden.jpg',
@@ -849,7 +849,7 @@ export const ROOMS_DATA: Room[] = [
     description:
       'Our signature grand residence. Spanning 110 square meters of curated grandeur, offering a full culinary kitchen, private cedar sauna, fireplace salon, and dedicated butler pantry.',
     longDescription:
-      'Perched on the premier upper tier of SB Farm, the Executive Suite is an architectural tour-de-force. Featuring soaring 3.6-meter ceilings, floor-to-ceiling glass perimeter walls, and double wrap-around balconies, the suite accommodates up to four guests in unmatched privacy and luxury.',
+      'Perched on the premier upper tier of Renoos Hotel, the Executive Suite is an architectural tour-de-force. Featuring soaring 3.6-meter ceilings, floor-to-ceiling glass perimeter walls, and double wrap-around balconies, the suite accommodates up to four guests in unmatched privacy and luxury.',
     area: 110,
     guestCapacity: 4,
     bedType: 'Grand Presidential King + Separate Guest Salon',

@@ -1,0 +1,23 @@
+[
+  {
+    "roomNumber": "201",
+    "name": "The Forest Sanctuary Suite",
+    "baseTariff": 4800,
+    "operationalStatus": "available",
+    "housekeepingNotes": "Inspected and certified ready for guests"
+  },
+  {
+    "roomNumber": "202",
+    "name": "Mountain View Pavilion",
+    "baseTariff": 5200,
+    "operationalStatus": "available",
+    "housekeepingNotes": "High-balcony view ready for arrival."
+  },
+  {
+    "roomNumber": "203",
+    "name": "The Executive Sanctuary Suite",
+    "baseTariff": 8500,
+    "operationalStatus": "available",
+    "housekeepingNotes": "Executive penthouse cleaned and scented with pine essence."
+  }
+]

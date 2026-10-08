@@ -18,7 +18,7 @@ export const HeroSection: React.FC = () => {
         <div className="relative aspect-[16/10] sm:aspect-[21/10] lg:aspect-[2.4/1] rounded-2xl sm:rounded-3xl overflow-hidden shadow-warm-lg border border-[#E9E4DB] group bg-cream">
           <img
             src="/images/hero.jpg"
-            alt="SB Farm sanctuary grounds and pavilion lounge"
+            alt="Renoos Hotel sanctuary grounds and pavilion lounge"
             fetchPriority="high"
             width={1920}
             height={1080}
@@ -59,11 +59,11 @@ export const HeroSection: React.FC = () => {
           <div className="lg:col-span-8 space-y-3 sm:space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-terracotta/30 bg-terracotta/10 text-terracotta text-[11px] sm:text-xs tracking-wider uppercase font-medium">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>SB Farm · Modern Farm Sanctuary</span>
+              <span>Renoos Hotel · Luxury Nature Sanctuary</span>
             </div>
 
             <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-forest font-normal leading-[1.08] tracking-tight">
-              Stay Inside the SB Farm 360° Experience
+              Stay Inside the Renoos Hotel 360° Experience
             </h1>
           </div>
 
