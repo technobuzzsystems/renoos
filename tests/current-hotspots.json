@@ -1,0 +1,350 @@
+[
+  {
+    "room": "201",
+    "space": "bedroom",
+    "id": "hs-201-bed-to-kitchen",
+    "title": "Kitchen",
+    "description": "Explore the artisan kitchenette & bar",
+    "type": "navigation",
+    "targetSpaceId": "kitchen",
+    "yaw": -16,
+    "pitch": -2
+  },
+  {
+    "room": "201",
+    "space": "bedroom",
+    "id": "hs-201-bed-to-washroom",
+    "title": "Washroom",
+    "description": "Enter the spa marble washroom",
+    "type": "navigation",
+    "targetSpaceId": "washroom",
+    "yaw": 28,
+    "pitch": -2
+  },
+  {
+    "room": "201",
+    "space": "bedroom",
+    "id": "hs-201-bed",
+    "title": "Handcrafted Bed Platform",
+    "description": "Sustainable white oak with custom floating side tables",
+    "type": "feature",
+    "yaw": 180,
+    "pitch": -22
+  },
+  {
+    "room": "201",
+    "space": "bedroom",
+    "id": "hs-201-window",
+    "title": "Garden View Acoustic Glazing",
+    "description": "Triple-pane insulated acoustic glass opening onto private courtyard",
+    "type": "info",
+    "yaw": 121,
+    "pitch": 0
+  },
+  {
+    "room": "201",
+    "space": "kitchen",
+    "id": "hs-201-kitch-to-bedroom",
+    "title": "Bedroom",
+    "description": "Return to master bedroom chamber",
+    "type": "navigation",
+    "targetSpaceId": "bedroom",
+    "yaw": -50,
+    "pitch": -2
+  },
+  {
+    "room": "201",
+    "space": "kitchen",
+    "id": "hs-201-kitch-to-washroom",
+    "title": "Washroom",
+    "description": "Transition to spa marble washroom",
+    "type": "navigation",
+    "targetSpaceId": "washroom",
+    "yaw": 10,
+    "pitch": -2
+  },
+  {
+    "room": "201",
+    "space": "kitchen",
+    "id": "hs-201-bar",
+    "title": "Artisan Dining & Pour-Over Bar",
+    "description": "Handcrafted dining table and specialty pour-over tea setup",
+    "type": "feature",
+    "yaw": -90,
+    "pitch": -20
+  },
+  {
+    "room": "201",
+    "space": "kitchen",
+    "id": "hs-201-tap",
+    "title": "Purified Water Station & Tap",
+    "description": "Wall-mounted multi-stage water filtration and dedicated tap",
+    "type": "info",
+    "yaw": -162,
+    "pitch": 5
+  },
+  {
+    "room": "201",
+    "space": "washroom",
+    "id": "hs-201-wash-to-bedroom",
+    "title": "Bedroom",
+    "description": "Return to master bedroom chamber",
+    "type": "navigation",
+    "targetSpaceId": "bedroom",
+    "yaw": -4,
+    "pitch": -2
+  },
+  {
+    "room": "201",
+    "space": "washroom",
+    "id": "hs-201-wash-to-kitchen",
+    "title": "Kitchen",
+    "description": "Walk through to kitchenette & bar",
+    "type": "navigation",
+    "targetSpaceId": "kitchen",
+    "yaw": 10,
+    "pitch": -2
+  },
+  {
+    "room": "201",
+    "space": "washroom",
+    "id": "hs-201-vanity",
+    "title": "Illuminated Marble Vanity",
+    "description": "Ceramic countertop basin with round ambient backlit mirror",
+    "type": "feature",
+    "yaw": 62,
+    "pitch": -4
+  },
+  {
+    "room": "201",
+    "space": "washroom",
+    "id": "hs-201-shower",
+    "title": "Rainfall Deluge Shower",
+    "description": "Ceiling-mounted overhead square rainfall shower with thermostatic controls",
+    "type": "feature",
+    "yaw": 171,
+    "pitch": 20
+  },
+  {
+    "room": "202",
+    "space": "bedroom",
+    "id": "hs-202-bed-to-kitchen",
+    "title": "Kitchen",
+    "description": "Step into the gourmet studio kitchenette",
+    "type": "navigation",
+    "targetSpaceId": "kitchen",
+    "yaw": -8,
+    "pitch": 0
+  },
+  {
+    "room": "202",
+    "space": "bedroom",
+    "id": "hs-202-bed-to-washroom",
+    "title": "Washroom",
+    "description": "Enter the oasis basalt spa washroom",
+    "type": "navigation",
+    "targetSpaceId": "washroom",
+    "yaw": -1,
+    "pitch": 0
+  },
+  {
+    "room": "202",
+    "space": "bedroom",
+    "id": "hs-202-art",
+    "title": "Curated Wall Art Gallery",
+    "description": "Commissioned modern abstract triptych gallery collection",
+    "type": "info",
+    "yaw": -73,
+    "pitch": 2
+  },
+  {
+    "room": "202",
+    "space": "bedroom",
+    "id": "hs-202-terrace-door",
+    "title": "Glazed Terrace Portal",
+    "description": "Floor-to-ceiling glass sliding door opening to the scenic private balcony",
+    "type": "feature",
+    "yaw": 61,
+    "pitch": 0
+  },
+  {
+    "room": "202",
+    "space": "kitchen",
+    "id": "hs-202-kitch-to-bedroom",
+    "title": "Bedroom",
+    "description": "Return to panoramic master suite",
+    "type": "navigation",
+    "targetSpaceId": "bedroom",
+    "yaw": -58,
+    "pitch": 0
+  },
+  {
+    "room": "202",
+    "space": "kitchen",
+    "id": "hs-202-kitch-to-washroom",
+    "title": "Washroom",
+    "description": "Walk through to basalt spa washroom",
+    "type": "navigation",
+    "targetSpaceId": "washroom",
+    "yaw": -8,
+    "pitch": 0
+  },
+  {
+    "room": "202",
+    "space": "kitchen",
+    "id": "hs-202-cooktop",
+    "title": "Induction Cooktop & Prep Island",
+    "description": "Gaggenau touch-induction cooking surface with breakfast preparation bar",
+    "type": "feature",
+    "yaw": -115,
+    "pitch": -18
+  },
+  {
+    "room": "202",
+    "space": "washroom",
+    "id": "hs-202-wash-to-bedroom",
+    "title": "Bedroom",
+    "description": "Return to panoramic master suite",
+    "type": "navigation",
+    "targetSpaceId": "bedroom",
+    "yaw": -134,
+    "pitch": 0
+  },
+  {
+    "room": "202",
+    "space": "washroom",
+    "id": "hs-202-wash-to-kitchen",
+    "title": "Kitchen",
+    "description": "Enter studio kitchenette & bar",
+    "type": "navigation",
+    "targetSpaceId": "kitchen",
+    "yaw": -129,
+    "pitch": 0
+  },
+  {
+    "room": "202",
+    "space": "washroom",
+    "id": "hs-202-shower",
+    "title": "Rainfall Deluge Shower",
+    "description": "Thermostatic walk-in rain shower with integrated shower caddy",
+    "type": "feature",
+    "yaw": -53,
+    "pitch": 22
+  },
+  {
+    "room": "203",
+    "space": "bedroom",
+    "id": "hs-203-bed-to-kitchen",
+    "title": "Kitchen",
+    "description": "Explore the culinary chef kitchen & patio",
+    "type": "navigation",
+    "targetSpaceId": "kitchen",
+    "yaw": -29,
+    "pitch": 0
+  },
+  {
+    "room": "203",
+    "space": "bedroom",
+    "id": "hs-203-bed-to-washroom",
+    "title": "Washroom",
+    "description": "Enter imperial marble spa washroom",
+    "type": "navigation",
+    "targetSpaceId": "washroom",
+    "yaw": 61,
+    "pitch": 0
+  },
+  {
+    "room": "203",
+    "space": "bedroom",
+    "id": "hs-203-bed",
+    "title": "Presidential Master Bed",
+    "description": "Handcrafted king platform with live-edge bench and premium natural linens",
+    "type": "feature",
+    "yaw": -177,
+    "pitch": -22
+  },
+  {
+    "room": "203",
+    "space": "bedroom",
+    "id": "hs-203-dressing",
+    "title": "Rustic Wardrobe & Dressing Suite",
+    "description": "Artisanal timber clothing rail, storage bench, and dressing area",
+    "type": "feature",
+    "yaw": -123,
+    "pitch": -4
+  },
+  {
+    "room": "203",
+    "space": "kitchen",
+    "id": "hs-203-kitch-to-bedroom",
+    "title": "Bedroom",
+    "description": "Return to presidential master suite",
+    "type": "navigation",
+    "targetSpaceId": "bedroom",
+    "yaw": 57,
+    "pitch": 0
+  },
+  {
+    "room": "203",
+    "space": "kitchen",
+    "id": "hs-203-kitch-to-washroom",
+    "title": "Washroom",
+    "description": "Transition to imperial spa washroom",
+    "type": "navigation",
+    "targetSpaceId": "washroom",
+    "yaw": -69,
+    "pitch": 0
+  },
+  {
+    "room": "203",
+    "space": "kitchen",
+    "id": "hs-203-pool",
+    "title": "Courtyard Plunge Pool & Patio",
+    "description": "Private courtyard plunge pool with integrated sun loungers and tropical greenery",
+    "type": "feature",
+    "yaw": 180,
+    "pitch": -20
+  },
+  {
+    "room": "203",
+    "space": "washroom",
+    "id": "hs-203-wash-to-bedroom",
+    "title": "Bedroom",
+    "description": "Return to presidential master suite",
+    "type": "navigation",
+    "targetSpaceId": "bedroom",
+    "yaw": 7,
+    "pitch": 0
+  },
+  {
+    "room": "203",
+    "space": "washroom",
+    "id": "hs-203-wash-to-kitchen",
+    "title": "Kitchen",
+    "description": "Walk through to courtyard pool & dining patio",
+    "type": "navigation",
+    "targetSpaceId": "kitchen",
+    "yaw": -5,
+    "pitch": 0
+  },
+  {
+    "room": "203",
+    "space": "washroom",
+    "id": "hs-203-window",
+    "title": "Panoramic Rainforest Window",
+    "description": "Expansive picture window framing the lush tropical greenery and waterfall",
+    "type": "feature",
+    "yaw": 176,
+    "pitch": 5
+  },
+  {
+    "room": "203",
+    "space": "washroom",
+    "id": "hs-203-tub",
+    "title": "Freestanding Soaking Tub",
+    "description": "Deep ergonomic oval soaking tub with floor-mounted matte black filler",
+    "type": "feature",
+    "yaw": 96,
+    "pitch": -18
+  }
+]

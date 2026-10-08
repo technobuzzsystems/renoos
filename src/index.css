@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --forest-green: #263D2F;
+    --forest-dark: #1A2A20;
+    --sage-green: #647668;
+    --warm-ivory: #F9F6F0;
+    --soft-cream: #FFFFFF;
+    --muted-terracotta: #B8684A;
+    --deep-charcoal: #1C231E;
+    --warm-border: #E9E4DB;
+  }
+
+  html {
+    color-scheme: light;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #F9F6F0;
+    color: #1C231E;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Custom subtle warm scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #F9F6F0;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #D5CEBF;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #647668;
+  }
+}
+
+@layer utilities {
+  .shadow-warm {
+    box-shadow: 0 4px 20px -2px rgba(35, 72, 58, 0.06), 0 2px 6px -1px rgba(35, 72, 58, 0.04);
+  }
+
+  .shadow-warm-lg {
+    box-shadow: 0 10px 30px -4px rgba(35, 72, 58, 0.08), 0 4px 12px -2px rgba(35, 72, 58, 0.04);
+  }
+
+  .shadow-warm-hover:hover {
+    box-shadow: 0 16px 36px -6px rgba(35, 72, 58, 0.12), 0 6px 16px -2px rgba(35, 72, 58, 0.06);
+  }
+
+  .border-warm {
+    border-color: #E9E4DB;
+  }
+}

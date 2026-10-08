@@ -1,0 +1,20 @@
+{
+  "room": "room-202",
+  "space": "kitchen",
+  "status": "pending_modeling",
+  "format": "binary_gltf_glb",
+  "expectedFilePath": "/models/room-202/kitchen.glb",
+  "cameraPreset": {
+    "position": [
+      0,
+      1.6,
+      3.5
+    ],
+    "target": [
+      0,
+      1.2,
+      0
+    ]
+  },
+  "notes": "BIM / CAD architectural GLB export scheduled for Phase 2."
+}

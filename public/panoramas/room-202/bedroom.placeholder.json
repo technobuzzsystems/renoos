@@ -1,0 +1,15 @@
+{
+  "room": "room-202",
+  "space": "bedroom",
+  "status": "pending_capture",
+  "aspectRatio": "2:1",
+  "recommendedResolution": "4096x2048",
+  "format": "equirectangular_jpg",
+  "expectedFilePath": "/panoramas/room-202/bedroom.jpg",
+  "fov": {
+    "initial": 75,
+    "min": 40,
+    "max": 95
+  },
+  "notes": "High dynamic range architectural capture scheduled for Phase 2."
+}

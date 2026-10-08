@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- SB Farm Monogram Favicon -->
+  <rect width="64" height="64" rx="16" fill="#263D2F" />
+  <rect x="3" y="3" width="58" height="58" rx="13" fill="none" stroke="#FAF8F5" stroke-opacity="0.18" stroke-width="1.5" />
+  <g fill="#FAF8F5">
+    <!-- Stylized modern serif monogram SB -->
+    <text
+      x="32"
+      y="41"
+      font-family="'Newsreader', 'Playfair Display', 'Cormorant Garamond', Georgia, serif"
+      font-size="30"
+      font-weight="600"
+      letter-spacing="-0.03em"
+      text-anchor="middle"
+    >SB</text>
+  </g>
+  <!-- Subtle leaf / organic seed accent at top right -->
+  <circle cx="49" cy="15" r="2.5" fill="#B8684A" />
+</svg>
