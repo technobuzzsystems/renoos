@@ -45,12 +45,27 @@ const server = http.createServer(async (req, res) => {
 
   const parsedUrl = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`)
   let pathname = parsedUrl.pathname
+  try {
+    pathname = decodeURIComponent(pathname)
+  } catch {
+    res.writeHead(400)
+    res.end('Bad Request')
+    return
+  }
   if (pathname === '/') pathname = '/index.html'
 
-  let filePath = path.join(DIST_DIR, pathname)
+  const relativePath = pathname.replace(/^\/+/, '')
+  if (relativePath.split(/[/\\]/).includes('..')) {
+    res.writeHead(403)
+    res.end('Forbidden')
+    return
+  }
+
+  let filePath = path.join(DIST_DIR, relativePath)
 
   // Security check: prevent directory traversal
-  if (!filePath.startsWith(DIST_DIR)) {
+  const distPrefix = DIST_DIR.endsWith(path.sep) ? DIST_DIR : DIST_DIR + path.sep
+  if (filePath !== DIST_DIR && !filePath.startsWith(distPrefix)) {
     res.writeHead(403)
     res.end('Forbidden')
     return

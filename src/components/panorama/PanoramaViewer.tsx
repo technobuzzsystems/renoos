@@ -284,7 +284,7 @@ export const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
     const loader = new THREE.TextureLoader()
 
     loader.load(
-      config.imageSrc,
+      encodeURI(config.imageSrc),
       (loadedTexture) => {
         if (isCancelled) {
           loadedTexture.dispose()
@@ -778,7 +778,7 @@ export const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
                   setIsLoading(true)
                   const loader = new THREE.TextureLoader()
                   loader.load(
-                    config.imageSrc,
+                    encodeURI(config.imageSrc),
                     (loadedTexture) => {
                       loadedTexture.colorSpace = THREE.SRGBColorSpace
                       loadedTexture.minFilter = THREE.LinearFilter
