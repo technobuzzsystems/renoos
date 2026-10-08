@@ -35,7 +35,7 @@ export const SpaceSelector: React.FC<SpaceSelectorProps> = ({
   return (
     <div className={`w-full ${className}`}>
       <div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-row items-stretch gap-2 p-1.5 bg-cream/90 backdrop-blur-md rounded-2xl border border-[#E9E4DB] shadow-sm"
+        className="flex flex-row overflow-x-auto no-scrollbar items-center gap-1.5 sm:gap-2 p-1 sm:p-1.5 bg-[#142018]/90 sm:bg-cream/90 backdrop-blur-md rounded-2xl border border-cream/20 sm:border-[#E9E4DB] shadow-sm"
         role="tablist"
         aria-label="Room Spaces Selector"
       >
@@ -50,19 +50,19 @@ export const SpaceSelector: React.FC<SpaceSelectorProps> = ({
               aria-controls={`space-panel-${space.id}`}
               id={`space-tab-${space.id}`}
               onClick={() => onSelectSpace(space.id)}
-              className={`flex-1 flex items-center justify-between gap-2.5 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-xs tracking-wider uppercase rounded-xl transition-all duration-300 relative group ${
+              className={`shrink-0 sm:flex-1 flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs tracking-wider uppercase rounded-xl transition-all duration-300 relative group cursor-pointer ${
                 isActive
-                  ? 'bg-forest text-cream font-semibold shadow-warm'
-                  : 'text-charcoal-muted hover:text-forest hover:bg-ivory/60'
+                  ? 'bg-cream sm:bg-forest text-[#16251C] sm:text-cream font-bold shadow-md'
+                  : 'text-cream/70 sm:text-charcoal-muted hover:text-white sm:hover:text-forest hover:bg-white/10 sm:hover:bg-ivory/60'
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-2.5">
                 {space.images.main && (
                   <div
-                    className={`relative w-8 h-8 rounded-lg overflow-hidden border shrink-0 transition-transform duration-300 ${
+                    className={`relative w-6 h-6 sm:w-8 sm:h-8 rounded-lg overflow-hidden border shrink-0 transition-transform duration-300 ${
                       isActive
-                        ? 'border-cream/30 shadow-sm'
-                        : 'border-[#E9E4DB] opacity-80 group-hover:opacity-100 group-hover:scale-105'
+                        ? 'border-[#16251C]/30 sm:border-cream/30 shadow-sm'
+                        : 'border-white/20 sm:border-[#E9E4DB] opacity-80 group-hover:opacity-100 group-hover:scale-105'
                     }`}
                   >
                     <img
@@ -74,11 +74,11 @@ export const SpaceSelector: React.FC<SpaceSelectorProps> = ({
                   </div>
                 )}
 
-                <div className="flex items-center gap-2 text-left">
-                  <span className={isActive ? 'text-terracotta-light' : 'text-sage'}>
+                <div className="flex items-center gap-1.5 sm:gap-2 text-left whitespace-nowrap">
+                  <span className={isActive ? 'text-[#16251C] sm:text-terracotta-light' : 'text-amber-200/80 sm:text-sage'}>
                     {getSpaceIcon(space.type)}
                   </span>
-                  <span className="font-medium">
+                  <span className="font-semibold sm:font-medium">
                     {space.type === 'bedroom'
                       ? 'Bedroom'
                       : space.type === 'kitchen'
@@ -94,10 +94,10 @@ export const SpaceSelector: React.FC<SpaceSelectorProps> = ({
 
               {space.area && (
                 <span
-                  className={`text-[10px] px-2 py-0.5 rounded-full font-mono ${
+                  className={`text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full font-mono hidden xs:inline shrink-0 ${
                     isActive
-                      ? 'bg-cream/20 text-cream font-semibold'
-                      : 'bg-ivory text-charcoal-muted border border-[#E9E4DB]'
+                      ? 'bg-black/10 sm:bg-cream/20 text-[#16251C] sm:text-cream font-bold'
+                      : 'bg-white/10 sm:bg-ivory text-cream/70 sm:text-charcoal-muted border border-white/10 sm:border-[#E9E4DB]'
                   }`}
                 >
                   {space.area} m²

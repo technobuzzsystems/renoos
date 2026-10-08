@@ -121,7 +121,7 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
       hotspots: [
         {
           id: 'hs-entrance-walk',
-          title: 'Walk to Reception Desk',
+          title: 'Walk to Receptionist',
           description: 'Step through the entrance door into the 360° Grand Lobby',
           type: 'navigation' as const,
           spherical: { yaw: -6.5, pitch: -3.5 },
@@ -132,6 +132,8 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
     }),
     []
   )
+
+  const [isCardMinimized, setIsCardMinimized] = useState(false)
 
   return (
     <div className="relative w-full h-full bg-[#0d1510] overflow-hidden select-none">
@@ -153,7 +155,7 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
           onNavigateSpace={() => handleWalkIntoReception()}
           hideHotspotList={true}
           hideInternalHeader={true}
-          bottomBarOffsetClass="bottom-44 sm:bottom-6"
+          bottomBarOffsetClass={isCardMinimized ? 'bottom-4 sm:bottom-6' : 'bottom-32 sm:bottom-28 md:bottom-6'}
           viewportHeightClass="h-full w-full"
           className="h-full w-full"
         />
@@ -182,7 +184,7 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
       {/* =========================================================================
           2. TOP HEADER HUD OVERLAY (Minimal, Editorial, Unobtrusive)
           ========================================================================= */}
-      <header className="absolute top-0 inset-x-0 p-3 sm:p-6 flex items-center justify-between pointer-events-none z-20 bg-gradient-to-b from-black/85 via-black/40 to-transparent">
+      <header className="absolute top-0 inset-x-0 p-3 sm:p-6 flex items-center justify-between pointer-events-none z-20 bg-gradient-to-b from-black/85 via-black/50 to-transparent pt-safe">
         {/* Brand Header */}
         <div className="pointer-events-auto flex items-center gap-2 sm:gap-3">
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-cream/20 bg-[#16251C]/75 backdrop-blur-md flex items-center justify-center text-cream shadow-lg shrink-0">
@@ -190,21 +192,21 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
           </div>
           <div>
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <h1 className="font-serif text-base sm:text-xl text-cream font-medium tracking-tight whitespace-nowrap">
+              <h1 className="font-serif text-base sm:text-xl text-cream font-medium tracking-tight">
                 RENOOS HOTEL
               </h1>
-              <span className="hidden xs:inline-block px-1.5 sm:px-2 py-0.5 rounded-full bg-cream/15 border border-cream/20 text-cream/90 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider whitespace-nowrap">
-                360° Exterior
+              <span className="px-1.5 sm:px-2 py-0.5 rounded-full bg-cream/15 border border-cream/20 text-cream/90 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider">
+                360°
               </span>
             </div>
-            <p className="text-[10px] sm:text-xs text-cream/70 font-light font-mono truncate max-w-[140px] sm:max-w-none">
-              Mountain Resort · India
+            <p className="text-[10px] sm:text-xs text-cream/70 font-light font-mono hidden xs:block">
+              Luxury Mountain Resort · India
             </p>
           </div>
         </div>
 
         {/* Top Controls: Sound Ambience, Guest Account & Direct Walk In */}
-        <div className="pointer-events-auto flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <div className="pointer-events-auto flex items-center gap-1.5 sm:gap-3">
           {/* Guest Account / Portal Trigger */}
           <GuestAccountButton variant="dark" />
 
@@ -212,8 +214,9 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
           <button
             type="button"
             onClick={toggleSanctuarySound}
-            className="p-2 sm:px-3 sm:py-1.5 rounded-full bg-[#16251C]/70 hover:bg-[#16251C]/90 text-cream/80 hover:text-cream border border-cream/20 backdrop-blur-md text-xs font-mono flex items-center gap-1.5 transition-all shadow-md"
+            className="p-2 sm:px-3 sm:py-1.5 rounded-full bg-[#16251C]/70 hover:bg-[#16251C]/90 text-cream/80 hover:text-cream border border-cream/20 backdrop-blur-md text-xs font-mono flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
             title="Toggle Nature Sound Ambience"
+            aria-label="Toggle Nature Sound Ambience"
           >
             {isAudioPlaying ? (
               <>
@@ -228,14 +231,14 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
             )}
           </button>
 
-          {/* Primary Walk to Reception Action */}
+          {/* Primary Walk to Reception Action (Hidden on mobile to save header space, prominently in bottom card) */}
           <button
             type="button"
             onClick={handleWalkIntoReception}
-            className="hidden md:flex px-4 py-2 rounded-full bg-cream hover:bg-white text-[#16251C] font-semibold text-xs font-mono items-center gap-1.5 transition-all shadow-lg cursor-pointer transform hover:scale-105 whitespace-nowrap"
+            className="hidden sm:flex px-4 py-2 rounded-full bg-cream hover:bg-white text-[#16251C] font-semibold text-xs font-mono items-center gap-1.5 transition-all shadow-lg cursor-pointer transform hover:scale-105"
           >
             <Compass className="w-3.5 h-3.5 text-[#16251C]" />
-            <span>Walk to Reception</span>
+            <span>Walk to Receptionist</span>
             <ArrowRight className="w-3 h-3 text-[#16251C]" />
           </button>
         </div>
@@ -244,34 +247,56 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
       {/* =========================================================================
           3. BOTTOM INTERACTION CARD: ELEGANT ENTRANCE INVITATION
           ========================================================================= */}
-      <div className="absolute bottom-3 sm:bottom-5 inset-x-0 flex justify-center pointer-events-none z-20 px-3 sm:px-4">
-        <div className="pointer-events-auto max-w-lg w-full bg-[#16251C]/85 backdrop-blur-xl border border-cream/20 rounded-3xl p-3.5 sm:p-5 shadow-2xl space-y-2 sm:space-y-2.5 text-cream">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-300 font-semibold">
-                Lakeside Grounds & Pavilion
-              </span>
-            </div>
-            <span className="text-[10px] font-mono text-cream/60">
-              3 Bespoke Suites
-            </span>
-          </div>
-
-          <p className="text-[11px] sm:text-xs text-cream/80 font-light leading-relaxed">
-            Drag to explore the 360° sanctuary grounds. Click the entrance door spot or tap below to walk into the 360° Grand Lobby.
-          </p>
-
+      <div className="absolute bottom-3 sm:bottom-5 inset-x-0 flex justify-center pointer-events-none z-20 px-3 sm:px-4 pb-safe">
+        {isCardMinimized ? (
           <button
             type="button"
-            onClick={handleWalkIntoReception}
-            className="w-full py-2.5 sm:py-3 px-4 sm:px-5 bg-cream hover:bg-white text-[#16251C] font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-xl flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-[1.01] cursor-pointer"
+            onClick={() => setIsCardMinimized(false)}
+            className="pointer-events-auto px-4 py-2.5 rounded-full bg-[#16251C]/90 hover:bg-[#16251C] backdrop-blur-xl border border-cream/25 text-cream text-xs font-mono flex items-center gap-2 shadow-2xl transition-all cursor-pointer animate-fade-in"
           >
-            <Compass className="w-4 h-4 text-[#16251C]" />
-            <span>Walk to Reception & Book Rooms</span>
-            <ArrowRight className="w-4 h-4 text-[#16251C]" />
+            <Compass className="w-4 h-4 text-emerald-300" />
+            <span>Open Reception Entrance Card</span>
+            <ArrowRight className="w-3.5 h-3.5 text-amber-200" />
           </button>
-        </div>
+        ) : (
+          <div className="pointer-events-auto max-w-lg w-full bg-[#16251C]/90 backdrop-blur-xl border border-cream/20 rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-2xl space-y-2 sm:space-y-2.5 text-cream animate-fade-in">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-300 font-semibold">
+                  Lakeside Grounds & Pavilion
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono text-cream/60 hidden xs:inline">
+                  3 Bespoke Suites
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsCardMinimized(true)}
+                  className="text-[10px] font-mono text-cream/50 hover:text-cream px-1.5 py-0.5 rounded bg-cream/10 border border-cream/15 cursor-pointer"
+                  title="Minimize card to explore full view"
+                >
+                  Hide
+                </button>
+              </div>
+            </div>
+
+            <p className="text-[11px] sm:text-xs text-cream/80 font-light leading-relaxed line-clamp-2 sm:line-clamp-none">
+              Drag to explore the 360° sanctuary grounds. Click the entrance door beacon or tap below to walk into the 360° Grand Lobby.
+            </p>
+
+            <button
+              type="button"
+              onClick={handleWalkIntoReception}
+              className="w-full py-2.5 sm:py-3 px-4 sm:px-5 bg-cream hover:bg-white text-[#16251C] font-semibold text-xs uppercase tracking-wider rounded-xl sm:rounded-2xl shadow-xl flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-[1.01] cursor-pointer"
+            >
+              <Compass className="w-4 h-4 text-[#16251C]" />
+              <span>Walk to Receptionist & Book Rooms</span>
+              <ArrowRight className="w-4 h-4 text-[#16251C]" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

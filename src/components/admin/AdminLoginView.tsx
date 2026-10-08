@@ -39,13 +39,13 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({ onSuccess, onExi
   }
 
   return (
-    <div className="min-h-screen w-screen bg-[#0E1712] text-cream flex flex-col items-center justify-center p-4 relative overflow-hidden select-none">
+    <div className="min-h-[100dvh] w-full bg-[#0E1712] text-cream flex flex-col items-center justify-center p-3 sm:p-4 relative overflow-hidden select-none py-safe">
       {/* Subtle Atmospheric Background Gradients */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,#1F3A29_0%,#0E1712_70%)] pointer-events-none opacity-80" />
       <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-600 via-amber-300 to-terracotta" />
 
       {/* Login Card */}
-      <div className="relative z-10 max-w-md w-full bg-[#16251C]/90 backdrop-blur-2xl border border-amber-200/25 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+      <div className="relative z-10 max-w-md w-full bg-[#16251C]/90 backdrop-blur-2xl border border-amber-200/25 rounded-3xl p-5 sm:p-8 shadow-2xl space-y-5 sm:space-y-6">
         {/* Emblem & Header */}
         <div className="flex flex-col items-center text-center space-y-2">
           <div className="w-14 h-14 rounded-full border border-amber-300/40 bg-amber-400/10 flex items-center justify-center text-amber-200 shadow-lg">

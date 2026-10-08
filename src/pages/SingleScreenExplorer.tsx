@@ -111,7 +111,7 @@ export const SingleScreenExplorer: React.FC = () => {
   const [bookingDates, setBookingDates] = useState<BookingDatesState>(defaultDates)
 
   return (
-    <div className="relative w-full h-[100dvh] min-h-[100dvh] bg-[#0d1510] text-cream flex flex-col overflow-hidden select-none">
+    <div className="relative w-full h-[100dvh] max-h-[100dvh] bg-[#0d1510] text-cream flex flex-col overflow-hidden select-none">
       {/* =========================================================================
           CINEMATIC STAGE TRANSITION OVERLAY (Subtle, Atmospheric, Non-Intrusive)
           ========================================================================= */}

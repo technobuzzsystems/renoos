@@ -128,27 +128,27 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
   const isCheckedIn = booking.status === 'checked_in'
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in">
       <div
-        className="relative w-full max-w-2xl max-h-[90vh] bg-[#16251C] border border-cream/20 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-cream"
+        className="relative w-full max-w-2xl max-h-[96dvh] sm:max-h-[90vh] bg-[#16251C] border border-cream/20 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-cream"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Accent */}
         <div className="h-1.5 w-full bg-gradient-to-r from-emerald-600 via-amber-300 to-terracotta shrink-0" />
 
         {/* Header */}
-        <div className="p-6 pb-4 flex items-center justify-between border-b border-cream/15 shrink-0">
+        <div className="p-4 sm:p-6 pb-3 sm:pb-4 flex items-center justify-between border-b border-cream/15 shrink-0">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono uppercase tracking-widest text-amber-200 font-semibold">
+              <span className="text-[11px] sm:text-xs font-mono uppercase tracking-widest text-amber-200 font-semibold">
                 Folio Details
               </span>
               <span className="text-cream/40">·</span>
-              <span className="text-xs font-mono font-bold text-cream">
+              <span className="text-[11px] sm:text-xs font-mono font-bold text-cream">
                 {booking.bookingReference}
               </span>
             </div>
-            <h3 className="font-serif text-2xl font-bold text-cream mt-0.5">
+            <h3 className="font-serif text-xl sm:text-2xl font-bold text-cream mt-0.5">
               Room {booking.roomNumber} — {booking.roomName}
             </h3>
           </div>
@@ -156,14 +156,15 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-full text-cream/70 hover:text-cream hover:bg-white/10 transition-colors cursor-pointer"
+            className="p-2 rounded-full text-cream/70 hover:text-cream hover:bg-white/10 transition-colors min-h-[38px] min-w-[38px] flex items-center justify-center cursor-pointer"
+            aria-label="Close details modal"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto p-6 space-y-5 flex-1">
+        <div className="overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5 flex-1 no-scrollbar">
           {/* Status Quick Bar */}
           <div className="p-4 bg-black/30 rounded-2xl border border-cream/10 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
@@ -181,13 +182,13 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
               </span>
             </div>
 
-            <div className="flex items-center gap-1.5 font-mono text-xs">
-              <span className="text-cream/50 text-[11px]">Update:</span>
+            <div className="flex flex-wrap items-center gap-1.5 font-mono text-xs w-full sm:w-auto">
+              <span className="text-cream/50 text-[11px] mr-1">Update:</span>
               <button
                 type="button"
                 disabled={isUpdating || booking.status === 'checked_in'}
                 onClick={() => handleStatusSelect('checked_in')}
-                className="px-2.5 py-1 rounded-lg bg-blue-600/80 hover:bg-blue-500 text-white font-bold transition-colors disabled:opacity-30 cursor-pointer"
+                className="px-3 py-1.5 rounded-lg bg-blue-600/80 hover:bg-blue-500 text-white font-bold transition-colors disabled:opacity-30 cursor-pointer min-h-[34px] flex items-center justify-center text-xs"
               >
                 Check In
               </button>
@@ -195,7 +196,7 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
                 type="button"
                 disabled={isUpdating || booking.status === 'checked_out'}
                 onClick={() => handleStatusSelect('checked_out')}
-                className="px-2.5 py-1 rounded-lg bg-gray-600/80 hover:bg-gray-500 text-white font-bold transition-colors disabled:opacity-30 cursor-pointer"
+                className="px-3 py-1.5 rounded-lg bg-gray-600/80 hover:bg-gray-500 text-white font-bold transition-colors disabled:opacity-30 cursor-pointer min-h-[34px] flex items-center justify-center text-xs"
               >
                 Check Out
               </button>
@@ -203,7 +204,7 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
                 type="button"
                 disabled={isUpdating || isCancelled}
                 onClick={() => handleStatusSelect('cancelled')}
-                className="px-2.5 py-1 rounded-lg bg-red-600/80 hover:bg-red-500 text-white font-bold transition-colors disabled:opacity-30 cursor-pointer"
+                className="px-3 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-500 text-white font-bold transition-colors disabled:opacity-30 cursor-pointer min-h-[34px] flex items-center justify-center text-xs"
               >
                 Cancel Stay
               </button>
@@ -310,23 +311,23 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 px-6 border-t border-cream/15 bg-black/30 flex flex-wrap items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-2">
+        <div className="p-3 sm:p-4 sm:px-6 border-t border-cream/15 bg-black/30 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 shrink-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <button
               type="button"
               onClick={handleDownloadPDF}
-              className="px-4 py-2 rounded-full bg-terracotta hover:bg-terracotta-dark text-cream text-xs font-mono uppercase font-semibold transition-all flex items-center gap-1.5 shadow-md cursor-pointer"
+              className="px-3.5 py-2.5 sm:py-2 rounded-full bg-terracotta hover:bg-terracotta-dark text-cream text-[11px] sm:text-xs font-mono uppercase font-semibold transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer min-h-[38px]"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 shrink-0" />
               <span>Download Tax Bill (PDF)</span>
             </button>
 
             <button
               type="button"
               onClick={handlePrint}
-              className="px-4 py-2 rounded-full bg-cream/15 hover:bg-cream/25 text-cream text-xs font-mono uppercase font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2.5 sm:py-2 rounded-full bg-cream/15 hover:bg-cream/25 text-cream text-[11px] sm:text-xs font-mono uppercase font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px]"
             >
-              <Printer className="w-3.5 h-3.5" />
+              <Printer className="w-3.5 h-3.5 shrink-0" />
               <span>Print Tax Bill</span>
             </button>
           </div>
@@ -334,7 +335,7 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-full bg-cream/10 hover:bg-cream/20 text-cream text-xs font-mono transition-colors cursor-pointer"
+            className="px-5 py-2.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream text-xs font-mono transition-colors cursor-pointer text-center min-h-[38px] flex items-center justify-center"
           >
             Close
           </button>

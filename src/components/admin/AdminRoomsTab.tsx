@@ -155,7 +155,7 @@ export const AdminRoomsTab: React.FC<AdminRoomsTabProps> = ({
                     <button
                       type="button"
                       onClick={() => handleQuickStatusChange(room.roomNumber, 'available')}
-                      className={`py-1.5 rounded-xl font-bold transition-all ${
+                      className={`py-1.5 rounded-xl font-bold transition-all min-h-[36px] flex items-center justify-center cursor-pointer ${
                         opStatus === 'available'
                           ? 'bg-emerald-600 text-white shadow-sm'
                           : 'text-cream/60 hover:text-white'
@@ -166,7 +166,7 @@ export const AdminRoomsTab: React.FC<AdminRoomsTabProps> = ({
                     <button
                       type="button"
                       onClick={() => handleQuickStatusChange(room.roomNumber, 'cleaning')}
-                      className={`py-1.5 rounded-xl font-bold transition-all ${
+                      className={`py-1.5 rounded-xl font-bold transition-all min-h-[36px] flex items-center justify-center cursor-pointer ${
                         opStatus === 'cleaning'
                           ? 'bg-blue-600 text-white shadow-sm'
                           : 'text-cream/60 hover:text-white'
@@ -177,7 +177,7 @@ export const AdminRoomsTab: React.FC<AdminRoomsTabProps> = ({
                     <button
                       type="button"
                       onClick={() => handleQuickStatusChange(room.roomNumber, 'maintenance')}
-                      className={`py-1.5 rounded-xl font-bold transition-all ${
+                      className={`py-1.5 rounded-xl font-bold transition-all min-h-[36px] flex items-center justify-center cursor-pointer ${
                         opStatus === 'maintenance'
                           ? 'bg-red-600 text-white shadow-sm'
                           : 'text-cream/60 hover:text-white'
@@ -281,7 +281,7 @@ export const AdminRoomsTab: React.FC<AdminRoomsTabProps> = ({
       </div>
 
       {/* 2. 14-DAY VISUAL OCCUPANCY MATRIX / CALENDAR GRID */}
-      <div className="p-6 bg-[#16251C]/80 backdrop-blur-xl border border-cream/15 rounded-3xl shadow-xl space-y-4">
+      <div className="p-4 sm:p-6 bg-[#16251C]/80 backdrop-blur-xl border border-cream/15 rounded-3xl shadow-xl space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 className="font-serif text-lg sm:text-xl font-bold text-cream flex items-center gap-2">
@@ -293,28 +293,35 @@ export const AdminRoomsTab: React.FC<AdminRoomsTabProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-4 text-xs font-mono text-cream/70">
+          <div className="flex items-center gap-3 sm:gap-4 text-xs font-mono text-cream/70">
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
-              <span>Vacant</span>
+              <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500/80" />
+              <span className="text-[11px] sm:text-xs">Vacant</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-amber-500" />
-              <span>Reserved</span>
+              <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-500" />
+              <span className="text-[11px] sm:text-xs">Reserved</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-red-500/80" />
-              <span>Maintenance</span>
+              <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500/80" />
+              <span className="text-[11px] sm:text-xs">Maintenance</span>
             </div>
           </div>
         </div>
 
+        {/* Mobile Swipe Hint */}
+        <div className="sm:hidden text-[10px] text-amber-200/80 font-mono flex items-center gap-1 pt-1">
+          <span>← Swipe horizontally to inspect 14-day schedule →</span>
+        </div>
+
         {/* Matrix Table */}
-        <div className="overflow-x-auto pt-2">
+        <div className="overflow-x-auto pt-2 touch-pan-x">
           <table className="w-full text-center text-xs font-mono border-collapse">
             <thead>
               <tr className="border-b border-cream/15 text-[10px] text-cream/60 uppercase">
-                <th className="py-2 px-3 text-left w-36">Suite</th>
+                <th className="py-2 px-3 text-left w-28 sm:w-36 sticky left-0 bg-[#16251C] z-20 border-r border-cream/10 shadow-sm">
+                  Suite
+                </th>
                 {next14Days.map((d) => (
                   <th
                     key={d.dateStr}
@@ -334,9 +341,9 @@ export const AdminRoomsTab: React.FC<AdminRoomsTabProps> = ({
 
                 return (
                   <tr key={room.roomNumber} className="hover:bg-cream/5 transition-colors">
-                    <td className="py-3 px-3 text-left font-serif font-bold text-cream">
-                      <div>Room {room.roomNumber}</div>
-                      <div className="text-[10px] text-cream/50 font-mono truncate max-w-[120px]">
+                    <td className="py-3 px-3 text-left font-serif font-bold text-cream sticky left-0 bg-[#16251C] z-10 border-r border-cream/10 shadow-sm">
+                      <div className="text-xs sm:text-sm">Room {room.roomNumber}</div>
+                      <div className="text-[10px] text-cream/50 font-mono truncate max-w-[90px] sm:max-w-[120px]">
                         {room.name.split(' ')[0]}
                       </div>
                     </td>

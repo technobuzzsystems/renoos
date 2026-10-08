@@ -58,16 +58,16 @@ export const ComputerTerminal: React.FC<ComputerTerminalProps> = ({
 
         {/* Right: Quick Breadcrumb Navigation & Screen Size Toggle */}
         <div className="flex items-center gap-2">
-          {/* Back to Reception Desk */}
+          {/* Back to Receptionist */}
           <button
             type="button"
             onClick={onBackToReceptionist}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-cream text-xs font-medium border border-white/15 transition-all"
-            title="Step back to reception desk"
+            title="Step back to chat with receptionist"
           >
             <ArrowLeft className="w-3.5 h-3.5 text-amber-300" />
-            <span className="hidden sm:inline">Back to Reception</span>
-            <span className="sm:hidden">Reception</span>
+            <span className="hidden sm:inline">Speak to Receptionist</span>
+            <span className="sm:hidden">Receptionist</span>
           </button>
 
           {/* Back to Hotel 3D View */}
@@ -105,7 +105,7 @@ export const ComputerTerminal: React.FC<ComputerTerminalProps> = ({
         className={`flex-1 w-full h-full relative overflow-hidden transition-all duration-500 ${
           isEdgeToEdge
             ? 'p-0'
-            : 'p-1.5 sm:p-3 md:p-4 bg-[#0a100c] flex items-center justify-center'
+            : 'p-0 sm:p-3 md:p-4 bg-[#0a100c] flex items-center justify-center'
         }`}
       >
         {/* Monitor Physical Bezel Frame (when not edge-to-edge) */}
@@ -113,12 +113,12 @@ export const ComputerTerminal: React.FC<ComputerTerminalProps> = ({
           className={`relative w-full h-full overflow-hidden transition-all duration-300 ${
             isEdgeToEdge
               ? 'rounded-none border-none'
-              : 'rounded-2xl sm:rounded-3xl border-4 sm:border-8 border-[#1f2d23] shadow-[0_0_50px_rgba(0,0,0,0.8)]'
+              : 'rounded-none sm:rounded-3xl border-0 sm:border-8 border-[#1f2d23] shadow-none sm:shadow-[0_0_50px_rgba(0,0,0,0.8)]'
           }`}
         >
-          {/* Inner Gloss / Camera Dot at Top Bezel */}
+          {/* Inner Gloss / Camera Dot at Top Bezel (Desktop only) */}
           {!isEdgeToEdge && (
-            <div className="absolute top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-black/80 border border-white/20 z-40 flex items-center justify-center pointer-events-none">
+            <div className="hidden sm:flex absolute top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-black/80 border border-white/20 z-40 items-center justify-center pointer-events-none">
               <span className="w-0.5 h-0.5 rounded-full bg-emerald-400" />
             </div>
           )}
@@ -128,9 +128,9 @@ export const ComputerTerminal: React.FC<ComputerTerminalProps> = ({
             {children}
           </div>
 
-          {/* Monitor Bottom Chin / Logo Badge */}
+          {/* Monitor Bottom Chin / Logo Badge (Desktop only) */}
           {!isEdgeToEdge && (
-            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded bg-black/60 border border-white/10 text-[8px] font-mono tracking-widest text-cream/40 uppercase pointer-events-none z-40">
+            <div className="hidden sm:block absolute bottom-1 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded bg-black/60 border border-white/10 text-[8px] font-mono tracking-widest text-cream/40 uppercase pointer-events-none z-40">
               RENOOS HOTEL · WORKSTATION 01
             </div>
           )}

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 import {
   Sparkles,
   ArrowRight,
@@ -9,7 +9,7 @@ import {
   Leaf,
   User,
   LogIn,
-  Info,
+  X,
 } from 'lucide-react'
 import { PanoramaViewer } from '../panorama/PanoramaViewer'
 import { GuestAccountButton } from '@/components/auth'
@@ -33,7 +33,7 @@ interface ReceptionSceneProps {
  * STAGE 2: Grand Lobby & Reception Scene
  * Styled with direct reference to Renoos Hotel Resort Welcome:
  * - Modern luxury resort lobby with curved Calacatta marble counter and vertical timber fluting
- * - Real photographic presentation of the reception desk
+ * - Real photographic presentation of the receptionist behind the desk
  * - Floating transparent/frosted-glass concierge interface (translucent cream/forest glass)
  * - In-scene compact date selection & smooth transition to Room Preview
  */
@@ -45,19 +45,6 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
 }) => {
   const { user, isAuthenticated, setIsAuthModalOpen, setIsBookingsModalOpen, userBookings } =
     useAuth()
-
-  // Make sure any prior browser speech synthesis is silenced
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel()
-    }
-    return () => {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel()
-      }
-    }
-  }, [])
-
   // Mode: Front Desk View (Matching Reference Photo) vs 360° Grand Lobby Tour
   const [receptionMode, setReceptionMode] = useState<'desk-photo' | '360-lobby'>(initialMode)
 
@@ -88,7 +75,6 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
   )
   const [adults, setAdults] = useState<number>(initialDates?.adults || defaultDates.adults)
   const [children, setChildren] = useState<number>(initialDates?.children || defaultDates.children)
-
   // Calculate nights & validate check-out > check-in cleanly without setState in render
   const { nights, dateError } = useMemo(() => {
     try {
@@ -145,20 +131,11 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
       caption: 'Renoos Hotel — 360° Grand Lobby & Reception Tour',
       hotspots: [
         {
-          id: 'hs-lobby-welcome',
-          title: 'Reception & Concierge Desk',
-          description: 'Welcome to Renoos Hotel · Concierge & Guest Services',
-          type: 'feature' as const,
-          spherical: { yaw: 166, pitch: -13 },
-          category: 'Front Desk',
-          icon: 'info',
-        },
-        {
           id: 'hs-lobby-book',
-          title: 'Book a Room · रूम बुक करा',
+          title: 'Book a Suite · Select Dates',
           description: 'Select reservation dates & check suite availability',
           type: 'navigation' as const,
-          spherical: { yaw: 194, pitch: -13 },
+          spherical: { yaw: 180, pitch: -13 },
           targetSpaceId: 'dates',
           category: 'Reservation Desk',
           icon: 'calendar',
@@ -172,51 +149,34 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
     <div className="relative w-full h-full bg-[#0d1510] text-cream overflow-hidden flex flex-col justify-between select-none">
       {/* =========================================================================
           1. MAIN VISUAL ENVIRONMENT: 
-             PHOTOREALISTIC FRONT DESK OR 360° GRAND LOBBY
+             PHOTOREALISTIC FRONT DESK (MATCHING REFERENCE IMAGE) OR 360° GRAND LOBBY
           ========================================================================= */}
       {receptionMode === 'desk-photo' ? (
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
             src="/images/Luxury Mountain Resort Lobby.png"
-            alt="Renoos Hotel Front Desk and Grand Lobby"
+            alt="Renoos Hotel Front Desk Receptionist and Grand Lobby"
             className="w-full h-full object-cover object-center filter brightness-100 contrast-105"
           />
           {/* Subtle top gradient edge for header legibility */}
           <div className="absolute top-0 inset-x-0 h-28 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
 
-          {/* Interactive Beacons on Front Desk Photo */}
+          {/* Interactive Beacon on Front Desk Photo */}
           <div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center">
-            {/* Front Desk Information Beacon */}
-            <div className="absolute top-[54%] left-[40%] sm:left-[41%] -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
-              <button
-                type="button"
-                onClick={() => setViewState('greeting')}
-                className="group flex flex-col items-center gap-1 cursor-pointer transition-all transform hover:scale-105"
-              >
-                <span className="relative flex items-center justify-center w-9 h-9 rounded-full bg-black/80 border border-amber-300/80 shadow-2xl backdrop-blur-md group-hover:bg-[#1a2d21]">
-                  <span className="absolute -inset-1.5 rounded-full bg-amber-400/30 animate-pulse" />
-                  <Info className="w-4 h-4 text-amber-200" />
-                </span>
-                <span className="px-3 py-1 rounded-full bg-[#142319]/90 border border-amber-300/60 text-[10px] font-mono uppercase tracking-wider text-cream font-medium shadow-md flex items-center gap-1.5 group-hover:bg-black/95">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Reception Desk · स्वागत
-                </span>
-              </button>
-            </div>
-
-            {/* Book a Room Beacon */}
-            <div className="absolute top-[54%] left-[60%] sm:left-[59%] -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+            {/* Front Desk Reservation Beacon */}
+            <div className="absolute top-[52%] sm:top-[54%] left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
               <button
                 type="button"
                 onClick={() => setViewState('dates')}
-                className="group flex flex-col items-center gap-1 cursor-pointer transition-all transform hover:scale-105"
+                className="group flex flex-col items-center gap-1.5 cursor-pointer transition-all transform hover:scale-105"
+                aria-label="Book a Suite · Select Dates"
               >
-                <span className="relative flex items-center justify-center w-9 h-9 rounded-full bg-black/80 border border-white/40 shadow-2xl backdrop-blur-md group-hover:border-emerald-300 group-hover:bg-[#1a2d21]">
+                <span className="relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/85 border border-emerald-400/60 shadow-2xl backdrop-blur-md group-hover:border-amber-300 group-hover:bg-[#1a2d21]">
                   <span className="absolute -inset-1.5 rounded-full bg-emerald-400/25 animate-pulse" />
-                  <Calendar className="w-4 h-4 text-emerald-300" />
+                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-300 group-hover:text-amber-200" />
                 </span>
-                <span className="px-3.5 py-1 rounded-full bg-black/80 border border-white/30 text-[10px] font-mono uppercase tracking-wider text-cream font-medium shadow-md group-hover:border-emerald-300 group-hover:bg-black/95">
-                  Book a Room · रूम बुक करा
+                <span className="px-3.5 sm:px-4 py-1 rounded-full bg-black/85 border border-cream/25 text-[10px] sm:text-xs font-mono uppercase tracking-wider text-cream font-medium shadow-md group-hover:border-amber-300 group-hover:bg-black/95 whitespace-nowrap">
+                  Book Suite · Select Dates
                 </span>
               </button>
             </div>
@@ -229,10 +189,6 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
             spaceTitle="Grand Lobby & Front Desk"
             roomNumber="Lobby"
             onHotspotClick={(hs) => {
-              if (hs.id === 'hs-lobby-welcome') {
-                setViewState('greeting')
-                return true
-              }
               if (hs.id === 'hs-lobby-book' || hs.targetSpaceId === 'dates') {
                 setViewState('dates')
                 return true
@@ -242,7 +198,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
             onNavigateSpace={() => setViewState('dates')}
             hideHotspotList={true}
             hideInternalHeader={true}
-            bottomBarOffsetClass="bottom-16 sm:bottom-20"
+            bottomBarOffsetClass="bottom-14 sm:bottom-20"
             viewportHeightClass="h-full w-full"
             className="h-full w-full"
           />
@@ -252,33 +208,36 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
       {/* =========================================================================
           2. TOP NAVIGATION HUD (Minimal & Editorial)
           ========================================================================= */}
-      <header className="relative z-30 h-14 sm:h-16 px-3 sm:px-6 flex items-center justify-between border-b border-cream/15 bg-[#16251C]/75 backdrop-blur-md">
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+      <header className="relative z-30 min-h-14 sm:h-16 px-3 sm:px-6 py-2 flex items-center justify-between border-b border-cream/15 bg-[#16251C]/75 backdrop-blur-md pt-safe">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             type="button"
             onClick={onBackToExterior}
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream text-xs font-mono transition-all border border-cream/15 cursor-pointer"
+            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream text-[11px] sm:text-xs font-mono transition-all border border-cream/15 cursor-pointer shrink-0"
           >
             <ArrowLeft className="w-3.5 h-3.5 text-cream" />
             <span className="hidden sm:inline">Hotel Exterior</span>
-            <span className="sm:hidden text-[11px]">Exterior</span>
+            <span className="sm:hidden">Exterior</span>
           </button>
 
-          <div className="h-4 w-px bg-cream/20 hidden md:block" />
+          <div className="h-4 w-px bg-cream/20 hidden sm:block" />
 
-          <div className="hidden sm:flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-serif text-sm sm:text-base font-medium text-cream truncate max-w-[140px] md:max-w-none">
-              Grand Lobby & Reception Desk
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            <span className="font-serif text-xs sm:text-base font-medium text-cream truncate max-w-[130px] xs:max-w-none">
+              Grand Lobby
+            </span>
+            <span className="font-serif text-xs sm:text-base font-medium text-cream/70 hidden md:inline">
+              & Reception Desk
             </span>
           </div>
         </div>
 
         {/* View Mode Toggle: Front Desk Photo vs 360° Lobby Tour & Guest Account */}
-        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-3">
           <GuestAccountButton variant="dark" />
 
-          <div className="flex items-center p-1 bg-[#16251C]/75 backdrop-blur-md rounded-full border border-cream/20 text-xs font-mono">
+          <div className="flex items-center p-0.5 sm:p-1 bg-[#16251C]/80 backdrop-blur-md rounded-full border border-cream/20 text-[11px] sm:text-xs font-mono">
             <button
               type="button"
               onClick={() => setReceptionMode('desk-photo')}
@@ -287,11 +246,10 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                   ? 'bg-cream text-[#16251C] font-semibold shadow-sm'
                   : 'text-cream/70 hover:text-white'
               }`}
-              title="Front Desk Photo"
             >
-              <Camera className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Front Desk</span>
-              <span className="sm:hidden text-[10px]">Photo</span>
+              <Camera className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span className="hidden xs:inline">Desk</span>
+              <span className="xs:hidden">Desk</span>
             </button>
             <button
               type="button"
@@ -301,11 +259,9 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                   ? 'bg-cream text-[#16251C] font-semibold shadow-sm'
                   : 'text-cream/70 hover:text-white'
               }`}
-              title="360° Lobby Tour"
             >
-              <Compass className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">360° Lobby</span>
-              <span className="sm:hidden text-[10px]">360°</span>
+              <Compass className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span>360°</span>
             </button>
           </div>
         </div>
@@ -313,13 +269,13 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
 
       {/* =========================================================================
           3. TRANSPARENT CONCIERGE INTERFACE SCREEN
-          Placed gracefully to the right side of the counter
+          Placed gracefully to the right side of the counter (matching reference image)
           Soft blur, thin border, translucent cream/forest glass, minimal editorial content.
           ========================================================================= */}
-      <div className="relative z-20 flex-1 flex items-center justify-center md:justify-end px-4 sm:px-8 md:pr-16 pointer-events-none">
+      <div className="relative z-20 flex-1 flex items-center justify-center md:justify-end px-3 sm:px-8 md:pr-16 pointer-events-none py-2">
         {viewState === 'greeting' && (
-          <div className="pointer-events-auto max-w-sm sm:max-w-md w-full bg-[#18261E]/75 backdrop-blur-xl border border-amber-200/30 shadow-2xl rounded-3xl p-6 sm:p-8 space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500 text-cream">
-            {/* Golden Emblem */}
+          <div className="pointer-events-auto max-w-sm sm:max-w-md w-full max-h-[82dvh] overflow-y-auto no-scrollbar bg-[#18261E]/85 backdrop-blur-xl border border-amber-200/30 shadow-2xl rounded-3xl p-5 sm:p-8 space-y-4 sm:space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500 text-cream">
+            {/* Golden Lotus Emblem */}
             <div className="flex flex-col items-center text-center space-y-1">
               <div className="w-10 h-10 rounded-full border border-amber-300/40 bg-amber-400/10 flex items-center justify-center text-amber-200 shadow-md">
                 <Sparkles className="w-5 h-5 text-amber-200" />
@@ -331,13 +287,13 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                 Renoos Hotel
               </h2>
               <p className="text-xs sm:text-sm text-cream/80 font-light mt-1">
-                Welcome to Renoos Hotel Luxury Mountain Sanctuary.
+                Hello, and welcome to Renoos Hotel.
                 <br />
-                Plan your stay or explore our bespoke residences.
+                How can we help you today?
               </p>
             </div>
 
-            {/* Action Buttons */}
+            {/* Action Buttons: Matching Reference Image Style */}
             <div className="space-y-2.5 pt-1">
               {/* Primary Action Button: Book a Room */}
               <button
@@ -387,7 +343,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
               <button
                 type="button"
                 onClick={() => setViewState('free-explore')}
-                className="w-full py-3 px-5 rounded-2xl bg-white/10 hover:bg-white/15 text-cream border border-white/20 shadow-md flex items-center justify-between transition-all text-xs font-mono group cursor-pointer"
+                className="w-full py-3 px-5 rounded-2xl bg-white/10 hover:bg-white/15 text-cream border border-white/20 shadow-md flex items-center justify-between transition-all text-xs font-mono group"
               >
                 <div className="flex items-center gap-2.5">
                   <Leaf className="w-4 h-4 text-amber-200" />
@@ -399,16 +355,16 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
           </div>
         )}
 
-        {/* DATE SELECTION LAYER */}
+        {/* DATE SELECTION LAYER: Connected Visually in the Same Transparent Screen */}
         {viewState === 'dates' && (
-          <div className="pointer-events-auto max-w-sm sm:max-w-md w-full bg-[#18261E]/85 backdrop-blur-xl border border-amber-200/35 shadow-2xl rounded-3xl p-6 sm:p-7 space-y-4 animate-in fade-in zoom-in-95 duration-400 text-cream">
+          <div className="pointer-events-auto max-w-sm sm:max-w-md w-full max-h-[82dvh] overflow-y-auto no-scrollbar bg-[#18261E]/85 backdrop-blur-xl border border-amber-200/35 shadow-2xl rounded-3xl p-5 sm:p-7 space-y-3.5 sm:space-y-4 animate-in fade-in zoom-in-95 duration-400 text-cream">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-cream/15 pb-3">
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-300 font-semibold block">
                   Reservation Dates
                 </span>
-                <h3 className="font-serif text-lg sm:text-xl text-cream font-medium">
+                <h3 className="font-serif text-base sm:text-xl text-cream font-medium">
                   Select Check-in & Check-out
                 </h3>
               </div>
@@ -422,9 +378,9 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
             </div>
 
             {/* Date Pickers Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 pt-1">
               {/* Check-In */}
-              <div className="space-y-1.5 p-3 rounded-2xl bg-[#0f1b13]/70 border border-cream/15">
+              <div className="space-y-1 p-2.5 sm:p-3 rounded-2xl bg-[#0f1b13]/70 border border-cream/15">
                 <label className="text-[10px] font-mono text-cream/60 uppercase tracking-wider block">
                   Check-in Date
                 </label>
@@ -441,7 +397,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
               </div>
 
               {/* Check-Out */}
-              <div className="space-y-1.5 p-3 rounded-2xl bg-[#0f1b13]/70 border border-cream/15">
+              <div className="space-y-1 p-2.5 sm:p-3 rounded-2xl bg-[#0f1b13]/70 border border-cream/15">
                 <label className="text-[10px] font-mono text-cream/60 uppercase tracking-wider block">
                   Check-out Date
                 </label>
@@ -466,7 +422,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
             )}
 
             {/* Guests Selector */}
-            <div className="p-3 rounded-2xl bg-[#0f1b13]/70 border border-cream/15 space-y-2.5">
+            <div className="p-2.5 sm:p-3 rounded-2xl bg-[#0f1b13]/70 border border-cream/15 space-y-2 sm:space-y-2.5">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-mono text-cream/60 uppercase tracking-wider block">
@@ -480,7 +436,8 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                   <button
                     type="button"
                     onClick={() => setAdults(Math.max(1, adults - 1))}
-                    className="w-7 h-7 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer"
+                    aria-label="Decrease adults"
                   >
                     -
                   </button>
@@ -488,7 +445,8 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                   <button
                     type="button"
                     onClick={() => setAdults(Math.min(4, adults + 1))}
-                    className="w-7 h-7 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer"
+                    aria-label="Increase adults"
                   >
                     +
                   </button>
@@ -507,7 +465,8 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                   <button
                     type="button"
                     onClick={() => setChildren(Math.max(0, children - 1))}
-                    className="w-7 h-7 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer"
+                    aria-label="Decrease children"
                   >
                     -
                   </button>
@@ -515,7 +474,8 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                   <button
                     type="button"
                     onClick={() => setChildren(Math.min(3, children + 1))}
-                    className="w-7 h-7 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer"
+                    aria-label="Increase children"
                   >
                     +
                   </button>
@@ -536,7 +496,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
               type="button"
               disabled={nights <= 0}
               onClick={() => handleContinue()}
-              className={`w-full py-3.5 px-6 rounded-2xl text-xs uppercase tracking-wider font-semibold flex items-center justify-center gap-2 shadow-xl transition-all duration-300 ${
+              className={`w-full py-3 sm:py-3.5 px-5 sm:px-6 rounded-2xl text-xs uppercase tracking-wider font-semibold flex items-center justify-center gap-2 shadow-xl transition-all duration-300 ${
                 nights > 0
                   ? 'bg-cream hover:bg-white text-[#16251C] cursor-pointer transform hover:scale-[1.01]'
                   : 'bg-cream/30 text-cream/50 cursor-not-allowed'
@@ -551,25 +511,24 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
 
       {/* Floating Re-Open Pill when User Minimized to Free Explore */}
       {viewState === 'free-explore' && (
-        <div className="relative z-20 p-3 sm:p-5 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 pointer-events-none mb-12 sm:mb-0">
+        <div className="relative z-20 p-3 sm:p-6 flex flex-wrap items-center justify-center gap-2 sm:gap-3 pointer-events-none">
           <button
             type="button"
             onClick={() => setViewState('greeting')}
-            className="pointer-events-auto w-full sm:w-auto px-4 py-2 sm:py-2.5 rounded-full bg-[#18261E]/95 hover:bg-[#18261E] text-cream text-[11px] sm:text-xs font-mono border border-amber-300/40 flex items-center justify-center gap-2 shadow-2xl transition-all transform hover:scale-105 cursor-pointer"
+            className="pointer-events-auto px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-[#18261E]/90 hover:bg-[#18261E] text-cream text-[11px] sm:text-xs font-mono border border-cream/25 flex items-center gap-2 shadow-2xl transition-all transform hover:scale-105 cursor-pointer"
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <Info className="w-3.5 h-3.5 text-amber-200" />
-            <span>Reception & Concierge · स्वागत</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+            <span>Welcome Menu</span>
           </button>
 
           <button
             type="button"
             onClick={() => setViewState('dates')}
-            className="pointer-events-auto w-full sm:w-auto px-5 py-2 sm:py-2.5 rounded-full bg-cream hover:bg-white text-[#16251C] text-[11px] sm:text-xs font-mono font-semibold flex items-center justify-center gap-2 shadow-2xl transition-all transform hover:scale-105 cursor-pointer"
+            className="pointer-events-auto px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-cream hover:bg-white text-[#16251C] text-[11px] sm:text-xs font-mono font-semibold flex items-center gap-2 shadow-2xl transition-all transform hover:scale-105 cursor-pointer"
           >
             <Calendar className="w-3.5 h-3.5 text-[#16251C]" />
-            <span>तारखा निवडून रूम बुक करा · Book Room</span>
-            <ArrowRight className="w-3 h-3 text-[#16251C]" />
+            <span>Select Dates & Book Suite</span>
+            <ArrowRight className="w-3.5 h-3.5 text-[#16251C]" />
           </button>
         </div>
       )}
@@ -577,22 +536,23 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
       {/* =========================================================================
           4. BOTTOM STATUS FOOTER
           ========================================================================= */}
-      <footer className="relative z-30 h-10 sm:h-12 px-3 sm:px-6 flex items-center justify-between border-t border-cream/15 bg-[#16251C]/75 backdrop-blur-md text-[11px] sm:text-xs font-mono text-cream/70">
-        <div className="flex items-center gap-2 truncate max-w-[210px] sm:max-w-none">
+      <footer className="relative z-30 h-10 sm:h-12 px-3 sm:px-6 flex items-center justify-between border-t border-cream/15 bg-[#16251C]/75 backdrop-blur-md text-[11px] sm:text-xs font-mono text-cream/70 pb-safe">
+        <div className="flex items-center gap-2 truncate pr-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
           <span className="truncate">
             {receptionMode === 'desk-photo'
-              ? 'Front Desk Presentation (Renoos Hotel)'
-              : '360° Grand Lobby Tour Active'}
+              ? 'Front Desk · Renoos Hotel'
+              : '360° Grand Lobby'}
+            <span className="hidden sm:inline"> · Drag to look around</span>
           </span>
         </div>
 
         <button
           type="button"
           onClick={onBackToExterior}
-          className="text-amber-200 hover:text-white underline font-medium shrink-0 ml-2 cursor-pointer"
+          className="text-amber-200 hover:text-white underline font-medium shrink-0 cursor-pointer text-xs"
         >
-          ← Hotel Exterior
+          ← <span className="hidden xs:inline">Hotel </span>Exterior
         </button>
       </footer>
     </div>

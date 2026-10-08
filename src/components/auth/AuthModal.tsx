@@ -101,22 +101,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in pt-safe pb-safe overflow-y-auto">
       <div
-        className="relative w-full max-w-md bg-[#FAF8F5] border border-[#E9E4DB] rounded-3xl shadow-2xl overflow-hidden text-[#1C231E]"
+        className="relative w-full max-w-md bg-[#FAF8F5] border border-[#E9E4DB] rounded-3xl shadow-2xl overflow-hidden text-[#1C231E] max-h-[92dvh] overflow-y-auto no-scrollbar my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Decorative Top Accent Bar */}
         <div className="h-1.5 w-full bg-gradient-to-r from-[#263D2F] via-[#B8684A] to-[#263D2F]" />
 
         {/* Modal Header */}
-        <div className="p-6 pb-4 flex items-start justify-between border-b border-[#E9E4DB]/80">
+        <div className="p-5 sm:p-6 pb-3 sm:pb-4 flex items-start justify-between border-b border-[#E9E4DB]/80">
           <div>
             <div className="flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-[#B8684A] font-semibold">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Renoos Hotel Guest Portal</span>
             </div>
-            <h3 className="font-serif text-2xl font-bold text-[#263D2F] mt-1">
+            <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#263D2F] mt-1">
               {tab === 'login' ? 'Sign In to Your Account' : 'Create Guest Profile'}
             </h3>
             <p className="text-xs text-[#646E68] mt-1">
@@ -129,7 +129,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-full text-[#646E68] hover:text-[#263D2F] hover:bg-black/5 transition-colors"
+            className="p-1.5 rounded-full text-[#646E68] hover:text-[#263D2F] hover:bg-black/5 transition-colors cursor-pointer shrink-0"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
@@ -137,7 +137,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
         </div>
 
         {/* Tabs: Login vs Register */}
-        <div className="px-6 pt-4 pb-2">
+        <div className="px-5 sm:px-6 pt-3 sm:pt-4 pb-2">
           <div className="flex bg-[#EFEAE2] p-1 rounded-2xl border border-[#E9E4DB]">
             <button
               type="button"

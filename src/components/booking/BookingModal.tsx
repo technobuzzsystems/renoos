@@ -263,10 +263,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="booking-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-charcoal/70 backdrop-blur-sm overflow-y-auto animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-charcoal/70 backdrop-blur-sm overflow-y-auto animate-fade-in pb-safe pt-safe"
     >
       <div
-        className="relative w-full max-w-4xl bg-cream rounded-2xl sm:rounded-3xl shadow-2xl border border-[#E9E4DB] overflow-hidden my-auto max-h-[96vh] sm:max-h-[92vh] flex flex-col"
+        className="relative w-full max-w-4xl bg-cream rounded-2xl sm:rounded-3xl shadow-2xl border border-[#E9E4DB] overflow-hidden my-auto max-h-[96dvh] sm:max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Bar */}

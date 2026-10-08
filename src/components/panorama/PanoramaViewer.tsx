@@ -227,14 +227,6 @@ export const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
   const [headingState, setHeadingState] = useState({ yaw: initialYaw, pitch: initialPitch, fov: defaultFov })
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null)
 
-  // Auto-dismiss initial gesture hint after 3.5s so it never blocks beacons
-  useEffect(() => {
-    const hintTimer = setTimeout(() => {
-      setHasInteracted(true)
-    }, 3500)
-    return () => clearTimeout(hintTimer)
-  }, [])
-
   // Developer-only calibration support (?calibrate in URL, strictly gated behind DEV mode)
   const isCalibrating =
     Boolean(import.meta.env.DEV) &&
@@ -860,7 +852,7 @@ export const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
 
         {/* First-Interaction Gesture Hint */}
         <div
-          className={`absolute top-[36%] sm:top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-all duration-700 z-10 ${
+          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-all duration-700 z-10 ${
             hasInteracted || isLoading || loadError ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'
           }`}
         >
@@ -930,60 +922,64 @@ export const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
 
         {/* Bottom Interactive HUD & Controls Bar */}
         {!hideInternalBottomBar && (
-          <div className={`absolute ${bottomBarOffsetClass || 'bottom-3 sm:bottom-4'} inset-x-0 px-4 sm:px-5 flex items-end justify-end pointer-events-none z-10`}>
+          <div className={`absolute ${bottomBarOffsetClass || 'bottom-3 sm:bottom-4'} inset-x-0 px-3 sm:px-5 flex items-end justify-end pointer-events-none z-10 pb-safe`}>
             {/* Floating Controls Dock */}
             <div
               onPointerDown={(e) => e.stopPropagation()}
               onPointerUp={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 p-1.5 bg-black/80 border border-white/15 rounded-sm backdrop-blur-md shadow-2xl pointer-events-auto"
+              className="flex items-center gap-1 p-1 sm:p-1.5 bg-black/85 border border-white/20 rounded-2xl backdrop-blur-md shadow-2xl pointer-events-auto"
             >
-            {/* Zoom In */}
-            <button
-              onClick={zoomIn}
-              disabled={headingState.fov <= minFov}
-              aria-label="Zoom in"
-              title="Zoom In (+)"
-              className="p-2.5 rounded-sm text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-            >
-              <ZoomIn className="w-4 h-4" />
-            </button>
+              {/* Zoom In */}
+              <button
+                type="button"
+                onClick={zoomIn}
+                disabled={headingState.fov <= minFov}
+                aria-label="Zoom in"
+                title="Zoom In (+)"
+                className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-xl text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
+              >
+                <ZoomIn className="w-4 h-4" />
+              </button>
 
-            {/* Zoom Out */}
-            <button
-              onClick={zoomOut}
-              disabled={headingState.fov >= maxFov}
-              aria-label="Zoom out"
-              title="Zoom Out (-)"
-              className="p-2.5 rounded-sm text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
-            >
-              <ZoomOut className="w-4 h-4" />
-            </button>
+              {/* Zoom Out */}
+              <button
+                type="button"
+                onClick={zoomOut}
+                disabled={headingState.fov >= maxFov}
+                aria-label="Zoom out"
+                title="Zoom Out (-)"
+                className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-xl text-neutral-300 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
+              >
+                <ZoomOut className="w-4 h-4" />
+              </button>
 
-            <div className="w-px h-5 bg-white/20 mx-0.5" />
+              <div className="w-px h-5 bg-white/20 mx-0.5" />
 
-            {/* Reset View */}
-            <button
-              onClick={resetView}
-              aria-label="Reset View"
-              title="Reset View (R)"
-              className="p-2.5 rounded-sm text-neutral-300 hover:text-luxury-gold hover:bg-white/10 transition-colors"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </button>
+              {/* Reset View */}
+              <button
+                type="button"
+                onClick={resetView}
+                aria-label="Reset View"
+                title="Reset View (R)"
+                className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-xl text-neutral-300 hover:text-emerald-300 hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </button>
 
-            <div className="w-px h-5 bg-white/20 mx-0.5" />
+              <div className="w-px h-5 bg-white/20 mx-0.5" />
 
-            {/* Fullscreen Toggle */}
-            <button
-              onClick={toggleFullscreen}
-              aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-              title={isFullscreen ? 'Exit Fullscreen (F)' : 'Fullscreen (F)'}
-              className="p-2.5 rounded-sm text-neutral-300 hover:text-white hover:bg-white/10 transition-colors"
-            >
-              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-            </button>
+              {/* Fullscreen Toggle */}
+              <button
+                type="button"
+                onClick={toggleFullscreen}
+                aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+                title={isFullscreen ? 'Exit Fullscreen (F)' : 'Fullscreen (F)'}
+                className="w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center rounded-xl text-neutral-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
-        </div>
         )}
       </div>
 

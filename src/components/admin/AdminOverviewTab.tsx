@@ -145,11 +145,11 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <button
               type="button"
               onClick={onOpenWalkInModal}
-              className="px-4 py-2 rounded-full bg-emerald-700 hover:bg-emerald-600 text-cream font-mono text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
+              className="px-4 py-2 sm:py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-600 text-cream font-mono text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer min-h-[38px]"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>New Walk-in Booking</span>
@@ -158,7 +158,7 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({
             <button
               type="button"
               onClick={() => onNavigateToTab('rooms')}
-              className="px-3.5 py-2 rounded-full bg-cream/10 hover:bg-cream/20 text-cream font-mono text-xs transition-all border border-cream/20 cursor-pointer"
+              className="px-3.5 py-2 sm:py-2.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream font-mono text-xs transition-all border border-cream/20 cursor-pointer flex items-center justify-center min-h-[38px]"
             >
               <span>Manage Rooms & Rates →</span>
             </button>
@@ -260,7 +260,7 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({
 
       {/* 3. RECENT RESERVATIONS ACTIVITY LOG */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="font-serif text-xl sm:text-2xl text-cream font-semibold">
               Recent Reservations
@@ -273,7 +273,7 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({
           <button
             type="button"
             onClick={() => onNavigateToTab('bookings')}
-            className="px-4 py-1.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream font-mono text-xs border border-cream/20 transition-all cursor-pointer flex items-center gap-1.5"
+            className="px-4 py-2 rounded-full bg-cream/10 hover:bg-cream/20 text-cream font-mono text-xs border border-cream/20 transition-all cursor-pointer flex items-center gap-1.5 min-h-[36px]"
           >
             <span>View All ({recentBookings.length})</span>
             <ArrowRight className="w-3.5 h-3.5 text-amber-200" />
@@ -286,7 +286,67 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({
               No reservations recorded yet in PMS.
             </div>
           ) : (
-            <div className="overflow-x-auto">
+          <>
+            {/* Mobile Cards (<md) */}
+            <div className="md:hidden divide-y divide-cream/10">
+              {recentBookings.slice(0, 6).map((booking) => {
+                const isCancelled = booking.status === 'cancelled'
+                const isCheckedIn = booking.status === 'checked_in'
+
+                return (
+                  <div
+                    key={booking.id}
+                    className="p-4 space-y-2.5 hover:bg-cream/5 transition-colors cursor-pointer"
+                    onClick={() => onSelectBooking(booking)}
+                  >
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-bold text-amber-200">
+                        {booking.bookingReference}
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold border ${
+                          isCancelled
+                            ? 'bg-red-500/20 text-red-200 border-red-500/40'
+                            : isCheckedIn
+                            ? 'bg-blue-500/20 text-blue-200 border-blue-400/40'
+                            : 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40'
+                        }`}
+                      >
+                        {booking.status}
+                      </span>
+                    </div>
+
+                    <div className="flex items-start justify-between text-xs">
+                      <div>
+                        <div className="font-sans font-medium text-cream">
+                          {booking.guestDetails?.fullName || 'Guest'}
+                        </div>
+                        <div className="text-[10px] text-cream/50">
+                          +91 {booking.guestDetails?.phone}
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="font-bold text-cream">
+                          {formatCurrency(booking.totalAmount)}
+                        </div>
+                        <div className="text-[10px] text-amber-200/80">
+                          Room {booking.roomNumber}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-[11px] text-cream/70 flex items-center justify-between pt-1 border-t border-cream/5">
+                      <span>{booking.checkInDate} → {booking.checkOutDate}</span>
+                      <span className="text-[10px] text-cream/50">{booking.nights}N</span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Desktop Table (md+) */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-xs font-mono">
                 <thead className="bg-black/30 border-b border-cream/15 text-[10px] uppercase tracking-wider text-cream/70">
                   <tr>
@@ -361,6 +421,7 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({
                 </tbody>
               </table>
             </div>
+          </>
           )}
         </div>
       </div>

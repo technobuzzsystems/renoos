@@ -76,45 +76,45 @@ export const UserBookingsModal: React.FC<UserBookingsModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/65 backdrop-blur-sm animate-in fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/65 backdrop-blur-sm animate-in fade-in">
       <div
-        className="relative w-full max-w-3xl max-h-[90vh] bg-[#FAF8F5] border border-[#E9E4DB] rounded-3xl shadow-2xl flex flex-col overflow-hidden text-[#1C231E]"
+        className="relative w-full max-w-3xl max-h-[96dvh] sm:max-h-[90vh] bg-[#FAF8F5] border border-[#E9E4DB] rounded-3xl shadow-2xl flex flex-col overflow-hidden text-[#1C231E]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Decorative Top Accent Bar */}
         <div className="h-1.5 w-full bg-gradient-to-r from-[#263D2F] via-[#B8684A] to-[#263D2F] shrink-0" />
 
         {/* Modal Header */}
-        <div className="p-5 sm:p-6 pb-4 flex items-start justify-between border-b border-[#E9E4DB] shrink-0">
+        <div className="p-4 sm:p-6 pb-3 sm:pb-4 flex items-start justify-between border-b border-[#E9E4DB] shrink-0">
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[#B8684A] font-semibold">
+            <div className="flex items-center gap-2 text-[11px] sm:text-xs font-mono uppercase tracking-widest text-[#B8684A] font-semibold">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Renoos Hotel Guest Portal</span>
             </div>
-            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#263D2F] mt-1">
+            <h3 className="font-serif text-xl sm:text-3xl font-bold text-[#263D2F] mt-0.5 sm:mt-1">
               My Reservations
             </h3>
             {user && (
-              <div className="flex flex-wrap items-center gap-2 text-xs text-[#646E68] mt-1">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-[#646E68] mt-1">
                 <span className="font-medium text-[#263D2F]">Guest: {user.fullName}</span>
                 <span>·</span>
-                <span className="font-mono text-[#B8684A]">Mobile: +91 {user.phone}</span>
+                <span className="font-mono text-[#B8684A]">+91 {user.phone}</span>
                 {user.email && (
                   <>
-                    <span>·</span>
-                    <span>{user.email}</span>
+                    <span className="hidden sm:inline">·</span>
+                    <span className="hidden sm:inline truncate max-w-[180px]">{user.email}</span>
                   </>
                 )}
               </div>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               type="button"
               onClick={refreshUserBookings}
               disabled={isLoadingBookings}
-              className="p-2 rounded-full text-[#646E68] hover:text-[#263D2F] hover:bg-black/5 transition-colors"
+              className="p-2 rounded-full text-[#646E68] hover:text-[#263D2F] hover:bg-black/5 transition-colors min-h-[38px] min-w-[38px] flex items-center justify-center cursor-pointer"
               title="Refresh reservations"
               aria-label="Refresh reservations"
             >
@@ -124,7 +124,7 @@ export const UserBookingsModal: React.FC<UserBookingsModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-full text-[#646E68] hover:text-[#263D2F] hover:bg-black/5 transition-colors"
+              className="p-2 rounded-full text-[#646E68] hover:text-[#263D2F] hover:bg-black/5 transition-colors min-h-[38px] min-w-[38px] flex items-center justify-center cursor-pointer"
               aria-label="Close dialog"
             >
               <X className="w-5 h-5" />

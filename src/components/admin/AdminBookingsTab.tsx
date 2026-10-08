@@ -176,11 +176,11 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <button
             type="button"
             onClick={onOpenWalkInModal}
-            className="px-4 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-600 text-cream font-mono text-xs uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
+            className="flex-1 sm:flex-none justify-center px-4 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-600 text-cream font-mono text-xs uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-md cursor-pointer min-h-[38px]"
           >
             <Plus className="w-4 h-4" />
             <span>New Walk-in Reservation</span>
@@ -189,7 +189,7 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
           <button
             type="button"
             onClick={onRefresh}
-            className="p-2.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream border border-cream/20 transition-all cursor-pointer"
+            className="p-2.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream border border-cream/20 transition-all cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center shrink-0"
             title="Refresh list"
             aria-label="Refresh reservations"
           >
@@ -222,16 +222,16 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
         </div>
 
         {/* Filter Pills */}
-        <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 text-xs font-mono w-full md:w-auto">
           {/* Status Dropdown Filter */}
-          <div className="flex items-center gap-1 bg-black/30 p-1 rounded-2xl border border-cream/15">
+          <div className="flex items-center gap-1 bg-black/30 p-1 rounded-2xl border border-cream/15 overflow-x-auto no-scrollbar touch-pan-x max-w-full shrink-0">
             {(['all', 'confirmed', 'checked_in', 'checked_out', 'cancelled'] as const).map(
               (st) => (
                 <button
                   key={st}
                   type="button"
                   onClick={() => setStatusFilter(st)}
-                  className={`px-3 py-1 rounded-xl uppercase text-[10px] font-bold transition-all ${
+                  className={`px-2.5 sm:px-3 py-1 rounded-xl uppercase text-[9px] sm:text-[10px] font-bold transition-all shrink-0 whitespace-nowrap ${
                     statusFilter === st
                       ? 'bg-cream text-[#16251C] shadow-sm'
                       : 'text-cream/70 hover:text-white'
@@ -247,7 +247,7 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
           <select
             value={roomFilter}
             onChange={(e) => setRoomFilter(e.target.value)}
-            className="px-3 py-2 bg-black/30 border border-cream/15 rounded-xl text-xs font-mono text-cream focus:outline-none"
+            className="w-full sm:w-auto px-3 py-2 bg-black/30 border border-cream/15 rounded-xl text-xs font-mono text-cream focus:outline-none shrink-0"
           >
             <option value="all">All Suites (201-203)</option>
             <option value="201">Room 201 — Forest Suite</option>
@@ -275,14 +275,146 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-black/40 border-b border-cream/15 text-[10px] uppercase tracking-wider text-cream/70">
-                <tr>
-                  <th className="py-3 px-4">Ref & Created</th>
-                  <th className="py-3 px-4">Guest Information</th>
-                  <th className="py-3 px-4">Suite</th>
-                  <th className="py-3 px-4">Stay Dates</th>
+          <>
+            {/* Mobile Cards (Visible on <md) */}
+            <div className="md:hidden divide-y divide-cream/10">
+              {filteredBookings.map((b) => {
+                const isCancelled = b.status === 'cancelled'
+                const isCheckedIn = b.status === 'checked_in'
+                const isCheckedOut = b.status === 'checked_out'
+
+                return (
+                  <div key={b.id} className="p-4 space-y-3">
+                    {/* Top line: Reference + Status selector */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <span className="font-bold text-amber-200 text-xs block">
+                          {b.bookingReference}
+                        </span>
+                        <span className="text-[10px] text-cream/50">
+                          {b.createdAt ? new Date(b.createdAt).toLocaleDateString('en-IN') : 'Direct'}
+                        </span>
+                      </div>
+
+                      <select
+                        value={b.status}
+                        disabled={isUpdatingId === b.id}
+                        onChange={(e) =>
+                          handleStatusSelect(
+                            b,
+                            e.target.value as 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled'
+                          )
+                        }
+                        className={`px-2 py-1 rounded-xl text-[10px] font-mono font-bold uppercase border cursor-pointer focus:outline-none ${
+                          isCancelled
+                            ? 'bg-red-500/20 text-red-200 border-red-500/40'
+                            : isCheckedIn
+                            ? 'bg-blue-500/20 text-blue-200 border-blue-400/40'
+                            : isCheckedOut
+                            ? 'bg-gray-500/20 text-gray-300 border-gray-400/40'
+                            : 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40'
+                        }`}
+                      >
+                        <option value="confirmed" className="bg-[#16251C] text-emerald-300">
+                          Confirmed
+                        </option>
+                        <option value="checked_in" className="bg-[#16251C] text-blue-300">
+                          Checked In
+                        </option>
+                        <option value="checked_out" className="bg-[#16251C] text-gray-300">
+                          Checked Out
+                        </option>
+                        <option value="cancelled" className="bg-[#16251C] text-red-300">
+                          Cancelled
+                        </option>
+                      </select>
+                    </div>
+
+                    {/* Guest info */}
+                    <div className="flex items-start justify-between text-xs">
+                      <div>
+                        <div className="font-sans font-semibold text-cream text-sm">
+                          {b.guestDetails?.fullName || 'Guest'}
+                        </div>
+                        <div className="text-[11px] text-amber-200/80 font-mono">
+                          +91 {b.guestDetails?.phone}
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="font-bold text-cream text-sm">
+                          {formatCurrency(b.totalAmount)}
+                        </div>
+                        <div className="text-[10px] text-cream/50 capitalize">
+                          {b.paymentStatus === 'paid' ? 'Paid Online' : 'Pay at Hotel'}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Room and Dates */}
+                    <div className="p-2.5 bg-black/30 rounded-xl text-xs space-y-1">
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="font-serif font-bold text-cream">Room {b.roomNumber} ({b.roomName})</span>
+                        <span className="text-cream/60">{b.nights} {b.nights === 1 ? 'Night' : 'Nights'}</span>
+                      </div>
+                      <div className="text-[10px] text-cream/60 flex items-center justify-between">
+                        <span>{b.checkInDate} → {b.checkOutDate}</span>
+                        <span>{b.adults} Ad / {b.children} Ch</span>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => onSelectBooking(b)}
+                          className="px-2.5 py-1.5 rounded-lg bg-cream/10 hover:bg-cream/20 text-cream text-[11px] flex items-center gap-1 min-h-[34px]"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Details</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadPDF(b)}
+                          className="px-2.5 py-1.5 rounded-lg bg-terracotta/80 hover:bg-terracotta text-cream text-[11px] flex items-center gap-1 min-h-[34px]"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>PDF</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handlePrint(b)}
+                          className="px-2.5 py-1.5 rounded-lg bg-cream/15 hover:bg-cream/25 text-cream text-[11px] flex items-center gap-1 min-h-[34px]"
+                        >
+                          <Printer className="w-3.5 h-3.5" />
+                          <span>Print</span>
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => onDeleteBooking(b.id)}
+                        className="p-1.5 rounded-lg hover:bg-red-950/60 text-red-400 hover:text-red-200 min-h-[34px] min-w-[34px] flex items-center justify-center"
+                        title="Delete Record"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Desktop Table (Visible on md+) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-xs font-mono">
+                <thead className="bg-black/40 border-b border-cream/15 text-[10px] uppercase tracking-wider text-cream/70">
+                  <tr>
+                    <th className="py-3 px-4">Ref & Created</th>
+                    <th className="py-3 px-4">Guest Information</th>
+                    <th className="py-3 px-4">Suite</th>
+                    <th className="py-3 px-4">Stay Dates</th>
                   <th className="py-3 px-4">Total Amount</th>
                   <th className="py-3 px-4">Status & Action</th>
                   <th className="py-3 px-4 text-right">Documents</th>
@@ -448,6 +580,7 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
               </tbody>
             </table>
           </div>
+        </>
         )}
       </div>
     </div>

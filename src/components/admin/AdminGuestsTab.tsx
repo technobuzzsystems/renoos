@@ -48,7 +48,7 @@ export const AdminGuestsTab: React.FC<AdminGuestsTabProps> = ({
             placeholder="Search by name, phone, or email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-black/30 border border-cream/20 rounded-2xl text-xs font-mono text-cream placeholder-cream/40 focus:outline-none focus:border-amber-300/80"
+            className="w-full pl-10 pr-4 py-2.5 bg-black/30 border border-cream/20 rounded-2xl text-xs font-mono text-cream placeholder-cream/40 focus:outline-none focus:border-amber-300/80"
           />
         </div>
       </div>
@@ -69,91 +69,160 @@ export const AdminGuestsTab: React.FC<AdminGuestsTabProps> = ({
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-black/40 border-b border-cream/15 text-[10px] uppercase tracking-wider text-cream/70">
-                <tr>
-                  <th className="py-3 px-4">Guest</th>
-                  <th className="py-3 px-4">Contact Details</th>
-                  <th className="py-3 px-4">Registered</th>
-                  <th className="py-3 px-4">Total Reservations</th>
-                  <th className="py-3 px-4">Lifetime Spend</th>
-                  <th className="py-3 px-4">Last Stay</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-cream/10 text-cream/90">
-                {filteredGuests.map((g) => {
-                  return (
-                    <tr key={g.id} className="hover:bg-cream/5 transition-colors">
-                      {/* Name & Initials Avatar */}
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-amber-400/20 text-amber-200 border border-amber-300/30 flex items-center justify-center font-serif font-bold text-xs shrink-0">
-                            {g.fullName ? g.fullName.charAt(0).toUpperCase() : 'G'}
-                          </div>
-                          <div>
-                            <span className="font-sans font-semibold text-cream text-sm block">
-                              {g.fullName || 'Guest'}
-                            </span>
-                            <span className="text-[10px] text-cream/50">ID: {g.id}</span>
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Contact */}
-                      <td className="py-4 px-4">
-                        <div className="text-amber-200 font-bold flex items-center gap-1.5">
-                          <Phone className="w-3 h-3 text-amber-200/70" />
-                          <span>+91 {g.phone}</span>
-                        </div>
-                        {g.email && (
-                          <div className="text-[10px] text-cream/60 flex items-center gap-1.5 mt-0.5">
-                            <Mail className="w-3 h-3 text-cream/40" />
-                            <span>{g.email}</span>
-                          </div>
-                        )}
-                      </td>
-
-                      {/* Registered Date */}
-                      <td className="py-4 px-4 text-cream/70">
-                        {g.createdAt ? new Date(g.createdAt).toLocaleDateString('en-IN') : 'Direct'}
-                      </td>
-
-                      {/* Total Bookings */}
-                      <td className="py-4 px-4">
-                        <span className="px-2.5 py-1 rounded-full bg-cream/10 text-cream font-bold">
-                          {g.totalBookings || 0} stay(s)
+          <>
+            {/* Mobile Guest Cards (<md) */}
+            <div className="md:hidden divide-y divide-cream/10">
+              {filteredGuests.map((g) => (
+                <div key={g.id} className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-full bg-amber-400/20 text-amber-200 border border-amber-300/30 flex items-center justify-center font-serif font-bold text-sm shrink-0">
+                        {g.fullName ? g.fullName.charAt(0).toUpperCase() : 'G'}
+                      </div>
+                      <div>
+                        <span className="font-sans font-semibold text-cream text-sm block">
+                          {g.fullName || 'Guest'}
                         </span>
-                      </td>
+                        <span className="text-[10px] text-cream/50">ID: {g.id}</span>
+                      </div>
+                    </div>
 
-                      {/* Lifetime Spend */}
-                      <td className="py-4 px-4 font-bold text-emerald-300">
+                    <span className="px-2.5 py-1 rounded-full bg-cream/10 text-cream text-[10px] font-bold">
+                      {g.totalBookings || 0} stay(s)
+                    </span>
+                  </div>
+
+                  <div className="p-2.5 bg-black/30 rounded-xl text-xs space-y-1.5">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <a
+                        href={`tel:+91${g.phone}`}
+                        className="text-amber-200 font-bold flex items-center gap-1.5 hover:underline"
+                      >
+                        <Phone className="w-3 h-3 text-amber-200/70" />
+                        <span>+91 {g.phone}</span>
+                      </a>
+                      <span className="text-emerald-300 font-bold">
                         {formatCurrency(g.totalSpent || 0)}
-                      </td>
+                      </span>
+                    </div>
 
-                      {/* Last Stay */}
-                      <td className="py-4 px-4 text-cream/70">
-                        {g.lastStay || '—'}
-                      </td>
+                    {g.email && (
+                      <a
+                        href={`mailto:${g.email}`}
+                        className="text-[10px] text-cream/70 flex items-center gap-1.5 truncate hover:underline"
+                      >
+                        <Mail className="w-3 h-3 text-cream/40 shrink-0" />
+                        <span className="truncate">{g.email}</span>
+                      </a>
+                    )}
 
-                      {/* Action */}
-                      <td className="py-4 px-4 text-right">
-                        <button
-                          type="button"
-                          onClick={() => onFilterBookingsByGuest(g.phone)}
-                          className="px-3 py-1.5 rounded-xl bg-cream/10 hover:bg-cream/20 text-cream text-[11px] font-mono transition-colors cursor-pointer inline-flex items-center gap-1"
-                        >
-                          <span>View Folios</span>
-                          <ArrowRight className="w-3 h-3 text-amber-200" />
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+                    <div className="text-[10px] text-cream/50 flex items-center justify-between pt-0.5">
+                      <span>Last stay: {g.lastStay || '—'}</span>
+                      <span>{g.createdAt ? new Date(g.createdAt).toLocaleDateString('en-IN') : 'Direct'}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-1">
+                    <button
+                      type="button"
+                      onClick={() => onFilterBookingsByGuest(g.phone)}
+                      className="px-3.5 py-1.5 rounded-xl bg-cream/10 hover:bg-cream/20 text-cream text-xs font-mono transition-colors cursor-pointer inline-flex items-center gap-1.5 min-h-[36px]"
+                    >
+                      <span>View Reservations</span>
+                      <ArrowRight className="w-3 h-3 text-amber-200" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table (md+) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-xs font-mono">
+                <thead className="bg-black/40 border-b border-cream/15 text-[10px] uppercase tracking-wider text-cream/70">
+                  <tr>
+                    <th className="py-3 px-4">Guest</th>
+                    <th className="py-3 px-4">Contact Details</th>
+                    <th className="py-3 px-4">Registered</th>
+                    <th className="py-3 px-4">Total Reservations</th>
+                    <th className="py-3 px-4">Lifetime Spend</th>
+                    <th className="py-3 px-4">Last Stay</th>
+                    <th className="py-3 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-cream/10 text-cream/90">
+                  {filteredGuests.map((g) => {
+                    return (
+                      <tr key={g.id} className="hover:bg-cream/5 transition-colors">
+                        {/* Name & Initials Avatar */}
+                        <td className="py-4 px-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-amber-400/20 text-amber-200 border border-amber-300/30 flex items-center justify-center font-serif font-bold text-xs shrink-0">
+                              {g.fullName ? g.fullName.charAt(0).toUpperCase() : 'G'}
+                            </div>
+                            <div>
+                              <span className="font-sans font-semibold text-cream text-sm block">
+                                {g.fullName || 'Guest'}
+                              </span>
+                              <span className="text-[10px] text-cream/50">ID: {g.id}</span>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Contact */}
+                        <td className="py-4 px-4">
+                          <div className="text-amber-200 font-bold flex items-center gap-1.5">
+                            <Phone className="w-3 h-3 text-amber-200/70" />
+                            <span>+91 {g.phone}</span>
+                          </div>
+                          {g.email && (
+                            <div className="text-[10px] text-cream/60 flex items-center gap-1.5 mt-0.5">
+                              <Mail className="w-3 h-3 text-cream/40" />
+                              <span>{g.email}</span>
+                            </div>
+                          )}
+                        </td>
+
+                        {/* Registered Date */}
+                        <td className="py-4 px-4 text-cream/70">
+                          {g.createdAt ? new Date(g.createdAt).toLocaleDateString('en-IN') : 'Direct'}
+                        </td>
+
+                        {/* Total Bookings */}
+                        <td className="py-4 px-4">
+                          <span className="px-2.5 py-1 rounded-full bg-cream/10 text-cream font-bold">
+                            {g.totalBookings || 0} stay(s)
+                          </span>
+                        </td>
+
+                        {/* Lifetime Spend */}
+                        <td className="py-4 px-4 font-bold text-emerald-300">
+                          {formatCurrency(g.totalSpent || 0)}
+                        </td>
+
+                        {/* Last Stay */}
+                        <td className="py-4 px-4 text-cream/70">
+                          {g.lastStay || '—'}
+                        </td>
+
+                        {/* Action */}
+                        <td className="py-4 px-4 text-right">
+                          <button
+                            type="button"
+                            onClick={() => onFilterBookingsByGuest(g.phone)}
+                            className="px-3 py-1.5 rounded-xl bg-cream/10 hover:bg-cream/20 text-cream text-[11px] font-mono transition-colors cursor-pointer inline-flex items-center gap-1"
+                          >
+                            <span>View Folios</span>
+                            <ArrowRight className="w-3 h-3 text-amber-200" />
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>

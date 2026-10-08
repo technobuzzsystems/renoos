@@ -200,140 +200,148 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
       {/* =========================================================================
           1. TOP NAVIGATION & SUITE SWITCHER COCKPIT
           ========================================================================= */}
-      <header className="relative z-30 shrink-0 bg-[#16251C]/90 backdrop-blur-md border-b border-cream/15 px-3 sm:px-6 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-3 shadow-md">
-        {/* Left: Brand & Back to Reception */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          <button
-            type="button"
-            onClick={onBackToReception}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream text-xs font-mono transition-all border border-cream/15"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 text-cream" />
-            <span className="hidden sm:inline">Grand Lobby</span>
-            <span className="sm:hidden">Lobby</span>
-          </button>
+      {/* =========================================================================
+          1. TOP NAVIGATION & SUITE SWITCHER COCKPIT
+          ========================================================================= */}
+      <header className="relative z-30 shrink-0 bg-[#16251C]/95 backdrop-blur-md border-b border-cream/15 px-3 sm:px-6 py-2 sm:py-3 shadow-md pt-safe">
+        {/* Top Cockpit Row: Back, Brand, Dates, Guest */}
+        <div className="flex items-center justify-between gap-2">
+          {/* Left: Back & Brand */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              onClick={onBackToReception}
+              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream text-[11px] sm:text-xs font-mono transition-all border border-cream/15 cursor-pointer shrink-0"
+              title="Return to Grand Lobby"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-cream" />
+              <span className="hidden sm:inline">Grand Lobby</span>
+              <span className="sm:hidden">Lobby</span>
+            </button>
 
-          <div className="h-4 w-px bg-cream/20 hidden sm:block" />
+            <div className="h-4 w-px bg-cream/20 hidden sm:block" />
 
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-serif text-base sm:text-lg font-medium text-cream tracking-tight">
-                RENOOS HOTEL
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-cream/15 text-cream/90 text-[10px] font-mono uppercase tracking-wider hidden md:inline-block">
-                Suites Preview
-              </span>
+            <div>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="font-serif text-sm sm:text-lg font-medium text-cream tracking-tight">
+                  RENOOS HOTEL
+                </span>
+                <span className="px-1.5 sm:px-2 py-0.5 rounded-full bg-cream/15 text-cream/90 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider hidden xs:inline-block">
+                  Suites
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono text-cream/70">
+                <span>
+                  {formatShortDate(checkInDate)} – {formatShortDate(checkOutDate)} ({nights}{' '}
+                  {nights === 1 ? 'nt' : 'nts'})
+                </span>
+                <span className="hidden xs:inline">·</span>
+                <span className="hidden xs:inline">
+                  {adults} {adults === 1 ? 'Adult' : 'Adults'}
+                </span>
+                {onModifyDates && (
+                  <button
+                    type="button"
+                    onClick={onModifyDates}
+                    className="text-amber-200 hover:text-white underline ml-1 cursor-pointer font-medium"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-[11px] font-mono text-cream/70">
-              <span>
-                {formatShortDate(checkInDate)} – {formatShortDate(checkOutDate)} ({nights}{' '}
-                {nights === 1 ? 'nt' : 'nts'})
-              </span>
-              <span>·</span>
-              <span>
-                {adults} {adults === 1 ? 'Adult' : 'Adults'}
-              </span>
-              {onModifyDates && (
-                <button
-                  type="button"
-                  onClick={onModifyDates}
-                  className="text-amber-200 hover:text-white underline ml-1 cursor-pointer"
-                >
-                  Edit
-                </button>
-              )}
-            </div>
+          </div>
+
+          {/* Right: Guest Account Portal */}
+          <div className="shrink-0">
+            <GuestAccountButton variant="dark" />
           </div>
         </div>
 
-        {/* Center: Available Suites Selector Tabs (Room 201, 202, 203) */}
-        <div className="flex items-center p-1 bg-[#0f1b13]/80 rounded-2xl border border-cream/20 shadow-inner">
-          {ROOMS_DATA.map((room) => {
-            const isSelected = room.id === selectedRoom.id
-            const price = room.pricePerNight || 5200
-            const roomAvail = availability[room.roomNumber] || availability[room.id]
-            const isAvailable = roomAvail?.available !== false
+        {/* Second Row: Suite Switcher Tabs & View Mode Toggle */}
+        <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 mt-2 pt-2 border-t border-cream/10">
+          {/* Suite Switcher Tabs (Room 201, 202, 203) */}
+          <div className="flex items-center p-0.5 sm:p-1 bg-[#0f1b13]/90 rounded-2xl border border-cream/20 shadow-inner overflow-x-auto no-scrollbar">
+            {ROOMS_DATA.map((room) => {
+              const isSelected = room.id === selectedRoom.id
+              const price = room.pricePerNight || 5200
+              const roomAvail = availability[room.roomNumber] || availability[room.id]
+              const isAvailable = roomAvail?.available !== false
 
-            return (
-              <button
-                key={room.id}
-                type="button"
-                onClick={() => setSelectedRoomId(room.id)}
-                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs transition-all ${
-                  isSelected
-                    ? isAvailable
-                      ? 'bg-cream text-[#16251C] font-semibold shadow-md'
-                      : 'bg-red-900/80 text-red-100 border border-red-400 font-semibold shadow-md'
-                    : isAvailable
-                      ? 'text-cream/70 hover:text-white hover:bg-cream/10'
-                      : 'text-red-300/60 hover:text-red-200 hover:bg-red-950/40'
-                }`}
-              >
-                <span className="font-mono font-bold">{room.roomNumber}</span>
-                <span className="hidden md:inline font-serif">{room.name}</span>
-                {isAvailable ? (
-                  <span
-                    className={`text-[10px] font-mono ${
-                      isSelected ? 'text-[#16251C]/80 font-bold' : 'text-amber-200'
-                    }`}
-                  >
-                    ₹{(price).toLocaleString('en-IN')}
-                  </span>
-                ) : (
-                  <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-red-500/30 text-red-200 border border-red-500/50 font-bold">
-                    Booked
-                  </span>
-                )}
-              </button>
-            )
-          })}
-        </div>
+              return (
+                <button
+                  key={room.id}
+                  type="button"
+                  onClick={() => setSelectedRoomId(room.id)}
+                  className={`flex items-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-xl text-[11px] sm:text-xs transition-all cursor-pointer whitespace-nowrap ${
+                    isSelected
+                      ? isAvailable
+                        ? 'bg-cream text-[#16251C] font-bold shadow-md'
+                        : 'bg-red-900/80 text-red-100 border border-red-400 font-bold shadow-md'
+                      : isAvailable
+                        ? 'text-cream/70 hover:text-white hover:bg-cream/10'
+                        : 'text-red-300/60 hover:text-red-200 hover:bg-red-950/40'
+                  }`}
+                >
+                  <span className="font-mono font-bold">{room.roomNumber}</span>
+                  <span className="hidden md:inline font-serif">{room.name}</span>
+                  {isAvailable ? (
+                    <span
+                      className={`text-[9px] sm:text-[10px] font-mono ${
+                        isSelected ? 'text-[#16251C]/80 font-bold' : 'text-amber-200'
+                      }`}
+                    >
+                      ₹{(price).toLocaleString('en-IN')}
+                    </span>
+                  ) : (
+                    <span className="text-[8px] sm:text-[9px] font-mono uppercase px-1 py-0.2 rounded bg-red-500/30 text-red-200 border border-red-500/50 font-bold">
+                      Booked
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
 
-        {/* Right: Guest Account Portal & Three Viewing Modes Toggle */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          <GuestAccountButton variant="dark" />
-
-          <div className="flex items-center p-1 bg-[#0f1b13]/80 rounded-2xl border border-cream/20 text-xs font-mono">
+          {/* Three Viewing Modes Toggle (Photo, 360°, 3D) */}
+          <div className="flex items-center p-0.5 sm:p-1 bg-[#0f1b13]/90 rounded-2xl border border-cream/20 text-[11px] sm:text-xs font-mono shrink-0">
             <button
               type="button"
               onClick={() => setViewMode('photo')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl transition-all cursor-pointer ${
                 viewMode === 'photo'
                   ? 'bg-cream text-[#16251C] font-bold shadow-sm'
                   : 'text-cream/70 hover:text-white'
               }`}
             >
-              <Camera className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Photography</span>
-              <span className="sm:hidden">Photo</span>
+              <Camera className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span>Photo</span>
             </button>
 
             <button
               type="button"
               onClick={() => setViewMode('360')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl transition-all cursor-pointer ${
                 viewMode === '360'
                   ? 'bg-cream text-[#16251C] font-bold shadow-sm'
                   : 'text-cream/70 hover:text-white'
               }`}
             >
-              <Compass className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">360° Tour</span>
-              <span className="sm:hidden">360°</span>
+              <Compass className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span>360°</span>
             </button>
 
             <button
               type="button"
               onClick={() => setViewMode('3d')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl transition-all cursor-pointer ${
                 viewMode === '3d'
                   ? 'bg-cream text-[#16251C] font-bold shadow-sm'
                   : 'text-cream/70 hover:text-white'
               }`}
             >
-              <BoxIcon className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">3D View</span>
-              <span className="sm:hidden">3D</span>
+              <BoxIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <span>3D</span>
             </button>
           </div>
         </div>
@@ -467,39 +475,40 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
       {/* =========================================================================
           4. BOTTOM RESERVATION BAR (Pricing breakdown & Instant Booking Modal)
           ========================================================================= */}
-      <footer className="relative z-30 shrink-0 bg-[#0f1b13]/95 backdrop-blur-md border-t border-cream/20 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3 shadow-2xl">
+      {/* =========================================================================
+          4. BOTTOM RESERVATION BAR (Pricing breakdown & Instant Booking Modal)
+          ========================================================================= */}
+      <footer className="relative z-30 shrink-0 bg-[#0f1b13]/95 backdrop-blur-md border-t border-cream/20 px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-3 shadow-2xl pb-safe">
         {/* Left: Room Specifications Strip */}
-        <div className="flex items-center gap-3 text-xs font-mono text-cream/70">
-          <div className="flex items-center gap-1.5 text-cream">
-            <Bed className="w-4 h-4 text-emerald-300" />
+        <div className="flex items-center gap-1.5 sm:gap-3 text-[11px] sm:text-xs font-mono text-cream/70">
+          <div className="flex items-center gap-1 sm:gap-1.5 text-cream">
+            <Bed className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-300" />
             <span className="font-semibold">Room {selectedRoom.roomNumber}</span>
           </div>
           <span>·</span>
           <span>{formatArea(selectedRoom.area)}</span>
-          <span className="hidden sm:inline">·</span>
-          <span className="hidden sm:inline">{selectedRoom.viewType}</span>
-          <span>·</span>
-          <span className="text-amber-200 font-bold">
+          <span className="hidden xs:inline">·</span>
+          <span className="text-amber-200 font-bold hidden xs:inline">
             ₹{tariffPerNight.toLocaleString('en-IN')}/nt
           </span>
           {!isCurrentRoomAvailable && (
-            <span className="px-2 py-0.5 rounded-full bg-red-500/30 border border-red-500/50 text-red-200 text-[10px] font-mono font-bold uppercase">
+            <span className="px-1.5 py-0.5 rounded-full bg-red-500/30 border border-red-500/50 text-red-200 text-[9px] sm:text-[10px] font-mono font-bold uppercase">
               Unavailable
             </span>
           )}
         </div>
 
         {/* Right: Tariff Total & Primary Booking CTA */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className="text-right">
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-mono uppercase text-cream/60">Total Tariff</span>
-              <span className="text-base sm:text-lg font-serif font-bold text-cream">
+            <div className="flex items-center gap-1">
+              <span className="text-[9px] sm:text-[10px] font-mono uppercase text-cream/60 hidden xs:inline">Total</span>
+              <span className="text-sm sm:text-lg font-serif font-bold text-cream">
                 ₹{totalAmount.toLocaleString('en-IN')}
               </span>
             </div>
-            <span className="text-[10px] font-mono text-cream/60 block">
-              {nights} {nights === 1 ? 'night' : 'nights'} · incl. 12% GST
+            <span className="text-[9px] sm:text-[10px] font-mono text-cream/60 block">
+              {nights} {nights === 1 ? 'nt' : 'nts'} · incl. GST
             </span>
           </div>
 
@@ -507,7 +516,7 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
             type="button"
             disabled={!isCurrentRoomAvailable}
             onClick={() => setIsBookingModalOpen(true)}
-            className={`py-2.5 sm:py-3 px-5 sm:px-6 rounded-2xl text-xs uppercase tracking-wider font-bold shadow-xl flex items-center gap-2 transition-all duration-300 ${
+            className={`py-2 sm:py-3 px-3.5 sm:px-6 rounded-xl sm:rounded-2xl text-[11px] sm:text-xs uppercase tracking-wider font-bold shadow-xl flex items-center gap-1.5 transition-all duration-300 ${
               isCurrentRoomAvailable
                 ? 'bg-cream hover:bg-white text-[#16251C] transform hover:scale-105 cursor-pointer'
                 : 'bg-red-950/70 border border-red-500/40 text-red-300 cursor-not-allowed opacity-90'
@@ -515,14 +524,11 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
           >
             {isCurrentRoomAvailable ? (
               <>
-                <span>Book Room {selectedRoom.roomNumber}</span>
-                <ArrowRight className="w-4 h-4 text-[#16251C]" />
+                <span>Book <span className="hidden xs:inline">Room </span>{selectedRoom.roomNumber}</span>
+                <ArrowRight className="w-3.5 h-3.5 text-[#16251C]" />
               </>
             ) : (
-              <>
-                <span>Room {selectedRoom.roomNumber} Booked</span>
-                <span className="text-[10px] font-mono opacity-80">(Unavailable)</span>
-              </>
+              <span>Booked</span>
             )}
           </button>
         </div>
