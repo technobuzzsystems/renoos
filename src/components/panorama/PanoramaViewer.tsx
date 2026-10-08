@@ -227,6 +227,14 @@ export const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
   const [headingState, setHeadingState] = useState({ yaw: initialYaw, pitch: initialPitch, fov: defaultFov })
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null)
 
+  // Auto-dismiss initial gesture hint after 3.5s so it never blocks beacons
+  useEffect(() => {
+    const hintTimer = setTimeout(() => {
+      setHasInteracted(true)
+    }, 3500)
+    return () => clearTimeout(hintTimer)
+  }, [])
+
   // Developer-only calibration support (?calibrate in URL, strictly gated behind DEV mode)
   const isCalibrating =
     Boolean(import.meta.env.DEV) &&
@@ -852,7 +860,7 @@ export const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
 
         {/* First-Interaction Gesture Hint */}
         <div
-          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-all duration-700 z-10 ${
+          className={`absolute top-[36%] sm:top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-all duration-700 z-10 ${
             hasInteracted || isLoading || loadError ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'
           }`}
         >
