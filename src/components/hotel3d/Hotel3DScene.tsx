@@ -121,7 +121,7 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
       hotspots: [
         {
           id: 'hs-entrance-walk',
-          title: 'Walk to Receptionist',
+          title: 'Walk to Reception Desk',
           description: 'Step through the entrance door into the 360° Grand Lobby',
           type: 'navigation' as const,
           spherical: { yaw: -6.5, pitch: -3.5 },
@@ -235,7 +235,7 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
             className="hidden md:flex px-4 py-2 rounded-full bg-cream hover:bg-white text-[#16251C] font-semibold text-xs font-mono items-center gap-1.5 transition-all shadow-lg cursor-pointer transform hover:scale-105 whitespace-nowrap"
           >
             <Compass className="w-3.5 h-3.5 text-[#16251C]" />
-            <span>Walk to Receptionist</span>
+            <span>Walk to Reception</span>
             <ArrowRight className="w-3 h-3 text-[#16251C]" />
           </button>
         </div>
@@ -268,7 +268,7 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({ onEnterReception }) 
             className="w-full py-2.5 sm:py-3 px-4 sm:px-5 bg-cream hover:bg-white text-[#16251C] font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-xl flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-[1.01] cursor-pointer"
           >
             <Compass className="w-4 h-4 text-[#16251C]" />
-            <span>Walk to Receptionist & Book Rooms</span>
+            <span>Walk to Reception & Book Rooms</span>
             <ArrowRight className="w-4 h-4 text-[#16251C]" />
           </button>
         </div>

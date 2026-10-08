@@ -58,16 +58,16 @@ export const ComputerTerminal: React.FC<ComputerTerminalProps> = ({
 
         {/* Right: Quick Breadcrumb Navigation & Screen Size Toggle */}
         <div className="flex items-center gap-2">
-          {/* Back to Receptionist */}
+          {/* Back to Reception Desk */}
           <button
             type="button"
             onClick={onBackToReceptionist}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-cream text-xs font-medium border border-white/15 transition-all"
-            title="Step back to chat with receptionist"
+            title="Step back to reception desk"
           >
             <ArrowLeft className="w-3.5 h-3.5 text-amber-300" />
-            <span className="hidden sm:inline">Speak to Receptionist</span>
-            <span className="sm:hidden">Receptionist</span>
+            <span className="hidden sm:inline">Back to Reception</span>
+            <span className="sm:hidden">Reception</span>
           </button>
 
           {/* Back to Hotel 3D View */}
