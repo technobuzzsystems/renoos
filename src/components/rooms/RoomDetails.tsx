@@ -306,7 +306,7 @@ export const RoomDetails: React.FC<RoomDetailsProps> = ({ room }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <SectionHeader
             eyebrow="Space Exploration"
-            title="Explore Bedroom, Kitchen & Washroom"
+            title="Explore Bedroom & Bathroom"
             subtitle={`Navigate through the dedicated spaces of Room ${room.roomNumber}. Experience high-resolution photography, immersive 360° virtual tours, and 3D spatial architecture.`}
             align="center"
           />

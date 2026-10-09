@@ -72,7 +72,7 @@ export const HomePage: React.FC = () => {
           <SectionHeader
             eyebrow="Accommodations"
             title="Curated Rooms & Suites"
-            subtitle="Explore our three meticulously appointed residences. Each room features dedicated master bedrooms, artisan kitchenettes, and spa washrooms ready for virtual exploration."
+            subtitle="Explore our three meticulously appointed residences. Each room features dedicated master bedrooms and spa bathrooms ready for virtual exploration."
             align="center"
           />
 
@@ -122,20 +122,7 @@ export const HomePage: React.FC = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-forest-dark/80 via-transparent to-transparent pointer-events-none" />
 
-                  {/* Simulated Interactive Hotspot Pin 1 (Kitchen) */}
-                  <div className="absolute top-[48%] left-[28%] -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                    <div className="relative flex items-center justify-center">
-                      <span className="absolute w-8 h-8 rounded-full bg-terracotta/40 animate-ping" />
-                      <div className="w-6 h-6 rounded-full bg-terracotta text-cream flex items-center justify-center shadow-md border border-cream">
-                        <Compass className="w-3.5 h-3.5" />
-                      </div>
-                      <span className="hidden sm:inline-block absolute left-full ml-2.5 px-2.5 py-1 bg-forest/90 backdrop-blur-md border border-cream/20 text-[10px] uppercase font-mono tracking-wider text-cream rounded-full whitespace-nowrap shadow-warm">
-                        Artisan Kitchen →
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Simulated Interactive Hotspot Pin 2 (Washroom) */}
+                  {/* Simulated Interactive Hotspot Pin (Bathroom) */}
                   <div className="absolute top-[52%] right-[24%] translate-x-1/2 -translate-y-1/2 pointer-events-none">
                     <div className="relative flex items-center justify-center">
                       <span className="absolute w-8 h-8 rounded-full bg-terracotta/40 animate-ping delay-300" />
@@ -143,7 +130,7 @@ export const HomePage: React.FC = () => {
                         <Compass className="w-3.5 h-3.5" />
                       </div>
                       <span className="hidden sm:inline-block absolute right-full mr-2.5 px-2.5 py-1 bg-forest/90 backdrop-blur-md border border-cream/20 text-[10px] uppercase font-mono tracking-wider text-cream rounded-full whitespace-nowrap shadow-warm">
-                        ← Marble Washroom
+                        ← Marble Spa Bathroom
                       </span>
                     </div>
                   </div>
@@ -153,8 +140,7 @@ export const HomePage: React.FC = () => {
                     <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                       <span className="text-[10px] sm:text-[11px] font-light text-cream/70">Spaces:</span>
                       <span className="px-2 py-0.5 rounded-full bg-terracotta/25 text-terracotta-light font-mono text-[9px] sm:text-[10px] font-medium">Bedroom</span>
-                      <span className="px-2 py-0.5 rounded-full bg-white/10 text-cream/80 font-mono text-[9px] sm:text-[10px]">Kitchen</span>
-                      <span className="px-2 py-0.5 rounded-full bg-white/10 text-cream/80 font-mono text-[9px] sm:text-[10px]">Washroom</span>
+                      <span className="px-2 py-0.5 rounded-full bg-white/10 text-cream/80 font-mono text-[9px] sm:text-[10px]">Bathroom</span>
                     </div>
                     <span className="text-[9px] sm:text-[10px] font-mono text-terracotta-light uppercase tracking-wider hidden sm:inline-block font-semibold">Full Tour Ready</span>
                   </div>
@@ -181,7 +167,7 @@ export const HomePage: React.FC = () => {
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 rounded-full bg-terracotta-light mt-2 flex-shrink-0" />
                   <p className="text-xs text-cream/80 font-light leading-relaxed">
-                    <strong className="text-cream font-medium">Spatial Hotspot Transit:</strong> Click integrated door and corridor hotspots to transition fluidly between Bedroom, Kitchenette, and Washroom.
+                    <strong className="text-cream font-medium">Spatial Hotspot Transit:</strong> Click integrated door and corridor hotspots to transition fluidly between Bedroom and Bathroom.
                   </p>
                 </div>
                 <div className="flex items-start gap-3">

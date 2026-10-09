@@ -604,11 +604,171 @@ export function getAllUsersWithStats(): (SafeUser & {
 }
 
 /**
- * Verify admin passcode (Default: 'renoos2026' or 'admin123')
+ * Active Server-Side Session Store for Renoos Hotel Executive PMS
+ */
+export interface ServerAdminSession {
+  token: string
+  admin: {
+    id: string
+    name: string
+    role: string
+    hotel: string
+  }
+  createdAt: number
+  expiresAt: number
+  lastActivity: number
+  ip?: string
+  userAgent?: string
+}
+
+const ADMIN_SESSION_TTL_MS = 8 * 60 * 60 * 1000 // 8 hours active session lifetime
+const activeAdminSessions = new Map<string, ServerAdminSession>()
+
+/**
+ * Creates a cryptographically unguessable admin session token
+ */
+export function createAdminSession(ip?: string, userAgent?: string): ServerAdminSession {
+  const token = crypto.randomBytes(32).toString('hex')
+  const now = Date.now()
+  const session: ServerAdminSession = {
+    token,
+    admin: {
+      id: 'admin-primary',
+      name: 'General Manager',
+      role: 'Super Admin',
+      hotel: 'Renoos Hotel',
+    },
+    createdAt: now,
+    expiresAt: now + ADMIN_SESSION_TTL_MS,
+    lastActivity: now,
+    ip,
+    userAgent,
+  }
+  activeAdminSessions.set(token, session)
+  return session
+}
+
+/**
+ * Validates Bearer token authorization header and session lifetime
+ */
+export function verifyAdminSession(authHeader?: string): ServerAdminSession | null {
+  if (!authHeader || typeof authHeader !== 'string') return null
+  const match = authHeader.match(/^Bearer\s+([a-zA-Z0-9_-]+)$/)
+  if (!match) return null
+  const token = match[1]
+
+  const session = activeAdminSessions.get(token)
+  if (!session) return null
+
+  const now = Date.now()
+  if (now > session.expiresAt) {
+    activeAdminSessions.delete(token)
+    return null
+  }
+
+  // Update last activity timestamp to keep active sessions alive
+  session.lastActivity = now
+  return session
+}
+
+/**
+ * Safely terminates an active admin session on logout
+ */
+export function revokeAdminSession(authHeader?: string): boolean {
+  if (!authHeader || typeof authHeader !== 'string') return false
+  const match = authHeader.match(/^Bearer\s+([a-zA-Z0-9_-]+)$/)
+  if (!match) return false
+  const token = match[1]
+  return activeAdminSessions.delete(token)
+}
+
+/**
+ * Rate Limiting for Admin Authentication (Brute Force Protection)
+ */
+interface RateLimitRecord {
+  attempts: number
+  firstAttemptAt: number
+  lockedUntil?: number
+}
+
+const loginRateLimits = new Map<string, RateLimitRecord>()
+const MAX_LOGIN_ATTEMPTS = 5
+const LOCKOUT_WINDOW_MS = 15 * 60 * 1000 // 15 minutes lockout
+
+export function checkAdminLoginRateLimit(ip: string): {
+  allowed: boolean
+  remainingAttempts: number
+  retryAfterSeconds?: number
+} {
+  const now = Date.now()
+  const record = loginRateLimits.get(ip)
+
+  if (!record) {
+    return { allowed: true, remainingAttempts: MAX_LOGIN_ATTEMPTS }
+  }
+
+  if (record.lockedUntil && record.lockedUntil > now) {
+    const retryAfterSeconds = Math.ceil((record.lockedUntil - now) / 1000)
+    return { allowed: false, remainingAttempts: 0, retryAfterSeconds }
+  }
+
+  if (now - record.firstAttemptAt > LOCKOUT_WINDOW_MS) {
+    loginRateLimits.delete(ip)
+    return { allowed: true, remainingAttempts: MAX_LOGIN_ATTEMPTS }
+  }
+
+  const remaining = Math.max(0, MAX_LOGIN_ATTEMPTS - record.attempts)
+  return { allowed: remaining > 0, remainingAttempts: remaining }
+}
+
+export function recordAdminLoginFailure(ip: string): {
+  remainingAttempts: number
+  retryAfterSeconds?: number
+} {
+  const now = Date.now()
+  let record = loginRateLimits.get(ip)
+
+  if (!record || now - record.firstAttemptAt > LOCKOUT_WINDOW_MS) {
+    record = { attempts: 1, firstAttemptAt: now }
+  } else {
+    record.attempts += 1
+  }
+
+  if (record.attempts >= MAX_LOGIN_ATTEMPTS) {
+    record.lockedUntil = now + LOCKOUT_WINDOW_MS
+    loginRateLimits.set(ip, record)
+    return { remainingAttempts: 0, retryAfterSeconds: Math.ceil(LOCKOUT_WINDOW_MS / 1000) }
+  }
+
+  loginRateLimits.set(ip, record)
+  return { remainingAttempts: Math.max(0, MAX_LOGIN_ATTEMPTS - record.attempts) }
+}
+
+export function recordAdminLoginSuccess(ip: string): void {
+  loginRateLimits.delete(ip)
+}
+
+/**
+ * Verify admin passcode using constant-time comparison
+ * Configurable via ADMIN_PASSCODE or ADMIN_PASSWORD env vars
  */
 export function verifyAdminPasscode(passcode: string): boolean {
-  if (!passcode) return false
-  const validCodes = ['renoos2026', 'admin123', 'renoos-hotel-admin']
-  return validCodes.includes(passcode.trim())
+  if (!passcode || typeof passcode !== 'string') return false
+  const trimmed = passcode.trim()
+  if (!trimmed) return false
+
+  const envPasscode = process.env.ADMIN_PASSCODE || process.env.ADMIN_PASSWORD
+  const expectedPasscode = envPasscode || 'renoos2026'
+
+  const bufA = Buffer.from(trimmed)
+  const bufB = Buffer.from(expectedPasscode)
+
+  if (bufA.length !== bufB.length) {
+    crypto.timingSafeEqual(bufA, bufA)
+    return false
+  }
+
+  return crypto.timingSafeEqual(bufA, bufB)
 }
+
 

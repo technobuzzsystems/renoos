@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
 import {
   Sparkles,
   ArrowRight,
@@ -9,7 +9,10 @@ import {
   Leaf,
   User,
   LogIn,
-  X,
+  Volume2,
+  VolumeX,
+  RotateCcw,
+  Info,
 } from 'lucide-react'
 import { PanoramaViewer } from '../panorama/PanoramaViewer'
 import { GuestAccountButton } from '@/components/auth'
@@ -29,11 +32,16 @@ interface ReceptionSceneProps {
   initialMode?: 'desk-photo' | '360-lobby'
 }
 
+const RECEPTIONIST_AUDIO_PATH =
+  '/audio/ElevenLabs_2026-10-09T05_21_42_Anika%20-%20Marathi%20Customer%20Care%20Agent_pvc_sp100_s50_sb75_v4.mp3'
+const RECEPTIONIST_AUDIO_FALLBACK = '/audio/receptionist-voice.mp3'
+
 /**
  * STAGE 2: Grand Lobby & Reception Scene
  * Styled with direct reference to Renoos Hotel Resort Welcome:
+ * - Plays authentic high-fidelity receptionist greeting audio on customer arrival
  * - Modern luxury resort lobby with curved Calacatta marble counter and vertical timber fluting
- * - Real photographic presentation of the receptionist behind the desk
+ * - Real photographic presentation of the reception desk
  * - Floating transparent/frosted-glass concierge interface (translucent cream/forest glass)
  * - In-scene compact date selection & smooth transition to Room Preview
  */
@@ -45,12 +53,106 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
 }) => {
   const { user, isAuthenticated, setIsAuthModalOpen, setIsBookingsModalOpen, userBookings } =
     useAuth()
+
   // Mode: Front Desk View (Matching Reference Photo) vs 360° Grand Lobby Tour
   const [receptionMode, setReceptionMode] = useState<'desk-photo' | '360-lobby'>(initialMode)
 
   // Screen state inside the transparent concierge interface:
   // 'greeting' -> 'dates' -> 'free-explore' (minimized)
   const [viewState, setViewState] = useState<'greeting' | 'dates' | 'free-explore'>('free-explore')
+
+  // Receptionist Audio State & Controller
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [isAudioPlaying, setIsAudioPlaying] = useState<boolean>(false)
+
+  useEffect(() => {
+    // Instantiate audio object with the customer receptionist voice file
+    const audio = new Audio(RECEPTIONIST_AUDIO_PATH)
+    audio.preload = 'auto'
+    audioRef.current = audio
+
+    const onPlay = () => setIsAudioPlaying(true)
+    const onPause = () => setIsAudioPlaying(false)
+    const onEnded = () => setIsAudioPlaying(false)
+    const onError = () => {
+      // Fallback to alias if URL encoding has any edge case
+      if (audio.src.includes('ElevenLabs')) {
+        audio.src = RECEPTIONIST_AUDIO_FALLBACK
+        audio.play().catch(() => {})
+      }
+    }
+
+    audio.addEventListener('play', onPlay)
+    audio.addEventListener('pause', onPause)
+    audio.addEventListener('ended', onEnded)
+    audio.addEventListener('error', onError)
+
+    // Automatically speak the voice when any customer arrives at reception
+    const startPlayback = () => {
+      if (!audioRef.current) return
+      audioRef.current
+        .play()
+        .then(() => {
+          setIsAudioPlaying(true)
+        })
+        .catch((err) => {
+          console.log('Autoplay waiting for first customer interaction:', err)
+          // If browser restricts initial unprompted autoplay, play on very first touch/click
+          const unlockGesture = () => {
+            if (audioRef.current) {
+              audioRef.current
+                .play()
+                .then(() => setIsAudioPlaying(true))
+                .catch(() => {})
+            }
+            window.removeEventListener('click', unlockGesture)
+            window.removeEventListener('touchstart', unlockGesture)
+            window.removeEventListener('pointerdown', unlockGesture)
+          }
+
+          window.addEventListener('click', unlockGesture, { once: true })
+          window.addEventListener('touchstart', unlockGesture, { once: true })
+          window.addEventListener('pointerdown', unlockGesture, { once: true })
+        })
+    }
+
+    startPlayback()
+
+    return () => {
+      audio.removeEventListener('play', onPlay)
+      audio.removeEventListener('pause', onPause)
+      audio.removeEventListener('ended', onEnded)
+      audio.removeEventListener('error', onError)
+      audio.pause()
+      audio.currentTime = 0
+      audioRef.current = null
+    }
+  }, [])
+
+  const toggleVoicePlayback = () => {
+    if (!audioRef.current) return
+    if (isAudioPlaying) {
+      audioRef.current.pause()
+    } else {
+      if (audioRef.current.ended) {
+        audioRef.current.currentTime = 0
+      }
+      audioRef.current.play().catch(console.error)
+    }
+  }
+
+  const replayVoice = () => {
+    if (!audioRef.current) return
+    audioRef.current.currentTime = 0
+    audioRef.current.play().catch(console.error)
+  }
+
+  const handleBackToExterior = () => {
+    if (audioRef.current) {
+      audioRef.current.pause()
+    }
+    onBackToExterior()
+  }
 
   // Date Selection State
   const defaultDates = useMemo(() => {
@@ -75,6 +177,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
   )
   const [adults, setAdults] = useState<number>(initialDates?.adults || defaultDates.adults)
   const [children, setChildren] = useState<number>(initialDates?.children || defaultDates.children)
+
   // Calculate nights & validate check-out > check-in cleanly without setState in render
   const { nights, dateError } = useMemo(() => {
     try {
@@ -107,6 +210,9 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
 
   // Handle continuing to Room Preview
   const handleContinue = (_targetRoomId?: string) => {
+    if (audioRef.current) {
+      audioRef.current.pause()
+    }
     if (nights <= 0) return
     onContinueToRoomPreview({
       checkIn: checkInDate,
@@ -131,11 +237,20 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
       caption: 'Renoos Hotel — 360° Grand Lobby & Reception Tour',
       hotspots: [
         {
+          id: 'hs-lobby-welcome',
+          title: 'Welcome Menu',
+          description: 'Explore concierge services & hotel welcome',
+          type: 'feature' as const,
+          spherical: { yaw: 166, pitch: -13 },
+          category: 'Front Desk',
+          icon: 'sparkles',
+        },
+        {
           id: 'hs-lobby-book',
-          title: 'Book a Suite · Select Dates',
+          title: 'Book a Suite',
           description: 'Select reservation dates & check suite availability',
           type: 'navigation' as const,
-          spherical: { yaw: 180, pitch: -13 },
+          spherical: { yaw: 194, pitch: -13 },
           targetSpaceId: 'dates',
           category: 'Reservation Desk',
           icon: 'calendar',
@@ -161,22 +276,43 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
           {/* Subtle top gradient edge for header legibility */}
           <div className="absolute top-0 inset-x-0 h-28 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
 
-          {/* Interactive Beacon on Front Desk Photo */}
+          {/* Interactive Beacons Flanking Receptionist on Front Desk Photo */}
           <div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center">
-            {/* Front Desk Reservation Beacon */}
-            <div className="absolute top-[52%] sm:top-[54%] left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+            {/* Left side of receptionist: Welcome Menu */}
+            <div className="absolute top-[52%] sm:top-[54%] left-[40%] -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+              <button
+                type="button"
+                onClick={() => {
+                  setViewState('greeting')
+                  replayVoice()
+                }}
+                className="group flex flex-col items-center gap-1.5 cursor-pointer transition-all transform hover:scale-105"
+                aria-label="Welcome Menu"
+              >
+                <span className="relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/85 border border-amber-300/60 shadow-2xl backdrop-blur-md group-hover:border-emerald-300 group-hover:bg-[#1a2d21]">
+                  <span className="absolute -inset-1.5 rounded-full bg-amber-400/25 animate-pulse" />
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-200 group-hover:text-emerald-300" />
+                </span>
+                <span className="px-3.5 sm:px-4 py-1 rounded-full bg-black/85 border border-cream/25 text-[10px] sm:text-xs font-mono uppercase tracking-wider text-cream font-medium shadow-md group-hover:border-amber-300 group-hover:bg-black/95 whitespace-nowrap">
+                  Welcome Menu
+                </span>
+              </button>
+            </div>
+
+            {/* Right side of receptionist: Book a Suite */}
+            <div className="absolute top-[52%] sm:top-[54%] left-[60%] -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
               <button
                 type="button"
                 onClick={() => setViewState('dates')}
                 className="group flex flex-col items-center gap-1.5 cursor-pointer transition-all transform hover:scale-105"
-                aria-label="Book a Suite · Select Dates"
+                aria-label="Book a Suite"
               >
                 <span className="relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/85 border border-emerald-400/60 shadow-2xl backdrop-blur-md group-hover:border-amber-300 group-hover:bg-[#1a2d21]">
                   <span className="absolute -inset-1.5 rounded-full bg-emerald-400/25 animate-pulse" />
                   <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-300 group-hover:text-amber-200" />
                 </span>
                 <span className="px-3.5 sm:px-4 py-1 rounded-full bg-black/85 border border-cream/25 text-[10px] sm:text-xs font-mono uppercase tracking-wider text-cream font-medium shadow-md group-hover:border-amber-300 group-hover:bg-black/95 whitespace-nowrap">
-                  Book Suite · Select Dates
+                  Book a Suite
                 </span>
               </button>
             </div>
@@ -189,6 +325,11 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
             spaceTitle="Grand Lobby & Front Desk"
             roomNumber="Lobby"
             onHotspotClick={(hs) => {
+              if (hs.id === 'hs-lobby-welcome') {
+                setViewState('greeting')
+                replayVoice()
+                return true
+              }
               if (hs.id === 'hs-lobby-book' || hs.targetSpaceId === 'dates') {
                 setViewState('dates')
                 return true
@@ -212,7 +353,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             type="button"
-            onClick={onBackToExterior}
+            onClick={handleBackToExterior}
             className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream text-[11px] sm:text-xs font-mono transition-all border border-cream/15 cursor-pointer shrink-0"
           >
             <ArrowLeft className="w-3.5 h-3.5 text-cream" />
@@ -233,8 +374,43 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
           </div>
         </div>
 
-        {/* View Mode Toggle: Front Desk Photo vs 360° Lobby Tour & Guest Account */}
+        {/* View Mode Toggle: Voice Audio, Front Desk Photo vs 360° Lobby Tour & Guest Account */}
         <div className="flex items-center gap-1.5 sm:gap-3">
+          {/* Receptionist Voice Play/Pause Audio Button */}
+          <button
+            type="button"
+            onClick={toggleVoicePlayback}
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full border text-[11px] sm:text-xs font-mono transition-all cursor-pointer shadow-md ${
+              isAudioPlaying
+                ? 'bg-emerald-500/25 border-emerald-400/50 text-emerald-200'
+                : 'bg-cream/10 hover:bg-cream/20 border-cream/20 text-cream/80 hover:text-white'
+            }`}
+            title={
+              isAudioPlaying
+                ? 'Receptionist Voice is Playing (Click to Pause)'
+                : 'Play Receptionist Voice Welcome (मराठी)'
+            }
+            aria-label="Toggle Receptionist Voice Audio"
+          >
+            {isAudioPlaying ? (
+              <>
+                <Volume2 className="w-3.5 h-3.5 text-emerald-300 animate-pulse" />
+                <span className="hidden sm:inline">Voice Playing</span>
+                <span className="flex items-center gap-0.5">
+                  <span className="w-1 h-2 bg-emerald-400 animate-pulse rounded-full" />
+                  <span className="w-1 h-3 bg-emerald-300 animate-pulse delay-75 rounded-full" />
+                  <span className="w-1 h-2 bg-emerald-400 animate-pulse delay-150 rounded-full" />
+                </span>
+              </>
+            ) : (
+              <>
+                <Volume2 className="w-3.5 h-3.5 text-amber-300" />
+                <span className="hidden sm:inline">Play Voice</span>
+                <span className="sm:hidden text-[10px]">Voice</span>
+              </>
+            )}
+          </button>
+
           <GuestAccountButton variant="dark" />
 
           <div className="flex items-center p-0.5 sm:p-1 bg-[#16251C]/80 backdrop-blur-md rounded-full border border-cream/20 text-[11px] sm:text-xs font-mono">
@@ -293,6 +469,36 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
               </p>
             </div>
 
+            {/* Receptionist Audio Greeting Bar */}
+            <div className="p-3 rounded-2xl bg-black/45 border border-amber-300/30 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                    isAudioPlaying
+                      ? 'bg-emerald-500/20 text-emerald-300'
+                      : 'bg-amber-400/20 text-amber-200'
+                  }`}
+                >
+                  <Volume2 className={`w-4 h-4 ${isAudioPlaying ? 'animate-pulse' : ''}`} />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[11px] font-mono text-amber-200 block font-medium truncate">
+                    {isAudioPlaying ? 'Receptionist Speaking...' : 'Receptionist Voice Welcome'}
+                  </span>
+                  <span className="text-[10px] text-cream/60 block truncate">
+                    मराठी स्वागत · Marathi Customer Care Voice
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={toggleVoicePlayback}
+                className="px-3 py-1.5 rounded-full bg-cream hover:bg-white text-[#16251C] text-xs font-mono font-semibold shrink-0 cursor-pointer shadow-sm transition-all"
+              >
+                {isAudioPlaying ? 'Pause' : 'Play / Replay'}
+              </button>
+            </div>
+
             {/* Action Buttons: Matching Reference Image Style */}
             <div className="space-y-2.5 pt-1">
               {/* Primary Action Button: Book a Room */}
@@ -343,7 +549,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
               <button
                 type="button"
                 onClick={() => setViewState('free-explore')}
-                className="w-full py-3 px-5 rounded-2xl bg-white/10 hover:bg-white/15 text-cream border border-white/20 shadow-md flex items-center justify-between transition-all text-xs font-mono group"
+                className="w-full py-3 px-5 rounded-2xl bg-white/10 hover:bg-white/15 text-cream border border-white/20 shadow-md flex items-center justify-between transition-all text-xs font-mono group cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
                   <Leaf className="w-4 h-4 text-amber-200" />
@@ -514,11 +720,14 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
         <div className="relative z-20 p-3 sm:p-6 flex flex-wrap items-center justify-center gap-2 sm:gap-3 pointer-events-none">
           <button
             type="button"
-            onClick={() => setViewState('greeting')}
+            onClick={() => {
+              setViewState('greeting')
+              replayVoice()
+            }}
             className="pointer-events-auto px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-[#18261E]/90 hover:bg-[#18261E] text-cream text-[11px] sm:text-xs font-mono border border-cream/25 flex items-center gap-2 shadow-2xl transition-all transform hover:scale-105 cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-200" />
-            <span>Welcome Menu</span>
+            <Volume2 className="w-3.5 h-3.5 text-amber-200" />
+            <span>Receptionist Voice · स्वागत</span>
           </button>
 
           <button
@@ -549,7 +758,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
 
         <button
           type="button"
-          onClick={onBackToExterior}
+          onClick={handleBackToExterior}
           className="text-amber-200 hover:text-white underline font-medium shrink-0 cursor-pointer text-xs"
         >
           ← <span className="hidden xs:inline">Hotel </span>Exterior

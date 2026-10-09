@@ -14,6 +14,7 @@ import {
   User,
   CreditCard,
   RefreshCw,
+  Calendar,
 } from 'lucide-react'
 import type { BookingRecord } from '@/services/adminApi'
 import { generateReservationPDF, printReservationInvoice } from '@/lib/pdfBillGenerator'
@@ -43,6 +44,7 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled'>('all')
   const [roomFilter, setRoomFilter] = useState<string>('all')
+  const [dateFilter, setDateFilter] = useState<string>('')
   const [isUpdatingId, setIsUpdatingId] = useState<string | null>(null)
 
   const formatCurrency = (val: number) => '₹' + (val || 0).toLocaleString('en-IN')
@@ -133,6 +135,82 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
     }
   }
 
+  const handleExportCSV = () => {
+    if (filteredBookings.length === 0) {
+      alert('No reservations found matching the current filters.')
+      return
+    }
+
+    const headers = [
+      'Booking Reference',
+      'Room Number',
+      'Room Name',
+      'Guest Name',
+      'Phone',
+      'Email',
+      'Check-In Date',
+      'Check-Out Date',
+      'Nights',
+      'Adults',
+      'Children',
+      'Tariff Per Night',
+      'Subtotal',
+      'Discount',
+      'Taxes & GST',
+      'Total Amount',
+      'Payment Status',
+      'Payment Method',
+      'Reservation Status',
+      'Special Requests',
+      'Created At',
+    ]
+
+    const sanitizeCell = (val: any) => {
+      if (val === null || val === undefined) return '""'
+      let str = String(val).trim()
+      // Mitigate CSV Formula Injection (=, +, -, @, \t, \r)
+      if (/^[=+\-@\t\r]/.test(str)) {
+        str = `'${str}`
+      }
+      return `"${str.replace(/"/g, '""')}"`
+    }
+
+    const rows = filteredBookings.map((b) => [
+      sanitizeCell(b.bookingReference),
+      sanitizeCell(b.roomNumber),
+      sanitizeCell(b.roomName),
+      sanitizeCell(b.guestDetails?.fullName),
+      sanitizeCell(b.guestDetails?.phone),
+      sanitizeCell(b.guestDetails?.email),
+      sanitizeCell(b.checkInDate),
+      sanitizeCell(b.checkOutDate),
+      sanitizeCell(b.nights),
+      sanitizeCell(b.adults),
+      sanitizeCell(b.children),
+      sanitizeCell(b.tariffPerNight),
+      sanitizeCell(b.subtotal),
+      sanitizeCell(b.discount),
+      sanitizeCell(b.taxesAndGst),
+      sanitizeCell(b.totalAmount),
+      sanitizeCell(b.paymentStatus),
+      sanitizeCell(b.paymentMethod),
+      sanitizeCell(b.status),
+      sanitizeCell(b.guestDetails?.specialRequests || ''),
+      sanitizeCell(b.createdAt),
+    ])
+
+    const csvContent = [headers.map((h) => `"${h}"`).join(','), ...rows.map((r) => r.join(','))].join('\r\n')
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    link.setAttribute('download', `renoos-hotel-bookings-${new Date().toISOString().split('T')[0]}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
   // Filtered Bookings
   const filteredBookings = useMemo(() => {
     return bookings.filter((b) => {
@@ -146,7 +224,14 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
         return false
       }
 
-      // 3. Search Query
+      // 3. Date Filter (Check if stay spans or matches date)
+      if (dateFilter) {
+        if (b.checkInDate > dateFilter || b.checkOutDate < dateFilter) {
+          return false
+        }
+      }
+
+      // 4. Search Query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim()
         const matchName = b.guestDetails?.fullName?.toLowerCase().includes(q)
@@ -161,7 +246,7 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
 
       return true
     })
-  }, [bookings, statusFilter, roomFilter, searchQuery])
+  }, [bookings, statusFilter, roomFilter, dateFilter, searchQuery])
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -176,7 +261,7 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <button
             type="button"
             onClick={onOpenWalkInModal}
@@ -184,6 +269,16 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
           >
             <Plus className="w-4 h-4" />
             <span>New Walk-in Reservation</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            className="px-3.5 py-2.5 rounded-full bg-[#1c2e22] hover:bg-[#253e2e] text-cream border border-cream/20 font-mono text-xs uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-md cursor-pointer min-h-[38px]"
+            title="Export filtered reservations to CSV"
+          >
+            <Download className="w-4 h-4 text-amber-200" />
+            <span className="hidden sm:inline">Export CSV</span>
           </button>
 
           <button
@@ -221,7 +316,7 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
           )}
         </div>
 
-        {/* Filter Pills */}
+        {/* Filter Pills & Controls */}
         <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 text-xs font-mono w-full md:w-auto">
           {/* Status Dropdown Filter */}
           <div className="flex items-center gap-1 bg-black/30 p-1 rounded-2xl border border-cream/15 overflow-x-auto no-scrollbar touch-pan-x max-w-full shrink-0">
@@ -240,6 +335,28 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
                   {st.replace('_', ' ')}
                 </button>
               )
+            )}
+          </div>
+
+          {/* Stay Date Filter */}
+          <div className="flex items-center gap-1.5 bg-black/30 px-3 py-2 rounded-xl border border-cream/15 text-xs font-mono shrink-0">
+            <Calendar className="w-3.5 h-3.5 text-amber-200/80 shrink-0" />
+            <input
+              type="date"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="bg-transparent text-cream text-xs font-mono focus:outline-none cursor-pointer [color-scheme:dark]"
+              title="Filter by stay date"
+            />
+            {dateFilter && (
+              <button
+                type="button"
+                onClick={() => setDateFilter('')}
+                className="text-xs text-cream/60 hover:text-white ml-1"
+                title="Clear date filter"
+              >
+                ✕
+              </button>
             )}
           </div>
 

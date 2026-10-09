@@ -45,7 +45,7 @@ export const HeroSection: React.FC = () => {
             </div>
 
             <Link
-              to="/rooms/201?space=garden&mode=panorama#space-exploration-section"
+              to="/?stage=hotel-exterior&area=garden"
               className="inline-flex items-center gap-1.5 px-2.5 py-1.5 sm:px-4 sm:py-2 bg-forest hover:bg-forest-dark text-cream text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold rounded-full shadow-sm transition-all duration-300 shrink-0"
             >
               <span>Explore</span>
@@ -123,10 +123,10 @@ export const HeroSection: React.FC = () => {
 
           <div>
             <span className="font-serif text-xl sm:text-2xl text-forest font-normal block">
-              3 Living Spaces
+              Curated Spaces
             </span>
             <span className="text-[11px] sm:text-xs text-charcoal-muted uppercase tracking-wider font-light">
-              Bedroom, Kitchen, Washroom
+              Bedroom & Spa Bathroom
             </span>
           </div>
 

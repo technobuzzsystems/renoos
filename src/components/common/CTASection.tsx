@@ -19,7 +19,7 @@ export const CTASection: React.FC = () => {
         </h2>
 
         <p className="mt-6 text-base sm:text-lg text-cream/80 font-light max-w-2xl mx-auto leading-relaxed">
-          Step inside our curated collection of deluxe rooms, premium accommodations, and executive suites. Explore bedrooms, artisan kitchenettes, and marble wet-rooms in unhurried high-definition detail.
+          Step inside our curated collection of deluxe rooms, premium accommodations, and executive suites. Explore bedrooms and marble bathrooms in unhurried high-definition detail.
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">

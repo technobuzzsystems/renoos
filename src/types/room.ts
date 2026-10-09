@@ -24,9 +24,8 @@ export interface RoomImages {
 
 export interface RoomSpaces {
   bedroom: Space
-  kitchen: Space
   washroom: Space
-  garden?: Space
+  bathroom?: Space
   [key: string]: Space | undefined
 }
 

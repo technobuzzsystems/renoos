@@ -12,6 +12,7 @@ import {
 import {
   getStoredAdminSession,
   clearAdminSession,
+  adminLogoutApi,
   fetchAdminStatsApi,
   fetchAdminBookingsApi,
   updateBookingStatusApi,
@@ -78,6 +79,12 @@ export const AdminDashboardPage: React.FC = () => {
         }),
       ])
 
+      // If token expired during requests, authFetch cleared stored session
+      if (!getStoredAdminSession()) {
+        setSession(null)
+        return
+      }
+
       if (statsData) setStats(statsData)
       setBookings(bookingsData)
       setRooms(roomsData)
@@ -98,9 +105,12 @@ export const AdminDashboardPage: React.FC = () => {
     setSession(newSession)
   }
 
-  const handleLogout = () => {
-    clearAdminSession()
-    setSession(null)
+  const handleLogout = async () => {
+    try {
+      await adminLogoutApi()
+    } finally {
+      setSession(null)
+    }
   }
 
   const handleStatusChange = async (

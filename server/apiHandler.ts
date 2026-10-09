@@ -17,7 +17,24 @@ import {
   getAdminStats,
   getAllUsersWithStats,
   verifyAdminPasscode,
+  createAdminSession,
+  verifyAdminSession,
+  revokeAdminSession,
+  checkAdminLoginRateLimit,
+  recordAdminLoginFailure,
+  recordAdminLoginSuccess,
 } from './db.ts'
+
+/**
+ * Extract client IP address safely from request headers or socket
+ */
+function getClientIp(req: IncomingMessage): string {
+  const forwarded = req.headers['x-forwarded-for']
+  if (typeof forwarded === 'string') {
+    return forwarded.split(',')[0].trim()
+  }
+  return req.socket?.remoteAddress || '127.0.0.1'
+}
 
 /**
  * Parse JSON body from IncomingMessage
@@ -57,7 +74,7 @@ function sendJson(res: ServerResponse, statusCode: number, data: any): void {
     'Content-Type': 'application/json',
     'Cache-Control': 'no-store, no-cache, must-revalidate',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   })
   res.end(payload)
@@ -79,7 +96,7 @@ export async function handleApiRequest(
   if (req.method === 'OPTIONS' && pathname.startsWith('/api')) {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     })
     res.end()
@@ -95,173 +112,232 @@ export async function handleApiRequest(
     // =============================================================
     // ADMIN ROUTES: RENOOS HOTEL PMS MANAGEMENT
     // =============================================================
+    if (pathname.startsWith('/api/admin')) {
+      // ADMIN ROUTE 1: POST /api/admin/login
+      if (req.method === 'POST' && pathname === '/api/admin/login') {
+        const clientIp = getClientIp(req)
+        const rateCheck = checkAdminLoginRateLimit(clientIp)
 
-    // ADMIN ROUTE 1: POST /api/admin/login
-    if (req.method === 'POST' && pathname === '/api/admin/login') {
-      const body = await parseBody(req)
-      const { passcode } = body
-      if (verifyAdminPasscode(String(passcode || ''))) {
+        if (!rateCheck.allowed) {
+          sendJson(res, 429, {
+            success: false,
+            error: `Too many failed login attempts. Account temporarily locked for security. Please try again in ${Math.ceil((rateCheck.retryAfterSeconds || 900) / 60)} minutes.`,
+            retryAfter: rateCheck.retryAfterSeconds,
+          })
+          return true
+        }
+
+        const body = await parseBody(req)
+        const { passcode } = body
+        const isValid = verifyAdminPasscode(String(passcode || ''))
+
+        if (isValid) {
+          recordAdminLoginSuccess(clientIp)
+          const userAgent = typeof req.headers['user-agent'] === 'string' ? req.headers['user-agent'] : undefined
+          const session = createAdminSession(clientIp, userAgent)
+          sendJson(res, 200, {
+            success: true,
+            token: session.token,
+            admin: session.admin,
+            expiresAt: session.expiresAt,
+            message: 'Administrator authentication successful.',
+          })
+        } else {
+          const failRecord = recordAdminLoginFailure(clientIp)
+          if (failRecord.remainingAttempts === 0) {
+            sendJson(res, 429, {
+              success: false,
+              error: 'Maximum login attempts exceeded. Account locked for 15 minutes for security.',
+              retryAfter: failRecord.retryAfterSeconds,
+            })
+          } else {
+            sendJson(res, 401, {
+              success: false,
+              error: 'Invalid Administrator Passcode. Access denied.',
+              remainingAttempts: failRecord.remainingAttempts,
+            })
+          }
+        }
+        return true
+      }
+
+      // ADMIN ROUTE 2: POST /api/admin/logout
+      if (req.method === 'POST' && pathname === '/api/admin/logout') {
+        revokeAdminSession(req.headers.authorization)
         sendJson(res, 200, {
           success: true,
-          token: 'renoos-admin-authorized-session',
-          admin: {
-            name: 'General Manager',
-            role: 'Super Admin',
-            hotel: 'Renoos Hotel',
-          },
+          message: 'Administrator session terminated successfully.',
         })
-      } else {
+        return true
+      }
+
+      // Server-Side Authorization Guard for all other /api/admin/* endpoints
+      const session = verifyAdminSession(req.headers.authorization)
+      if (!session) {
         sendJson(res, 401, {
           success: false,
-          error: 'Invalid Administrator Passcode. Access denied.',
+          error: 'Unauthorized: Valid administrator Bearer token required.',
         })
-      }
-      return true
-    }
-
-    // ADMIN ROUTE 2: GET /api/admin/stats
-    if (req.method === 'GET' && pathname === '/api/admin/stats') {
-      const stats = getAdminStats()
-      sendJson(res, 200, { success: true, stats })
-      return true
-    }
-
-    // ADMIN ROUTE 3: GET /api/admin/bookings
-    if (req.method === 'GET' && pathname === '/api/admin/bookings') {
-      let bookings = getAllBookings()
-      const statusFilter = parsedUrl.searchParams.get('status')
-      const roomFilter = parsedUrl.searchParams.get('room')
-      const q = parsedUrl.searchParams.get('q')?.toLowerCase()?.trim()
-
-      if (statusFilter && statusFilter !== 'all') {
-        bookings = bookings.filter((b) => b.status === statusFilter)
-      }
-      if (roomFilter && roomFilter !== 'all') {
-        bookings = bookings.filter((b) => b.roomNumber === roomFilter || b.roomId === roomFilter)
-      }
-      if (q) {
-        bookings = bookings.filter(
-          (b) =>
-            b.guestDetails?.fullName?.toLowerCase().includes(q) ||
-            b.guestDetails?.phone?.includes(q) ||
-            b.guestDetails?.email?.toLowerCase().includes(q) ||
-            b.bookingReference?.toLowerCase().includes(q) ||
-            b.roomNumber?.toLowerCase().includes(q)
-        )
+        return true
       }
 
-      sendJson(res, 200, { success: true, count: bookings.length, bookings })
-      return true
-    }
-
-    // ADMIN ROUTE 4: PATCH /api/admin/bookings/:id/status
-    if (
-      req.method === 'PATCH' &&
-      pathname.startsWith('/api/admin/bookings/') &&
-      pathname.endsWith('/status')
-    ) {
-      const id = pathname.replace('/api/admin/bookings/', '').replace('/status', '').trim()
-      const body = await parseBody(req)
-      const updated = updateBookingStatus(id, body.status, body.notes)
-      if (updated) {
+      // ADMIN ROUTE 3: GET /api/admin/session (Session Status / Validation)
+      if (req.method === 'GET' && pathname === '/api/admin/session') {
         sendJson(res, 200, {
           success: true,
-          booking: updated,
-          message: `Reservation ${updated.bookingReference} status updated to ${updated.status}.`,
+          admin: session.admin,
+          expiresAt: session.expiresAt,
         })
-      } else {
-        sendJson(res, 404, { success: false, error: 'Booking not found' })
+        return true
       }
-      return true
-    }
 
-    // ADMIN ROUTE 5: PATCH /api/admin/bookings/:id
-    if (req.method === 'PATCH' && pathname.startsWith('/api/admin/bookings/')) {
-      const id = pathname.replace('/api/admin/bookings/', '').trim()
-      const body = await parseBody(req)
-      const updated = updateBookingDetails(id, body)
-      if (updated) {
-        sendJson(res, 200, {
-          success: true,
-          booking: updated,
-          message: `Reservation ${updated.bookingReference} updated successfully.`,
-        })
-      } else {
-        sendJson(res, 404, { success: false, error: 'Booking not found' })
+      // ADMIN ROUTE 4: GET /api/admin/stats
+      if (req.method === 'GET' && pathname === '/api/admin/stats') {
+        const stats = getAdminStats()
+        sendJson(res, 200, { success: true, stats })
+        return true
       }
-      return true
-    }
 
-    // ADMIN ROUTE 6: DELETE /api/admin/bookings/:id
-    if (req.method === 'DELETE' && pathname.startsWith('/api/admin/bookings/')) {
-      const id = pathname.replace('/api/admin/bookings/', '').trim()
-      const deleted = deleteBooking(id)
-      if (deleted) {
-        sendJson(res, 200, {
-          success: true,
-          message: `Reservation ${id} deleted successfully.`,
-        })
-      } else {
-        sendJson(res, 404, { success: false, error: 'Booking not found' })
-      }
-      return true
-    }
+      // ADMIN ROUTE 5: GET /api/admin/bookings
+      if (req.method === 'GET' && pathname === '/api/admin/bookings') {
+        let bookings = getAllBookings()
+        const statusFilter = parsedUrl.searchParams.get('status')
+        const roomFilter = parsedUrl.searchParams.get('room')
+        const q = parsedUrl.searchParams.get('q')?.toLowerCase()?.trim()
 
-    // ADMIN ROUTE 7: GET /api/admin/guests
-    if (req.method === 'GET' && pathname === '/api/admin/guests') {
-      const guests = getAllUsersWithStats()
-      sendJson(res, 200, { success: true, count: guests.length, guests })
-      return true
-    }
-
-    // ADMIN ROUTE 8: GET /api/admin/rooms
-    if (req.method === 'GET' && pathname === '/api/admin/rooms') {
-      const configs = getRoomsConfig()
-      const today = new Date().toISOString().split('T')[0]
-      const bookings = getAllBookings()
-
-      const roomsWithLiveState = configs.map((cfg) => {
-        const activeBooking = bookings.find(
-          (b) =>
-            (b.roomNumber === cfg.roomNumber || b.roomId === `room-${cfg.roomNumber}`) &&
-            (b.status === 'confirmed' || b.status === 'checked_in') &&
-            b.checkInDate <= today &&
-            b.checkOutDate > today
-        )
-        return {
-          ...cfg,
-          currentOccupant: activeBooking
-            ? {
-                guestName: activeBooking.guestDetails?.fullName,
-                phone: activeBooking.guestDetails?.phone,
-                checkInDate: activeBooking.checkInDate,
-                checkOutDate: activeBooking.checkOutDate,
-                status: activeBooking.status,
-                bookingReference: activeBooking.bookingReference,
-              }
-            : null,
-          isOccupiedToday: !!activeBooking,
+        if (statusFilter && statusFilter !== 'all') {
+          bookings = bookings.filter((b) => b.status === statusFilter)
         }
-      })
+        if (roomFilter && roomFilter !== 'all') {
+          bookings = bookings.filter((b) => b.roomNumber === roomFilter || b.roomId === roomFilter)
+        }
+        if (q) {
+          bookings = bookings.filter(
+            (b) =>
+              b.guestDetails?.fullName?.toLowerCase().includes(q) ||
+              b.guestDetails?.phone?.includes(q) ||
+              b.guestDetails?.email?.toLowerCase().includes(q) ||
+              b.bookingReference?.toLowerCase().includes(q) ||
+              b.roomNumber?.toLowerCase().includes(q)
+          )
+        }
 
-      sendJson(res, 200, { success: true, rooms: roomsWithLiveState })
-      return true
-    }
-
-    // ADMIN ROUTE 9: PATCH /api/admin/rooms/:roomNumber
-    if (req.method === 'PATCH' && pathname.startsWith('/api/admin/rooms/')) {
-      const roomNum = pathname.replace('/api/admin/rooms/', '').trim()
-      const body = await parseBody(req)
-      const updated = updateRoomConfig(roomNum, body)
-      if (updated) {
-        sendJson(res, 200, {
-          success: true,
-          room: updated,
-          message: `Room ${roomNum} configuration updated.`,
-        })
-      } else {
-        sendJson(res, 404, { success: false, error: 'Room configuration not found' })
+        sendJson(res, 200, { success: true, count: bookings.length, bookings })
+        return true
       }
+
+      // ADMIN ROUTE 6: PATCH /api/admin/bookings/:id/status
+      if (
+        req.method === 'PATCH' &&
+        pathname.startsWith('/api/admin/bookings/') &&
+        pathname.endsWith('/status')
+      ) {
+        const id = pathname.replace('/api/admin/bookings/', '').replace('/status', '').trim()
+        const body = await parseBody(req)
+        const updated = updateBookingStatus(id, body.status, body.notes)
+        if (updated) {
+          sendJson(res, 200, {
+            success: true,
+            booking: updated,
+            message: `Reservation ${updated.bookingReference} status updated to ${updated.status}.`,
+          })
+        } else {
+          sendJson(res, 404, { success: false, error: 'Booking not found' })
+        }
+        return true
+      }
+
+      // ADMIN ROUTE 7: PATCH /api/admin/bookings/:id
+      if (req.method === 'PATCH' && pathname.startsWith('/api/admin/bookings/')) {
+        const id = pathname.replace('/api/admin/bookings/', '').trim()
+        const body = await parseBody(req)
+        const updated = updateBookingDetails(id, body)
+        if (updated) {
+          sendJson(res, 200, {
+            success: true,
+            booking: updated,
+            message: `Reservation ${updated.bookingReference} updated successfully.`,
+          })
+        } else {
+          sendJson(res, 404, { success: false, error: 'Booking not found' })
+        }
+        return true
+      }
+
+      // ADMIN ROUTE 8: DELETE /api/admin/bookings/:id
+      if (req.method === 'DELETE' && pathname.startsWith('/api/admin/bookings/')) {
+        const id = pathname.replace('/api/admin/bookings/', '').trim()
+        const deleted = deleteBooking(id)
+        if (deleted) {
+          sendJson(res, 200, {
+            success: true,
+            message: `Reservation ${id} deleted successfully.`,
+          })
+        } else {
+          sendJson(res, 404, { success: false, error: 'Booking not found' })
+        }
+        return true
+      }
+
+      // ADMIN ROUTE 9: GET /api/admin/guests
+      if (req.method === 'GET' && pathname === '/api/admin/guests') {
+        const guests = getAllUsersWithStats()
+        sendJson(res, 200, { success: true, count: guests.length, guests })
+        return true
+      }
+
+      // ADMIN ROUTE 10: GET /api/admin/rooms
+      if (req.method === 'GET' && pathname === '/api/admin/rooms') {
+        const configs = getRoomsConfig()
+        const today = new Date().toISOString().split('T')[0]
+        const bookings = getAllBookings()
+
+        const roomsWithLiveState = configs.map((cfg) => {
+          const activeBooking = bookings.find(
+            (b) =>
+              (b.roomNumber === cfg.roomNumber || b.roomId === `room-${cfg.roomNumber}`) &&
+              (b.status === 'confirmed' || b.status === 'checked_in') &&
+              b.checkInDate <= today &&
+              b.checkOutDate > today
+          )
+          return {
+            ...cfg,
+            currentOccupant: activeBooking
+              ? {
+                  guestName: activeBooking.guestDetails?.fullName,
+                  phone: activeBooking.guestDetails?.phone,
+                  checkInDate: activeBooking.checkInDate,
+                  checkOutDate: activeBooking.checkOutDate,
+                  status: activeBooking.status,
+                  bookingReference: activeBooking.bookingReference,
+                }
+              : null,
+            isOccupiedToday: !!activeBooking,
+          }
+        })
+
+        sendJson(res, 200, { success: true, rooms: roomsWithLiveState })
+        return true
+      }
+
+      // ADMIN ROUTE 11: PATCH /api/admin/rooms/:roomNumber
+      if (req.method === 'PATCH' && pathname.startsWith('/api/admin/rooms/')) {
+        const roomNum = pathname.replace('/api/admin/rooms/', '').trim()
+        const body = await parseBody(req)
+        const updated = updateRoomConfig(roomNum, body)
+        if (updated) {
+          sendJson(res, 200, {
+            success: true,
+            room: updated,
+            message: `Room ${roomNum} configuration updated.`,
+          })
+        } else {
+          sendJson(res, 404, { success: false, error: 'Room configuration not found' })
+        }
+        return true
+      }
+
+      sendJson(res, 404, { success: false, error: 'Admin endpoint not found' })
       return true
     }
 

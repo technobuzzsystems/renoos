@@ -112,9 +112,7 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
   const [recentBooking, setRecentBooking] = useState<ConfirmedReservation | null>(() => {
     try {
-      const stored =
-        localStorage.getItem('renoos_hotel_reservations') ||
-        localStorage.getItem('sb_farm_reservations')
+      const stored = localStorage.getItem('renoos_hotel_reservations')
       if (stored) {
         const parsed = JSON.parse(stored)
         return parsed[0] || null
@@ -270,7 +268,7 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
           </div>
 
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-forest font-normal leading-tight">
-            Reserve Your Sanctuary Suite
+            Reserve Your Suite at Renoos Hotel
           </h2>
 
           <p className="text-charcoal-muted text-sm sm:text-base font-light leading-relaxed">
@@ -881,7 +879,7 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
                   </div>
                   <div className="flex items-center gap-2 p-2 bg-ivory rounded-xl border border-[#E9E4DB]">
                     <Compass className="w-3.5 h-3.5 text-forest" />
-                    <span>Sanctuary Farm Tour</span>
+                    <span>Renoos Nature Tour</span>
                   </div>
                 </div>
               </div>
@@ -923,7 +921,7 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
                   )}
 
                   <div className="flex justify-between text-charcoal-muted">
-                    <span>Farm Sanctuary Eco Conservation Fee</span>
+                    <span>Renoos Eco Conservation Fee</span>
                     <span>₹{conservationFee.toLocaleString('en-IN')}</span>
                   </div>
 
@@ -938,7 +936,7 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
                       <Tag className="w-3.5 h-3.5 text-sage absolute left-3 top-1/2 -translate-y-1/2" />
                       <input
                         type="text"
-                        placeholder="Promo Code (e.g. SBFARM)"
+                        placeholder="Promo Code (e.g. RENOOS)"
                         value={promoInput}
                         onChange={(e) => setPromoInput(e.target.value)}
                         className="w-full pl-8 pr-3 py-1.5 bg-cream border border-[#E9E4DB] rounded-xl text-xs uppercase tracking-wider text-forest focus:outline-none focus:ring-1 focus:ring-forest"

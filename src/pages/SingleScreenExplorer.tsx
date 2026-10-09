@@ -95,6 +95,18 @@ export const SingleScreenExplorer: React.FC = () => {
 
   // 3. Booking Dates State (preserved across stages)
   const defaultDates = useMemo<BookingDatesState>(() => {
+    const qIn = searchParams.get('checkIn')
+    const qOut = searchParams.get('checkOut')
+    const qAdults = searchParams.get('adults')
+    const qChildren = searchParams.get('children')
+    if (qIn && qOut) {
+      return {
+        checkIn: qIn,
+        checkOut: qOut,
+        adults: qAdults ? parseInt(qAdults, 10) : 2,
+        children: qChildren ? parseInt(qChildren, 10) : 0,
+      }
+    }
     const today = new Date()
     const checkIn = new Date(today)
     checkIn.setDate(today.getDate() + 1)
@@ -106,9 +118,23 @@ export const SingleScreenExplorer: React.FC = () => {
       adults: 2,
       children: 0,
     }
-  }, [])
+  }, [searchParams])
 
   const [bookingDates, setBookingDates] = useState<BookingDatesState>(defaultDates)
+
+  useEffect(() => {
+    const qIn = searchParams.get('checkIn')
+    const qOut = searchParams.get('checkOut')
+    if (qIn && qOut) {
+      setBookingDates((prev) => ({
+        ...prev,
+        checkIn: qIn,
+        checkOut: qOut,
+        adults: searchParams.get('adults') ? parseInt(searchParams.get('adults')!, 10) : prev.adults,
+        children: searchParams.get('children') ? parseInt(searchParams.get('children')!, 10) : prev.children,
+      }))
+    }
+  }, [searchParams])
 
   return (
     <div className="relative w-full h-[100dvh] max-h-[100dvh] bg-[#0d1510] text-cream flex flex-col overflow-hidden select-none">
@@ -140,6 +166,7 @@ export const SingleScreenExplorer: React.FC = () => {
       {currentStage === 'hotel-exterior' && (
         <div className="flex-1 w-full h-full relative overflow-hidden animate-fade-in">
           <Hotel3DScene
+            initialArea={searchParams.get('area') === 'garden' ? 'garden' : 'entrance'}
             onEnterReception={() =>
               handleTransitionTo('reception', 'Walking into 360° Reception Lobby...')
             }

@@ -55,6 +55,7 @@ export interface AdminSession {
   token: string
   name: string
   role: string
+  expiresAt?: number
   loginTime: string
 }
 
@@ -62,7 +63,12 @@ export function getStoredAdminSession(): AdminSession | null {
   try {
     const raw = localStorage.getItem(ADMIN_STORAGE_KEY)
     if (!raw) return null
-    return JSON.parse(raw)
+    const session = JSON.parse(raw) as AdminSession
+    if (session.expiresAt && Date.now() > session.expiresAt) {
+      clearAdminSession()
+      return null
+    }
+    return session
   } catch {
     return null
   }
@@ -85,6 +91,25 @@ export function clearAdminSession(): void {
 }
 
 /**
+ * Authorized fetch wrapper injecting Bearer token for admin API endpoints
+ */
+export async function authFetch(
+  input: RequestInfo | URL,
+  init: RequestInit = {}
+): Promise<Response> {
+  const session = getStoredAdminSession()
+  const headers = new Headers(init.headers || {})
+  if (session?.token) {
+    headers.set('Authorization', `Bearer ${session.token}`)
+  }
+  const response = await fetch(input, { ...init, headers })
+  if (response.status === 401) {
+    clearAdminSession()
+  }
+  return response
+}
+
+/**
  * Authenticate with the Admin Passcode
  */
 export async function adminLoginApi(passcode: string): Promise<AdminSession> {
@@ -95,14 +120,22 @@ export async function adminLoginApi(passcode: string): Promise<AdminSession> {
   })
 
   const data = await res.json().catch(() => ({}))
+  if (res.status === 429) {
+    throw new Error(data.error || 'Too many failed login attempts. Account temporarily locked.')
+  }
   if (!res.ok || !data.success) {
-    throw new Error(data.error || 'Invalid administrator passcode')
+    const remainingNotice =
+      data.remainingAttempts !== undefined
+        ? ` (${data.remainingAttempts} attempt${data.remainingAttempts === 1 ? '' : 's'} remaining)`
+        : ''
+    throw new Error((data.error || 'Invalid administrator passcode. Access denied.') + remainingNotice)
   }
 
   const session: AdminSession = {
     token: data.token,
     name: data.admin?.name || 'General Manager',
     role: data.admin?.role || 'Super Admin',
+    expiresAt: data.expiresAt,
     loginTime: new Date().toISOString(),
   }
 
@@ -111,10 +144,23 @@ export async function adminLoginApi(passcode: string): Promise<AdminSession> {
 }
 
 /**
+ * Terminate active administrator session on server and client
+ */
+export async function adminLogoutApi(): Promise<void> {
+  try {
+    await authFetch('/api/admin/logout', { method: 'POST' })
+  } catch {
+    // ignore
+  } finally {
+    clearAdminSession()
+  }
+}
+
+/**
  * Fetch executive PMS stats
  */
 export async function fetchAdminStatsApi(): Promise<AdminStats> {
-  const res = await fetch('/api/admin/stats', {
+  const res = await authFetch('/api/admin/stats', {
     headers: { Accept: 'application/json' },
   })
   const data = await res.json().catch(() => ({}))
@@ -138,7 +184,7 @@ export async function fetchAdminBookingsApi(filters?: {
   if (filters?.q) params.set('q', filters.q)
 
   const url = `/api/admin/bookings${params.toString() ? `?${params.toString()}` : ''}`
-  const res = await fetch(url, {
+  const res = await authFetch(url, {
     headers: { Accept: 'application/json' },
   })
   const data = await res.json().catch(() => ({}))
@@ -156,7 +202,7 @@ export async function updateBookingStatusApi(
   status: 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled',
   notes?: string
 ): Promise<BookingRecord> {
-  const res = await fetch(`/api/admin/bookings/${encodeURIComponent(id)}/status`, {
+  const res = await authFetch(`/api/admin/bookings/${encodeURIComponent(id)}/status`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status, notes }),
@@ -169,10 +215,29 @@ export async function updateBookingStatusApi(
 }
 
 /**
+ * Update full reservation details
+ */
+export async function updateBookingDetailsApi(
+  id: string,
+  updates: Partial<BookingRecord>
+): Promise<BookingRecord> {
+  const res = await authFetch(`/api/admin/bookings/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'Failed to update reservation details')
+  }
+  return data.booking
+}
+
+/**
  * Delete / Remove booking permanently
  */
 export async function deleteBookingApi(id: string): Promise<boolean> {
-  const res = await fetch(`/api/admin/bookings/${encodeURIComponent(id)}`, {
+  const res = await authFetch(`/api/admin/bookings/${encodeURIComponent(id)}`, {
     method: 'DELETE',
   })
   const data = await res.json().catch(() => ({}))
@@ -183,7 +248,7 @@ export async function deleteBookingApi(id: string): Promise<boolean> {
  * Fetch all registered guests & CRM records
  */
 export async function fetchAdminGuestsApi(): Promise<any[]> {
-  const res = await fetch('/api/admin/guests', {
+  const res = await authFetch('/api/admin/guests', {
     headers: { Accept: 'application/json' },
   })
   const data = await res.json().catch(() => ({}))
@@ -197,7 +262,7 @@ export async function fetchAdminGuestsApi(): Promise<any[]> {
  * Fetch all rooms configurations & live occupancy state
  */
 export async function fetchAdminRoomsApi(): Promise<any[]> {
-  const res = await fetch('/api/admin/rooms', {
+  const res = await authFetch('/api/admin/rooms', {
     headers: { Accept: 'application/json' },
   })
   const data = await res.json().catch(() => ({}))
@@ -214,7 +279,7 @@ export async function updateRoomConfigApi(
   roomNumber: string,
   updates: Partial<RoomConfig>
 ): Promise<RoomConfig> {
-  const res = await fetch(`/api/admin/rooms/${encodeURIComponent(roomNumber)}`, {
+  const res = await authFetch(`/api/admin/rooms/${encodeURIComponent(roomNumber)}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(updates),
@@ -230,7 +295,7 @@ export async function updateRoomConfigApi(
  * Create a walk-in / manual front desk booking
  */
 export async function createAdminWalkInBookingApi(payload: any): Promise<BookingRecord> {
-  const res = await fetch('/api/bookings', {
+  const res = await authFetch('/api/bookings', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),

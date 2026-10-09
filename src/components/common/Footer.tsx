@@ -73,11 +73,11 @@ export const Footer: React.FC = () => {
                 <span className="block text-[11px] text-charcoal-muted mt-0.5">Acoustic suites & organic linen</span>
               </li>
               <li>
-                <span className="text-charcoal font-medium">Artisan Kitchenettes</span>
-                <span className="block text-[11px] text-charcoal-muted mt-0.5">Custom tea bars & cooling</span>
+                <span className="text-charcoal font-medium">Private Balconies & Terraces</span>
+                <span className="block text-[11px] text-charcoal-muted mt-0.5">Scenic mountain vistas & fresh alpine air</span>
               </li>
               <li>
-                <span className="text-charcoal font-medium">Spa Marble Washrooms</span>
+                <span className="text-charcoal font-medium">Spa Marble Bathrooms</span>
                 <span className="block text-[11px] text-charcoal-muted mt-0.5">Freestanding stone baths & rain showers</span>
               </li>
             </ul>
@@ -86,7 +86,7 @@ export const Footer: React.FC = () => {
           {/* Concierge & Contact */}
           <div>
             <h3 className="text-xs uppercase tracking-wider text-forest font-semibold mb-4">
-              Sanctuary Concierge
+              Hotel Concierge
             </h3>
             <ul className="space-y-3 text-xs">
               <li className="flex items-start gap-2.5">

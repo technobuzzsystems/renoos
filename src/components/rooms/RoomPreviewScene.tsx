@@ -48,7 +48,7 @@ interface RoomPreviewSceneProps {
  * - Photography (real photos from /IMG/)
  * - 360° Virtual Tour (equirectangular panoramas via PanoramaViewer)
  * - 3D Spatial Architecture (via Model3DViewer)
- * - Space navigation (Bedroom, Kitchen, Washroom, Garden)
+ * - Space navigation (Bedroom, Bathroom)
  * - Direct client-side reservation flow & PDF tax invoice generation
  */
 export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
@@ -101,7 +101,7 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
   // Viewing Mode: Photography vs 360° Virtual Tour vs 3D View
   const [viewMode, setViewMode] = useState<'photo' | '360' | '3d'>('360')
 
-  // Selected Space in Current Room (Bedroom, Kitchen, Washroom, Garden)
+  // Selected Space in Current Room (Bedroom, Bathroom)
   const [selectedSpaceKey, setSelectedSpaceKey] = useState<string>('bedroom')
 
   // Ensure selected space exists in current room
@@ -334,6 +334,7 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
             <button
               type="button"
               onClick={() => setViewMode('3d')}
+              title="3D Preview — Coming Soon"
               className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl transition-all cursor-pointer ${
                 viewMode === '3d'
                   ? 'bg-cream text-[#16251C] font-bold shadow-sm'
@@ -341,7 +342,8 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
               }`}
             >
               <BoxIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-              <span>3D</span>
+              <span className="hidden sm:inline">3D (Coming Soon)</span>
+              <span className="sm:hidden">3D · Soon</span>
             </button>
           </div>
         </div>
@@ -440,7 +442,7 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
       </div>
 
       {/* =========================================================================
-          3. SPACE NAVIGATION BAR (Bedroom, Kitchen, Washroom, Garden)
+          3. SPACE NAVIGATION BAR (Bedroom, Bathroom)
           ========================================================================= */}
       <div className="relative z-20 shrink-0 px-3 sm:px-6 py-2 bg-[#16251C]/90 backdrop-blur-md border-t border-cream/15">
         <SpaceSelector

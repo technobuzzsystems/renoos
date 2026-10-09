@@ -1,7 +1,7 @@
 import type { PanoramaConfig } from './panorama'
 import type { Model3DConfig } from './model3d'
 
-export type SpaceType = 'bedroom' | 'kitchen' | 'washroom' | 'living' | 'balcony' | 'dining' | 'garden'
+export type SpaceType = 'bedroom' | 'bathroom' | 'washroom' | 'kitchen' | 'living' | 'balcony' | 'dining' | 'garden'
 
 export interface SpaceImages {
   main: string

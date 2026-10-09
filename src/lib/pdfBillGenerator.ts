@@ -123,7 +123,7 @@ export function generateReservationPDF(reservation: ConfirmedReservation): void 
   }
   const specialReqStr = Array.isArray(reservation.guestDetails.specialRequests) && reservation.guestDetails.specialRequests.length > 0
     ? reservation.guestDetails.specialRequests.join(', ').slice(0, 36)
-    : (reservation.guestDetails.customNotes ? reservation.guestDetails.customNotes.slice(0, 36) : 'Standard Sanctuary Welcome')
+    : (reservation.guestDetails.customNotes ? reservation.guestDetails.customNotes.slice(0, 36) : 'Standard Renoos Welcome')
   doc.text(
     `Special Requests: ${specialReqStr}`,
     margin + 4,
@@ -236,7 +236,7 @@ export function generateReservationPDF(reservation: ConfirmedReservation): void 
   )
 
   drawRow(
-    'Sanctuary Environmental & Conservation Levy',
+    'Renoos Environmental & Conservation Levy',
     'Preservation of alpine courtyard flora, botanical grounds & solar microgrid',
     '999799',
     formatCurrency(Math.round(reservation.conservationFee / reservation.nights)),
@@ -259,7 +259,7 @@ export function generateReservationPDF(reservation: ConfirmedReservation): void 
 
   drawRow(
     'Curated Inclusions & Privileges',
-    'Farm breakfast, ultra-high-speed Wi-Fi 6, 24-hr butler, 360° virtual tour access',
+    'Artisan buffet breakfast, ultra-high-speed Wi-Fi 6, 24-hr butler, 360° virtual tour access',
     'INCLUDED',
     'Rs. 0',
     'All Guests',
@@ -344,7 +344,7 @@ export function generateReservationPDF(reservation: ConfirmedReservation): void 
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(8)
   doc.setTextColor(cForest[0], cForest[1], cForest[2])
-  doc.text('SANCTUARY ARRIVAL & RECEPTION POLICIES', margin + 4, y + 5)
+  doc.text('HOTEL ARRIVAL & RECEPTION POLICIES', margin + 4, y + 5)
 
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(7)
@@ -649,7 +649,7 @@ export function printReservationInvoice(reservation: ConfirmedReservation): void
         <td class="right"><strong>₹${roomSubtotal.toLocaleString('en-IN')}</strong></td>
       </tr>
       <tr class="alt">
-        <td><strong>Sanctuary Environmental & Conservation Levy</strong><br><span style="color:#646E68;font-size:10px;">Ecology fund & solar microgrid maintenance</span></td>
+        <td><strong>Renoos Environmental & Conservation Levy</strong><br><span style="color:#646E68;font-size:10px;">Ecology fund & solar microgrid maintenance</span></td>
         <td>999799</td>
         <td class="right">₹${Math.round(reservation.conservationFee / reservation.nights).toLocaleString('en-IN')}</td>
         <td class="right">${reservation.nights}</td>
@@ -667,7 +667,7 @@ export function printReservationInvoice(reservation: ConfirmedReservation): void
           : ''
       }
       <tr class="alt">
-        <td><strong>Curated Privileges: Farm Breakfast, Wi-Fi 6, Butler Service</strong></td>
+        <td><strong>Curated Privileges: Artisan Breakfast, Wi-Fi 6, Butler Service</strong></td>
         <td>INCL</td>
         <td class="right">₹0</td>
         <td class="right">All</td>
@@ -704,7 +704,7 @@ export function printReservationInvoice(reservation: ConfirmedReservation): void
   </div>
 
   <div class="policies">
-    <strong>Sanctuary Policies & Check-In Requirements:</strong><br>
+    <strong>Hotel Policies & Check-In Requirements:</strong><br>
     • Valid government photo ID (Aadhaar / Passport) is required for each guest upon check-in.<br>
     • Check-in: 14:00 hrs | Check-out: 12:00 hrs. Complimentary cancellation up to 48 hours prior to arrival.<br>
     • Present this voucher or booking reference on arrival for instant reception room keycard encoding.

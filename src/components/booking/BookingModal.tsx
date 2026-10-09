@@ -71,7 +71,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     email: '',
     phone: '',
     arrivalTime: '14:00 - 16:00',
-    specialRequests: ['Complimentary Farm Sanctuary Tour'],
+    specialRequests: ['Complimentary Renoos Hotel Nature Tour'],
     customNotes: '',
   })
 
@@ -198,9 +198,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
 
       // Save to localStorage for local guest history
       try {
-        const stored =
-          localStorage.getItem('renoos_hotel_reservations') ||
-          localStorage.getItem('sb_farm_reservations')
+        const stored = localStorage.getItem('renoos_hotel_reservations')
         const existing = stored ? JSON.parse(stored) : []
         localStorage.setItem(
           'renoos_hotel_reservations',
@@ -277,7 +275,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             </div>
             <div>
               <span className="text-[10px] font-mono tracking-widest uppercase text-terracotta-light font-semibold block">
-                Official Sanctuary Reservation
+                Official Renoos Hotel Reservation
               </span>
               <h2 id="booking-modal-title" className="font-serif text-lg sm:text-xl text-cream font-medium">
                 {step === 'confirmed'
@@ -542,16 +540,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                 </div>
               </div>
 
-              {/* Special Sanctuary Requests */}
+              {/* Special Renoos Hotel Requests */}
               <div className="space-y-3 pt-2">
                 <span className="text-xs uppercase tracking-wider text-forest font-medium flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-terracotta" />
-                  <span>Sanctuary Enhancements & Preferences</span>
+                  <span>Renoos Hotel Enhancements & Preferences</span>
                 </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
                   {[
-                    'Complimentary Farm Sanctuary Tour',
+                    'Complimentary Renoos Hotel Nature Tour',
                     'Quiet Courtyard Facing Wing',
                     'High Floor Preference',
                     'Vegan / Gluten-Free Breakfast Request',
@@ -857,7 +855,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     )}
 
                     <div className="flex justify-between text-charcoal-muted">
-                      <span>Farm Sanctuary Conservation Levy</span>
+                      <span>Renoos Nature Conservation Levy</span>
                       <span>₹{conservationFee.toLocaleString('en-IN')}</span>
                     </div>
 
@@ -958,7 +956,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     Booking Confirmed & Guaranteed
                   </span>
                   <h3 className="font-serif text-2xl sm:text-3xl text-forest font-semibold pt-1">
-                    Your Sanctuary Stay is Reserved!
+                    Your Renoos Hotel Stay is Reserved!
                   </h3>
                   <p className="text-xs sm:text-sm text-charcoal-muted max-w-md mx-auto font-light">
                     A confirmation voucher and travel guide have been dispatched to{' '}

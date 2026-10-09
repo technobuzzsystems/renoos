@@ -10,7 +10,7 @@ export const NotFoundPage: React.FC = () => {
           404 · Destination Unreachable
         </span>
         <h1 className="font-serif text-4xl sm:text-5xl text-forest font-normal">
-          Beyond The Sanctuary
+          Beyond Renoos Hotel
         </h1>
         <p className="text-charcoal-muted text-sm font-light leading-relaxed">
           The horizon you seek has moved or does not exist. Allow our concierge to guide you back to our curated suites.

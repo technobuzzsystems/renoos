@@ -1,5 +1,5 @@
 import React from 'react'
-import { Bed, UtensilsCrossed, Bath, Trees, Sparkles } from 'lucide-react'
+import { Bed, Bath, Trees, Sparkles } from 'lucide-react'
 import type { Space } from '@/types'
 
 interface SpaceSelectorProps {
@@ -19,9 +19,8 @@ export const SpaceSelector: React.FC<SpaceSelectorProps> = ({
     switch (type) {
       case 'bedroom':
         return <Bed className="w-4 h-4" />
-      case 'kitchen':
-        return <UtensilsCrossed className="w-4 h-4" />
       case 'washroom':
+      case 'bathroom':
         return <Bath className="w-4 h-4" />
       case 'garden':
         return <Trees className="w-4 h-4" />
@@ -30,7 +29,17 @@ export const SpaceSelector: React.FC<SpaceSelectorProps> = ({
     }
   }
 
-  const spaceList = Object.values(spaces).filter((s): s is Space => Boolean(s))
+  // Filter out any kitchen or garden spaces and ensure only valid indoor spaces (Bedroom, Bathroom) are displayed
+  const spaceList = Object.values(spaces).filter(
+    (s): s is Space =>
+      Boolean(
+        s &&
+          s.type !== 'kitchen' &&
+          s.id !== 'kitchen' &&
+          s.type !== 'garden' &&
+          s.id !== 'garden'
+      )
+  )
 
   return (
     <div className={`w-full ${className}`}>
@@ -81,10 +90,8 @@ export const SpaceSelector: React.FC<SpaceSelectorProps> = ({
                   <span className="font-semibold sm:font-medium">
                     {space.type === 'bedroom'
                       ? 'Bedroom'
-                      : space.type === 'kitchen'
-                      ? 'Kitchen'
-                      : space.type === 'washroom'
-                      ? 'Washroom'
+                      : space.type === 'washroom' || space.type === 'bathroom'
+                      ? 'Bathroom'
                       : space.type === 'garden'
                       ? 'Garden'
                       : space.title}

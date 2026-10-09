@@ -36,7 +36,7 @@ export const RoomsPage: React.FC = () => {
           </h1>
 
           <p className="max-w-2xl mx-auto text-base sm:text-lg text-charcoal-muted font-light leading-relaxed">
-            Discover three unique architectural concepts. Explore bedrooms, kitchenettes, and marble bathrooms in high-definition virtual preview.
+            Discover three unique architectural concepts. Explore bedrooms and marble bathrooms in high-definition virtual preview.
           </p>
 
           {/* Filter Pills */}
