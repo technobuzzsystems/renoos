@@ -279,39 +279,39 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
           {/* Interactive Beacons Flanking Receptionist on Front Desk Photo */}
           <div className="absolute inset-0 pointer-events-none z-10 flex items-center justify-center">
             {/* Left side of receptionist: Welcome Menu */}
-            <div className="absolute top-[52%] sm:top-[54%] left-[40%] -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+            <div className="absolute top-[52%] sm:top-[54%] left-[28%] sm:left-[38%] -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
               <button
                 type="button"
                 onClick={() => {
                   setViewState('greeting')
                   replayVoice()
                 }}
-                className="group flex flex-col items-center gap-1.5 cursor-pointer transition-all transform hover:scale-105"
+                className="group flex flex-col items-center gap-1 sm:gap-1.5 cursor-pointer transition-all transform hover:scale-105 active:scale-95"
                 aria-label="Welcome Menu"
               >
-                <span className="relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/85 border border-amber-300/60 shadow-2xl backdrop-blur-md group-hover:border-emerald-300 group-hover:bg-[#1a2d21]">
-                  <span className="absolute -inset-1.5 rounded-full bg-amber-400/25 animate-pulse" />
+                <span className="relative flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/85 border border-amber-300/60 shadow-2xl backdrop-blur-md group-hover:border-emerald-300 group-hover:bg-[#1a2d21]">
+                  <span className="absolute -inset-1 rounded-full bg-amber-400/25 animate-pulse" />
                   <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-200 group-hover:text-emerald-300" />
                 </span>
-                <span className="px-3.5 sm:px-4 py-1 rounded-full bg-black/85 border border-cream/25 text-[10px] sm:text-xs font-mono uppercase tracking-wider text-cream font-medium shadow-md group-hover:border-amber-300 group-hover:bg-black/95 whitespace-nowrap">
+                <span className="px-2.5 sm:px-4 py-0.5 sm:py-1 rounded-full bg-black/85 border border-cream/25 text-[9px] sm:text-xs font-mono uppercase tracking-wider text-cream font-medium shadow-md group-hover:border-amber-300 whitespace-nowrap">
                   Welcome Menu
                 </span>
               </button>
             </div>
 
             {/* Right side of receptionist: Book a Suite */}
-            <div className="absolute top-[52%] sm:top-[54%] left-[60%] -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+            <div className="absolute top-[52%] sm:top-[54%] left-[72%] sm:left-[62%] -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
               <button
                 type="button"
                 onClick={() => setViewState('dates')}
-                className="group flex flex-col items-center gap-1.5 cursor-pointer transition-all transform hover:scale-105"
+                className="group flex flex-col items-center gap-1 sm:gap-1.5 cursor-pointer transition-all transform hover:scale-105 active:scale-95"
                 aria-label="Book a Suite"
               >
-                <span className="relative flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/85 border border-emerald-400/60 shadow-2xl backdrop-blur-md group-hover:border-amber-300 group-hover:bg-[#1a2d21]">
-                  <span className="absolute -inset-1.5 rounded-full bg-emerald-400/25 animate-pulse" />
+                <span className="relative flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/85 border border-emerald-400/60 shadow-2xl backdrop-blur-md group-hover:border-amber-300 group-hover:bg-[#1a2d21]">
+                  <span className="absolute -inset-1 rounded-full bg-emerald-400/25 animate-pulse" />
                   <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-300 group-hover:text-amber-200" />
                 </span>
-                <span className="px-3.5 sm:px-4 py-1 rounded-full bg-black/85 border border-cream/25 text-[10px] sm:text-xs font-mono uppercase tracking-wider text-cream font-medium shadow-md group-hover:border-amber-300 group-hover:bg-black/95 whitespace-nowrap">
+                <span className="px-2.5 sm:px-4 py-0.5 sm:py-1 rounded-full bg-black/85 border border-cream/25 text-[9px] sm:text-xs font-mono uppercase tracking-wider text-cream font-medium shadow-md group-hover:border-amber-300 whitespace-nowrap">
                   Book a Suite
                 </span>
               </button>
@@ -339,7 +339,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
             onNavigateSpace={() => setViewState('dates')}
             hideHotspotList={true}
             hideInternalHeader={true}
-            bottomBarOffsetClass="bottom-14 sm:bottom-20"
+            bottomBarOffsetClass="bottom-28 sm:bottom-20"
             viewportHeightClass="h-full w-full"
             className="h-full w-full"
           />
@@ -349,23 +349,25 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
       {/* =========================================================================
           2. TOP NAVIGATION HUD (Minimal & Editorial)
           ========================================================================= */}
-      <header className="relative z-30 min-h-14 sm:h-16 px-3 sm:px-6 py-2 flex items-center justify-between border-b border-cream/15 bg-[#16251C]/75 backdrop-blur-md pt-safe">
-        <div className="flex items-center gap-2 sm:gap-3">
+      <header className="relative z-30 min-h-12 sm:min-h-14 sm:h-16 px-2.5 sm:px-6 py-2 flex items-center justify-between border-b border-cream/15 bg-[#16251C]/85 backdrop-blur-md pt-safe w-full max-w-full overflow-hidden">
+        <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
           <button
             type="button"
             onClick={handleBackToExterior}
-            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream text-[11px] sm:text-xs font-mono transition-all border border-cream/15 cursor-pointer shrink-0"
+            className="flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream text-[11px] sm:text-xs font-mono transition-all border border-cream/15 cursor-pointer shrink-0 min-h-[34px]"
+            title="Return to Hotel Exterior"
+            aria-label="Return to Hotel Exterior"
           >
-            <ArrowLeft className="w-3.5 h-3.5 text-cream" />
+            <ArrowLeft className="w-3.5 h-3.5 text-cream shrink-0" />
             <span className="hidden sm:inline">Hotel Exterior</span>
-            <span className="sm:hidden">Exterior</span>
+            <span className="sm:hidden text-[10px]">Exterior</span>
           </button>
 
           <div className="h-4 w-px bg-cream/20 hidden sm:block" />
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="hidden xs:flex items-center gap-1.5 min-w-0">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-            <span className="font-serif text-xs sm:text-base font-medium text-cream truncate max-w-[130px] xs:max-w-none">
+            <span className="font-serif text-xs sm:text-base font-medium text-cream truncate max-w-[120px] sm:max-w-none">
               Grand Lobby
             </span>
             <span className="font-serif text-xs sm:text-base font-medium text-cream/70 hidden md:inline">
@@ -375,12 +377,12 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
         </div>
 
         {/* View Mode Toggle: Voice Audio, Front Desk Photo vs 360° Lobby Tour & Guest Account */}
-        <div className="flex items-center gap-1.5 sm:gap-3">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {/* Receptionist Voice Play/Pause Audio Button */}
           <button
             type="button"
             onClick={toggleVoicePlayback}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full border text-[11px] sm:text-xs font-mono transition-all cursor-pointer shadow-md ${
+            className={`flex items-center gap-1 sm:gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-full border text-[11px] sm:text-xs font-mono transition-all cursor-pointer shadow-md min-h-[34px] min-w-[34px] justify-center shrink-0 ${
               isAudioPlaying
                 ? 'bg-emerald-500/25 border-emerald-400/50 text-emerald-200'
                 : 'bg-cream/10 hover:bg-cream/20 border-cream/20 text-cream/80 hover:text-white'
@@ -392,51 +394,48 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
             }
             aria-label="Toggle Receptionist Voice Audio"
           >
+            <Volume2 className={`w-3.5 h-3.5 ${isAudioPlaying ? 'text-emerald-300 animate-pulse' : 'text-amber-300'}`} />
             {isAudioPlaying ? (
               <>
-                <Volume2 className="w-3.5 h-3.5 text-emerald-300 animate-pulse" />
-                <span className="hidden sm:inline">Voice Playing</span>
-                <span className="flex items-center gap-0.5">
+                <span className="hidden md:inline">Voice Playing</span>
+                <span className="hidden sm:flex items-center gap-0.5">
                   <span className="w-1 h-2 bg-emerald-400 animate-pulse rounded-full" />
                   <span className="w-1 h-3 bg-emerald-300 animate-pulse delay-75 rounded-full" />
                   <span className="w-1 h-2 bg-emerald-400 animate-pulse delay-150 rounded-full" />
                 </span>
               </>
             ) : (
-              <>
-                <Volume2 className="w-3.5 h-3.5 text-amber-300" />
-                <span className="hidden sm:inline">Play Voice</span>
-                <span className="sm:hidden text-[10px]">Voice</span>
-              </>
+              <span className="hidden sm:inline">Voice</span>
             )}
           </button>
 
           <GuestAccountButton variant="dark" />
 
-          <div className="flex items-center p-0.5 sm:p-1 bg-[#16251C]/80 backdrop-blur-md rounded-full border border-cream/20 text-[11px] sm:text-xs font-mono">
+          <div className="flex items-center p-0.5 bg-[#0f1b13]/90 backdrop-blur-md rounded-full border border-cream/20 text-[10px] sm:text-xs font-mono shrink-0">
             <button
               type="button"
               onClick={() => setReceptionMode('desk-photo')}
-              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-full transition-all cursor-pointer ${
+              className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full transition-all cursor-pointer ${
                 receptionMode === 'desk-photo'
                   ? 'bg-cream text-[#16251C] font-semibold shadow-sm'
                   : 'text-cream/70 hover:text-white'
               }`}
+              title="Static Desk Photography"
             >
-              <Camera className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-              <span className="hidden xs:inline">Desk</span>
-              <span className="xs:hidden">Desk</span>
+              <Camera className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+              <span>Desk</span>
             </button>
             <button
               type="button"
               onClick={() => setReceptionMode('360-lobby')}
-              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-full transition-all cursor-pointer ${
+              className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full transition-all cursor-pointer ${
                 receptionMode === '360-lobby'
                   ? 'bg-cream text-[#16251C] font-semibold shadow-sm'
                   : 'text-cream/70 hover:text-white'
               }`}
+              title="360° Grand Lobby Tour"
             >
-              <Compass className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <Compass className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
               <span>360°</span>
             </button>
           </div>
@@ -717,35 +716,37 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
 
       {/* Floating Re-Open Pill when User Minimized to Free Explore */}
       {viewState === 'free-explore' && (
-        <div className="relative z-20 p-3 sm:p-6 flex flex-wrap items-center justify-center gap-2 sm:gap-3 pointer-events-none">
-          <button
-            type="button"
-            onClick={() => {
-              setViewState('greeting')
-              replayVoice()
-            }}
-            className="pointer-events-auto px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-[#18261E]/90 hover:bg-[#18261E] text-cream text-[11px] sm:text-xs font-mono border border-cream/25 flex items-center gap-2 shadow-2xl transition-all transform hover:scale-105 cursor-pointer"
-          >
-            <Volume2 className="w-3.5 h-3.5 text-amber-200" />
-            <span>Receptionist Voice · स्वागत</span>
-          </button>
+        <div className="relative z-20 px-3 py-2 sm:p-5 flex items-center justify-center pointer-events-none mb-1">
+          <div className="flex flex-wrap items-center justify-center gap-2 pointer-events-auto max-w-full">
+            <button
+              type="button"
+              onClick={() => {
+                setViewState('greeting')
+                replayVoice()
+              }}
+              className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-[#18261E]/95 hover:bg-[#18261E] text-cream text-[11px] sm:text-xs font-mono border border-cream/25 flex items-center gap-1.5 shadow-2xl transition-all active:scale-95 cursor-pointer backdrop-blur-md"
+            >
+              <Volume2 className="w-3.5 h-3.5 text-amber-200 shrink-0" />
+              <span>Receptionist Voice</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setViewState('dates')}
-            className="pointer-events-auto px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-cream hover:bg-white text-[#16251C] text-[11px] sm:text-xs font-mono font-semibold flex items-center gap-2 shadow-2xl transition-all transform hover:scale-105 cursor-pointer"
-          >
-            <Calendar className="w-3.5 h-3.5 text-[#16251C]" />
-            <span>Select Dates & Book Suite</span>
-            <ArrowRight className="w-3.5 h-3.5 text-[#16251C]" />
-          </button>
+            <button
+              type="button"
+              onClick={() => setViewState('dates')}
+              className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-cream hover:bg-white text-[#16251C] text-[11px] sm:text-xs font-mono font-bold flex items-center gap-1.5 shadow-2xl transition-all active:scale-95 cursor-pointer"
+            >
+              <Calendar className="w-3.5 h-3.5 text-[#16251C] shrink-0" />
+              <span>Select Dates & Book Suite</span>
+              <ArrowRight className="w-3.5 h-3.5 text-[#16251C] shrink-0" />
+            </button>
+          </div>
         </div>
       )}
 
       {/* =========================================================================
           4. BOTTOM STATUS FOOTER
           ========================================================================= */}
-      <footer className="relative z-30 h-10 sm:h-12 px-3 sm:px-6 flex items-center justify-between border-t border-cream/15 bg-[#16251C]/75 backdrop-blur-md text-[11px] sm:text-xs font-mono text-cream/70 pb-safe">
+      <footer className="relative z-30 h-10 sm:h-12 px-3 sm:px-6 flex items-center justify-between border-t border-cream/15 bg-[#16251C]/80 backdrop-blur-md text-[10px] sm:text-xs font-mono text-cream/70 pb-safe">
         <div className="flex items-center gap-2 truncate pr-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
           <span className="truncate">
@@ -759,9 +760,9 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
         <button
           type="button"
           onClick={handleBackToExterior}
-          className="text-amber-200 hover:text-white underline font-medium shrink-0 cursor-pointer text-xs"
+          className="text-amber-200 hover:text-white underline font-medium shrink-0 cursor-pointer text-[10px] sm:text-xs hidden sm:inline-block"
         >
-          ← <span className="hidden xs:inline">Hotel </span>Exterior
+          ← Hotel Exterior
         </button>
       </footer>
     </div>

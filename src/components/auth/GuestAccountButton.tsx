@@ -32,7 +32,7 @@ export const GuestAccountButton: React.FC<GuestAccountButtonProps> = ({
       <button
         type="button"
         onClick={() => setIsBookingsModalOpen(true)}
-        className={`group flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-full border text-xs font-mono transition-all duration-200 cursor-pointer backdrop-blur-md ${variantStyles} ${className}`}
+        className={`group flex items-center gap-1 sm:gap-2 px-2 sm:px-3.5 py-1.5 rounded-full border text-xs font-mono transition-all duration-200 cursor-pointer backdrop-blur-md shrink-0 ${variantStyles} ${className}`}
         title={`Signed in as ${user.fullName || user.phone} · Click to view reservations`}
         aria-label="Open My Reservations"
       >
@@ -40,22 +40,22 @@ export const GuestAccountButton: React.FC<GuestAccountButtonProps> = ({
           <User className="w-3 h-3 text-amber-300" />
         </div>
 
-        <div className={`flex items-center gap-1.5 ${showTextOnMobile ? 'flex' : 'hidden sm:flex'}`}>
-          <span className="font-sans font-medium tracking-normal text-xs max-w-[90px] md:max-w-[120px] truncate">
+        <div className={`items-center gap-1.5 ${showTextOnMobile ? 'flex' : 'hidden md:flex'}`}>
+          <span className="font-sans font-medium tracking-normal text-xs max-w-[85px] lg:max-w-[120px] truncate">
             {displayName}
           </span>
-          <span className="text-[10px] text-cream/60 hidden md:inline">· Bookings</span>
+          <span className="text-[10px] text-cream/60 hidden lg:inline">· Bookings</span>
         </div>
 
         {activeReservationsCount > 0 ? (
           <span
-            className="px-1.5 py-0.5 rounded-full bg-emerald-500 text-white text-[10px] font-mono font-bold leading-none shrink-0 animate-pulse"
+            className="px-1.5 py-0.5 rounded-full bg-emerald-500 text-white text-[10px] font-mono font-bold leading-none shrink-0"
             title={`${activeReservationsCount} active booking(s)`}
           >
             {activeReservationsCount}
           </span>
         ) : (
-          <Calendar className="w-3 h-3 text-cream/50 group-hover:text-amber-200 shrink-0" />
+          <Calendar className="w-3 h-3 text-cream/50 group-hover:text-amber-200 shrink-0 hidden sm:block" />
         )}
       </button>
     )
@@ -72,12 +72,12 @@ export const GuestAccountButton: React.FC<GuestAccountButtonProps> = ({
     <button
       type="button"
       onClick={() => setIsAuthModalOpen(true)}
-      className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full border text-xs font-mono transition-all duration-200 cursor-pointer backdrop-blur-md ${signinStyles} ${className}`}
+      className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full border text-xs font-mono transition-all duration-200 cursor-pointer backdrop-blur-md shrink-0 ${signinStyles} ${className}`}
       title="Sign in with mobile number to view reservations"
       aria-label="Sign In with Mobile Number"
     >
-      <LogIn className="w-3.5 h-3.5 text-amber-200" />
-      <span className={showTextOnMobile ? 'inline' : 'hidden sm:inline font-medium'}>
+      <LogIn className="w-3.5 h-3.5 text-amber-200 shrink-0" />
+      <span className={showTextOnMobile ? 'inline text-[11px]' : 'hidden sm:inline font-medium'}>
         Sign In
       </span>
     </button>

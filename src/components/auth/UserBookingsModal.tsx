@@ -259,12 +259,12 @@ export const UserBookingsModal: React.FC<UserBookingsModalProps> = ({
                   </div>
 
                   {/* Actions Bar */}
-                  <div className="mt-4 pt-3 border-t border-[#E9E4DB] flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
+                  <div className="mt-4 pt-3 border-t border-[#E9E4DB] flex flex-col xs:flex-row xs:items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 w-full xs:w-auto">
                       <button
                         type="button"
                         onClick={() => handleDownloadPDF(booking)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#EFEAE2] text-[#263D2F] border border-[#E9E4DB] text-xs font-medium transition-colors"
+                        className="flex-1 xs:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#EFEAE2] text-[#263D2F] border border-[#E9E4DB] text-xs font-medium transition-colors"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Download Tax PDF</span>
@@ -273,7 +273,7 @@ export const UserBookingsModal: React.FC<UserBookingsModalProps> = ({
                       <button
                         type="button"
                         onClick={() => handlePrint(booking)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#EFEAE2] text-[#263D2F] border border-[#E9E4DB] text-xs font-medium transition-colors"
+                        className="flex-1 xs:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF8F5] hover:bg-[#EFEAE2] text-[#263D2F] border border-[#E9E4DB] text-xs font-medium transition-colors"
                       >
                         <Printer className="w-3.5 h-3.5" />
                         <span>Print Bill</span>
@@ -285,7 +285,7 @@ export const UserBookingsModal: React.FC<UserBookingsModalProps> = ({
                         type="button"
                         disabled={cancellingId === booking.id}
                         onClick={() => handleCancel(booking.id, booking.room?.roomNumber || '201')}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-red-700 hover:bg-red-50 text-xs font-medium transition-colors border border-transparent hover:border-red-200 disabled:opacity-50"
+                        className="w-full xs:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-red-700 hover:bg-red-50 text-xs font-medium transition-colors border border-transparent hover:border-red-200 disabled:opacity-50"
                       >
                         <Ban className="w-3.5 h-3.5 text-red-600" />
                         <span>
@@ -301,23 +301,23 @@ export const UserBookingsModal: React.FC<UserBookingsModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 px-6 border-t border-[#E9E4DB] bg-[#FAF8F5] flex items-center justify-between shrink-0">
+        <div className="p-3.5 sm:p-4 px-4 sm:px-6 border-t border-[#E9E4DB] bg-[#FAF8F5] flex items-center justify-between shrink-0">
           <button
             type="button"
             onClick={() => {
               logout()
               onClose()
             }}
-            className="inline-flex items-center gap-1.5 text-xs text-red-700 hover:text-red-900 font-medium transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs text-red-700 hover:text-red-900 font-medium transition-colors cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
-            <span>Sign Out ({user?.phone})</span>
+            <span>Sign Out <span className="hidden sm:inline">({user?.phone})</span></span>
           </button>
 
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-full bg-[#263D2F] text-white text-xs uppercase tracking-wider font-semibold hover:bg-[#1A2A20] transition-colors"
+            className="px-5 py-2 rounded-full bg-[#263D2F] text-white text-xs uppercase tracking-wider font-semibold hover:bg-[#1A2A20] transition-colors cursor-pointer"
           >
             Close Portal
           </button>

@@ -317,16 +317,16 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
         </div>
 
         {/* Filter Pills & Controls */}
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 text-xs font-mono w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 text-xs font-mono w-full md:w-auto">
           {/* Status Dropdown Filter */}
-          <div className="flex items-center gap-1 bg-black/30 p-1 rounded-2xl border border-cream/15 overflow-x-auto no-scrollbar touch-pan-x max-w-full shrink-0">
+          <div className="flex items-center gap-1 bg-black/30 p-1 rounded-2xl border border-cream/15 overflow-x-auto no-scrollbar touch-pan-x w-full sm:w-auto shrink-0">
             {(['all', 'confirmed', 'checked_in', 'checked_out', 'cancelled'] as const).map(
               (st) => (
                 <button
                   key={st}
                   type="button"
                   onClick={() => setStatusFilter(st)}
-                  className={`px-2.5 sm:px-3 py-1 rounded-xl uppercase text-[9px] sm:text-[10px] font-bold transition-all shrink-0 whitespace-nowrap ${
+                  className={`px-2.5 sm:px-3 py-1.5 sm:py-1 rounded-xl uppercase text-[10px] font-bold transition-all shrink-0 whitespace-nowrap ${
                     statusFilter === st
                       ? 'bg-cream text-[#16251C] shadow-sm'
                       : 'text-cream/70 hover:text-white'
@@ -338,39 +338,43 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
             )}
           </div>
 
-          {/* Stay Date Filter */}
-          <div className="flex items-center gap-1.5 bg-black/30 px-3 py-2 rounded-xl border border-cream/15 text-xs font-mono shrink-0">
-            <Calendar className="w-3.5 h-3.5 text-amber-200/80 shrink-0" />
-            <input
-              type="date"
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              className="bg-transparent text-cream text-xs font-mono focus:outline-none cursor-pointer [color-scheme:dark]"
-              title="Filter by stay date"
-            />
-            {dateFilter && (
-              <button
-                type="button"
-                onClick={() => setDateFilter('')}
-                className="text-xs text-cream/60 hover:text-white ml-1"
-                title="Clear date filter"
-              >
-                ✕
-              </button>
-            )}
-          </div>
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+            {/* Stay Date Filter */}
+            <div className="flex items-center justify-between xs:justify-start gap-1.5 bg-black/30 px-3 py-2 rounded-xl border border-cream/15 text-xs font-mono">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <Calendar className="w-3.5 h-3.5 text-amber-200/80 shrink-0" />
+                <input
+                  type="date"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  className="bg-transparent text-cream text-xs font-mono focus:outline-none cursor-pointer [color-scheme:dark] w-full"
+                  title="Filter by stay date"
+                />
+              </div>
+              {dateFilter && (
+                <button
+                  type="button"
+                  onClick={() => setDateFilter('')}
+                  className="text-xs text-cream/60 hover:text-white ml-1"
+                  title="Clear date filter"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
 
-          {/* Room Filter */}
-          <select
-            value={roomFilter}
-            onChange={(e) => setRoomFilter(e.target.value)}
-            className="w-full sm:w-auto px-3 py-2 bg-black/30 border border-cream/15 rounded-xl text-xs font-mono text-cream focus:outline-none shrink-0"
-          >
-            <option value="all">All Suites (201-203)</option>
-            <option value="201">Room 201 — Forest Suite</option>
-            <option value="202">Room 202 — Mountain View</option>
-            <option value="203">Room 203 — Executive Suite</option>
-          </select>
+            {/* Room Filter */}
+            <select
+              value={roomFilter}
+              onChange={(e) => setRoomFilter(e.target.value)}
+              className="w-full sm:w-auto px-3 py-2 bg-black/30 border border-cream/15 rounded-xl text-xs font-mono text-cream focus:outline-none"
+            >
+              <option value="all">All Suites (201-203)</option>
+              <option value="201">Room 201 — Forest</option>
+              <option value="202">Room 202 — Mountain</option>
+              <option value="203">Room 203 — Executive</option>
+            </select>
+          </div>
         </div>
       </div>
 
