@@ -24,3 +24,12 @@ tests
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files & secrets
+.env
+.env.*
+!.env.example
+
+# Temporary files & original backups
+*.original.*
+*.tmp.*

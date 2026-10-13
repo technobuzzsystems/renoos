@@ -14,6 +14,8 @@ export const RoomsPage: React.FC = () => {
     { key: 'Deluxe', label: 'Deluxe Room' },
     { key: 'Premium', label: 'Premium Room' },
     { key: 'Executive Suite', label: 'Executive Suite' },
+    { key: 'Presidential Suite', label: 'Presidential Suite' },
+    { key: 'Bohemian Suite', label: 'Bohemian Suite' },
   ]
 
   const filteredRooms =
@@ -36,7 +38,7 @@ export const RoomsPage: React.FC = () => {
           </h1>
 
           <p className="max-w-2xl mx-auto text-base sm:text-lg text-charcoal-muted font-light leading-relaxed">
-            Discover three unique architectural concepts. Explore bedrooms and marble bathrooms in high-definition virtual preview.
+            Discover five unique architectural sanctuaries. Explore bedrooms and marble bathrooms in high-definition virtual preview.
           </p>
 
           {/* Filter Pills */}
@@ -69,7 +71,7 @@ export const RoomsPage: React.FC = () => {
           <SectionHeader
             eyebrow="Architectural Matrix"
             title="Suite Comparison at a Glance"
-            subtitle="Explore how our three residences compare across spatial dimensions, features, and views."
+            subtitle="Explore how our five luxury residences compare across spatial dimensions, features, and views."
             align="center"
           />
 

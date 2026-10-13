@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { SingleScreenExplorer } from '@/pages/SingleScreenExplorer'
 import { AdminDashboardPage } from '@/pages/AdminDashboardPage'
 import { AuthProvider, useAuth } from '@/context/AuthContext'
+import { LanguageProvider } from '@/context/LanguageContext'
 import { AuthModal, UserBookingsModal } from '@/components/auth'
 
 const LuxuryPageLoader = () => (
@@ -38,18 +39,20 @@ const GlobalAuthModals: React.FC = () => {
 export function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <GlobalAuthModals />
-        <Suspense fallback={<LuxuryPageLoader />}>
-          <Routes>
-            <Route path="/" element={<SingleScreenExplorer />} />
-            <Route path="/rooms" element={<SingleScreenExplorer />} />
-            <Route path="/rooms/:roomId" element={<SingleScreenExplorer />} />
-            <Route path="/admin" element={<AdminDashboardPage />} />
-            <Route path="*" element={<SingleScreenExplorer />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
+      <LanguageProvider>
+        <BrowserRouter>
+          <GlobalAuthModals />
+          <Suspense fallback={<LuxuryPageLoader />}>
+            <Routes>
+              <Route path="/" element={<SingleScreenExplorer />} />
+              <Route path="/rooms" element={<SingleScreenExplorer />} />
+              <Route path="/rooms/:roomId" element={<SingleScreenExplorer />} />
+              <Route path="/admin" element={<AdminDashboardPage />} />
+              <Route path="*" element={<SingleScreenExplorer />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </LanguageProvider>
     </AuthProvider>
   )
 }

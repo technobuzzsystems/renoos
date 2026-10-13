@@ -34,7 +34,7 @@ export interface Room {
   roomNumber: string // "201"
   name: string // "Deluxe Room"
   tagline: string
-  category: 'Deluxe' | 'Premium' | 'Executive Suite'
+  category: 'Deluxe' | 'Premium' | 'Executive Suite' | 'Presidential Suite' | 'Royal Suite' | 'Bohemian Suite' | 'Tropical Suite'
   description: string
   longDescription: string
   area: number // sq meters

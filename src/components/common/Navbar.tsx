@@ -205,7 +205,7 @@ export const Navbar: React.FC = () => {
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center min-h-[48px] text-sm uppercase tracking-wider text-charcoal hover:text-forest py-2 font-medium"
             >
-              Farm Home
+              Hotel Home
             </Link>
             <Link
               to="/rooms"

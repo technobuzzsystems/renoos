@@ -45,6 +45,8 @@ export async function fetchRoomAvailability(
       '201': { available: true },
       '202': { available: true },
       '203': { available: true },
+      '204': { available: true },
+      '205': { available: true },
     }
   }
 
@@ -64,6 +66,8 @@ export async function fetchRoomAvailability(
         '201': { available: true },
         '202': { available: true },
         '203': { available: true },
+        '204': { available: true },
+        '205': { available: true },
       }
     }
 
@@ -76,6 +80,8 @@ export async function fetchRoomAvailability(
       '201': { available: true },
       '202': { available: true },
       '203': { available: true },
+      '204': { available: true },
+      '205': { available: true },
     }
   } catch (err) {
     console.error('Failed to fetch room availability from server:', err)
@@ -83,6 +89,8 @@ export async function fetchRoomAvailability(
       '201': { available: true },
       '202': { available: true },
       '203': { available: true },
+      '204': { available: true },
+      '205': { available: true },
     }
   }
 }

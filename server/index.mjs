@@ -8,6 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT_DIR = path.resolve(__dirname, '..')
 const DIST_DIR = path.join(ROOT_DIR, 'dist')
 const PORT = process.env.PORT || 5173
+const HOST = process.env.HOST || '0.0.0.0'
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -25,6 +26,13 @@ const MIME_TYPES = {
 }
 
 const server = http.createServer(async (req, res) => {
+  // 0. Lightweight health check endpoint for monitoring & load balancers
+  if (req.method === 'GET' && (req.url === '/health' || req.url === '/ping')) {
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ status: 'healthy', service: 'Renoos Hotel PMS', uptime: process.uptime() }))
+    return
+  }
+
   // 1. Try handling as /api route
   try {
     const handled = await handleApiRequest(req, res)
@@ -91,6 +99,16 @@ const server = http.createServer(async (req, res) => {
   res.end('Not Found')
 })
 
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`[Renoos Hotel PMS] Production Server running at http://127.0.0.1:${PORT}`)
+server.listen(PORT, HOST, () => {
+  console.log(`[Renoos Hotel PMS] Production Server running at http://${HOST}:${PORT}`)
+})
+
+// Graceful shutdown handling
+process.on('SIGTERM', () => {
+  console.log('[Renoos Hotel PMS] SIGTERM received. Closing server gracefully...')
+  server.close(() => process.exit(0))
+})
+process.on('SIGINT', () => {
+  console.log('[Renoos Hotel PMS] SIGINT received. Closing server gracefully...')
+  server.close(() => process.exit(0))
 })

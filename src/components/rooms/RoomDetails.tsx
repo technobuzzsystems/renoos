@@ -313,6 +313,7 @@ export const RoomDetails: React.FC<RoomDetailsProps> = ({ room }) => {
 
           {/* Space Selector Tabs */}
           <SpaceSelector
+            variant="light"
             spaces={room.spaces}
             activeSpaceId={activeSpaceId}
             onSelectSpace={(id) => {

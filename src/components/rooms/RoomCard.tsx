@@ -42,7 +42,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({
             fetchPriority={priority ? 'high' : undefined}
             onError={(e) => {
               e.currentTarget.onerror = null
-              e.currentTarget.src = '/IMG/203/kitchen.avif'
+              e.currentTarget.src = '/IMG/203/BEDROOM1.avif'
             }}
             className="w-full h-full object-cover object-center group-hover:scale-[1.02] transition-transform duration-700 ease-out"
           />

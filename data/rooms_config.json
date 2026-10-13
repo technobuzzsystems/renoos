@@ -2,22 +2,36 @@
   {
     "roomNumber": "201",
     "name": "The Forest Sanctuary Suite",
-    "baseTariff": 4800,
+    "baseTariff": 2400,
     "operationalStatus": "available",
     "housekeepingNotes": "Inspected and certified ready for guests"
   },
   {
     "roomNumber": "202",
     "name": "Mountain View Pavilion",
-    "baseTariff": 5200,
+    "baseTariff": 3000,
     "operationalStatus": "available",
     "housekeepingNotes": "High-balcony view ready for arrival."
   },
   {
     "roomNumber": "203",
     "name": "The Executive Sanctuary Suite",
-    "baseTariff": 8500,
+    "baseTariff": 3600,
     "operationalStatus": "available",
     "housekeepingNotes": "Executive penthouse cleaned and scented with pine essence."
+  },
+  {
+    "roomNumber": "204",
+    "name": "The Royal Horizon Suite",
+    "baseTariff": 4500,
+    "operationalStatus": "available",
+    "housekeepingNotes": "Royal Horizon Suite inspected. 360° tour and panoramas live."
+  },
+  {
+    "roomNumber": "205",
+    "name": "The Tropical Bohemian Suite",
+    "baseTariff": 5000,
+    "operationalStatus": "available",
+    "housekeepingNotes": "Artisan suite sanitized. Rattan decor & botanical diffuser refreshed."
   }
 ]

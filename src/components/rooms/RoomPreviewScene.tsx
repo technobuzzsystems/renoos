@@ -1,8 +1,7 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
 import {
   Compass,
   Camera,
-  Box as BoxIcon,
   Sparkles,
   Calendar,
   Users,
@@ -20,16 +19,18 @@ import {
   Bed,
   Layers,
   AlertTriangle,
+  Volume2,
 } from 'lucide-react'
 import { ROOMS_DATA } from '@/data/rooms'
 import type { Room, Space, ConfirmedReservation } from '@/types'
 import { PanoramaViewer } from '@/components/panorama/PanoramaViewer'
-import { Model3DViewer } from '@/components/model3d/Model3DViewer'
 import { SpaceSelector } from '@/components/rooms/SpaceSelector'
 import { BookingModal } from '@/components/booking/BookingModal'
 import { GuestAccountButton } from '@/components/auth'
 import { formatArea } from '@/lib/utils'
 import { fetchRoomAvailability, type AvailabilityMap } from '@/services/api'
+import { useLanguage } from '@/context/LanguageContext'
+import { LanguageSelector } from '@/components/common/LanguageSelector'
 
 interface RoomPreviewSceneProps {
   initialRoomId?: string
@@ -44,10 +45,9 @@ interface RoomPreviewSceneProps {
 
 /**
  * STAGE 3: Immersive Room Preview Scene
- * Displays available suites (Room 201, 202, 203) with:
+ * Displays available suites (Rooms 201–205) with:
  * - Photography (real photos from /IMG/)
  * - 360° Virtual Tour (equirectangular panoramas via PanoramaViewer)
- * - 3D Spatial Architecture (via Model3DViewer)
  * - Space navigation (Bedroom, Bathroom)
  * - Direct client-side reservation flow & PDF tax invoice generation
  */
@@ -64,6 +64,68 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
   // Selected Room State
   const [selectedRoomId, setSelectedRoomId] = useState<string>(initialRoomId)
 
+  const {
+    playAudio,
+    playRoomAudio,
+    hasRoomAudio,
+    stopAudio,
+    isPlaying: isAudioPlaying,
+    currentText,
+  } = useLanguage()
+
+  // Optional notification when selecting a room without an announcement recording
+  const [missingAudioNotice, setMissingAudioNotice] = useState<string | null>(null)
+
+  // Clean up audio when leaving room preview
+  useEffect(() => {
+    return () => {
+      stopAudio()
+    }
+  }, [stopAudio])
+
+  // Play room announcement once upon arriving at the Room Preview experience
+  const hasAnnouncedInitialRoomRef = useRef(false)
+  useEffect(() => {
+    if (!hasAnnouncedInitialRoomRef.current) {
+      hasAnnouncedInitialRoomRef.current = true
+      const targetRoom = ROOMS_DATA.find((r) => r.id === selectedRoomId || r.roomNumber === selectedRoomId)
+      const roomNum = targetRoom?.roomNumber || selectedRoomId || '201'
+      if (hasRoomAudio(roomNum)) {
+        playRoomAudio(roomNum, true)
+      }
+    }
+  }, [selectedRoomId, hasRoomAudio, playRoomAudio])
+
+  const handleSelectRoom = (roomId: string) => {
+    setSelectedRoomId(roomId)
+    const targetRoom = ROOMS_DATA.find((r) => r.id === roomId || r.roomNumber === roomId)
+    const roomNum = targetRoom?.roomNumber || roomId
+
+    // Stop previous room announcement, if playing
+    stopAudio()
+    setMissingAudioNotice(null)
+
+    // Find and play matching recording for that room in selected language
+    if (hasRoomAudio(roomNum)) {
+      playRoomAudio(roomNum, true)
+    } else {
+      // If none exists, do not play another room's recording; continue normally with brief notice
+      setMissingAudioNotice(`Viewing ${targetRoom?.name || `Room ${roomNum}`}`)
+      setTimeout(() => setMissingAudioNotice(null), 3000)
+    }
+  }
+
+  const handleSelectSpace = (spaceId: string) => {
+    if (spaceId !== selectedSpaceKey) {
+      setSelectedSpaceKey(spaceId)
+      if (spaceId === 'washroom' || spaceId === 'bathroom') {
+        playAudio('bathroomTour')
+      } else if (spaceId === 'bedroom') {
+        playAudio('bedroomTour')
+      }
+    }
+  }
+
   const selectedRoom = useMemo(() => {
     return (
       ROOMS_DATA.find((r) => r.id === selectedRoomId || r.roomNumber === selectedRoomId) ||
@@ -76,6 +138,8 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
     '201': { available: true },
     '202': { available: true },
     '203': { available: true },
+    '204': { available: true },
+    '205': { available: true },
   })
 
   const refreshAvailability = async () => {
@@ -98,8 +162,8 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
   const isCurrentRoomAvailable = currentRoomAvail?.available !== false
   const conflictingBooking = currentRoomAvail?.conflictingBooking
 
-  // Viewing Mode: Photography vs 360° Virtual Tour vs 3D View
-  const [viewMode, setViewMode] = useState<'photo' | '360' | '3d'>('360')
+  // Viewing Mode: Photography vs 360° Virtual Tour
+  const [viewMode, setViewMode] = useState<'photo' | '360'>('360')
 
   // Selected Space in Current Room (Bedroom, Bathroom)
   const [selectedSpaceKey, setSelectedSpaceKey] = useState<string>('bedroom')
@@ -151,17 +215,6 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
     )
   }, [activeSpace, selectedRoom])
 
-  // 3D Model Configuration
-  const model3DConfig = useMemo(() => {
-    return (
-      activeSpace?.model3d || {
-        isAvailable: false,
-        isPlaceholder: true,
-        placeholderNotes: 'Architectural model in preparation. Explore via 360° Tour or Photography.',
-      }
-    )
-  }, [activeSpace])
-
   // Tariff calculation (nights, gst, total)
   const nights = useMemo(() => {
     try {
@@ -203,40 +256,173 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
       {/* =========================================================================
           1. TOP NAVIGATION & SUITE SWITCHER COCKPIT
           ========================================================================= */}
-      <header className="relative z-30 shrink-0 bg-[#16251C]/95 backdrop-blur-md border-b border-cream/15 px-3 sm:px-6 py-2 sm:py-3 shadow-md pt-safe">
-        {/* Top Cockpit Row: Back, Brand, Dates, Guest */}
-        <div className="flex items-center justify-between gap-2">
-          {/* Left: Back & Brand */}
-          <div className="flex items-center gap-2 sm:gap-3">
+      <header className="relative z-30 shrink-0 bg-[#16251C]/95 backdrop-blur-md border-b border-cream/15 px-3 sm:px-6 py-2 sm:py-3 lg:py-2.5 shadow-md pt-safe">
+        {/* =========================================================================
+            MOBILE VIEW (< lg): Preserved original two-row cockpit
+            ========================================================================= */}
+        <div className="lg:hidden">
+          {/* Top Cockpit Row: Back, Brand, Dates, Guest */}
+          <div className="flex items-center justify-between gap-2">
+            {/* Left: Back & Brand */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                type="button"
+                onClick={onBackToReception}
+                className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream text-[11px] sm:text-xs font-mono transition-all border border-cream/15 cursor-pointer shrink-0"
+                title="Return to Grand Lobby"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 text-cream" />
+                <span className="hidden sm:inline">Grand Lobby</span>
+                <span className="sm:hidden">Lobby</span>
+              </button>
+
+              <div className="h-4 w-px bg-cream/20 hidden sm:block" />
+
+              <div>
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <span className="font-serif text-sm sm:text-lg font-medium text-cream tracking-tight">
+                    RENOOS HOTEL
+                  </span>
+                  <span className="px-1.5 sm:px-2 py-0.5 rounded-full bg-cream/15 text-cream/90 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider hidden xs:inline-block">
+                    Suites
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono text-cream/70">
+                  <span>
+                    {formatShortDate(checkInDate)} – {formatShortDate(checkOutDate)} ({nights}{' '}
+                    {nights === 1 ? 'nt' : 'nts'})
+                  </span>
+                  <span className="hidden xs:inline">·</span>
+                  <span className="hidden xs:inline">
+                    {adults} {adults === 1 ? 'Adult' : 'Adults'}
+                  </span>
+                  {onModifyDates && (
+                    <button
+                      type="button"
+                      onClick={onModifyDates}
+                      className="text-amber-200 hover:text-white underline ml-1 cursor-pointer font-medium"
+                    >
+                      Edit
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Language Selector & Guest Account Portal */}
+            <div className="shrink-0 flex items-center gap-1.5 sm:gap-2">
+              <LanguageSelector variant="compact" />
+              <GuestAccountButton variant="dark" />
+            </div>
+          </div>
+
+          {/* Second Row: View Mode Toggle (Left side) & Suite Switcher Tabs */}
+          <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-cream/10">
+            {/* Two Viewing Modes Toggle (Photo, 360°) - Left Side */}
+            <div className="flex items-center p-0.5 sm:p-1 bg-[#0f1b13]/90 rounded-2xl border border-cream/20 text-[11px] sm:text-xs font-mono shrink-0">
+              <button
+                type="button"
+                onClick={() => setViewMode('photo')}
+                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl transition-all cursor-pointer ${
+                  viewMode === 'photo'
+                    ? 'bg-cream text-[#16251C] font-bold shadow-sm'
+                    : 'text-cream/70 hover:text-white'
+                }`}
+              >
+                <Camera className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span>Photo</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setViewMode('360')}
+                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl transition-all cursor-pointer ${
+                  viewMode === '360'
+                    ? 'bg-cream text-[#16251C] font-bold shadow-sm'
+                    : 'text-cream/70 hover:text-white'
+                }`}
+              >
+                <Compass className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span>360°</span>
+              </button>
+            </div>
+
+            {/* Suite Switcher Tabs (Rooms 201–205) */}
+            <div className="flex items-center p-0.5 sm:p-1 bg-[#0f1b13]/90 rounded-2xl border border-cream/20 shadow-inner overflow-x-auto no-scrollbar max-w-full touch-pan-x scroll-smooth overscroll-x-contain">
+              {ROOMS_DATA.map((room) => {
+                const isSelected = room.id === selectedRoom.id
+                const price = room.pricePerNight || 5200
+                const roomAvail = availability[room.roomNumber] || availability[room.id]
+                const isAvailable = roomAvail?.available !== false
+
+                return (
+                  <button
+                    key={room.id}
+                    type="button"
+                    onClick={() => handleSelectRoom(room.id)}
+                    className={`flex items-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-1.5 rounded-xl text-[11px] sm:text-xs transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+                      isSelected
+                        ? isAvailable
+                          ? 'bg-cream text-[#16251C] font-bold shadow-md'
+                          : 'bg-red-900/80 text-red-100 border border-red-400 font-bold shadow-md'
+                        : isAvailable
+                          ? 'text-cream/70 hover:text-white hover:bg-cream/10'
+                          : 'text-red-300/60 hover:text-red-200 hover:bg-red-950/40'
+                    }`}
+                  >
+                    <span className="font-mono font-bold">{room.roomNumber}</span>
+                    <span className="hidden md:inline font-serif">{room.name}</span>
+                    {isAvailable ? (
+                      <span
+                        className={`text-[9px] sm:text-[10px] font-mono ${
+                          isSelected ? 'text-[#16251C]/80 font-bold' : 'text-amber-200'
+                        }`}
+                      >
+                        ₹{(price).toLocaleString('en-IN')}
+                      </span>
+                    ) : (
+                      <span className="text-[8px] sm:text-[9px] font-mono uppercase px-1 py-0.2 rounded bg-red-500/30 text-red-200 border border-red-500/50 font-bold">
+                        Booked
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* =========================================================================
+            LAPTOP / DESKTOP VIEW (lg:flex): Sleek single-row luxury cockpit
+            ========================================================================= */}
+        <div className="hidden lg:flex items-center justify-between gap-3 xl:gap-5">
+          {/* Left: Back to Lobby + Brand Wordmark + Reservation Dates Pill + View Mode Toggle */}
+          <div className="flex items-center gap-3 shrink-0">
             <button
               type="button"
               onClick={onBackToReception}
-              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream text-[11px] sm:text-xs font-mono transition-all border border-cream/15 cursor-pointer shrink-0"
+              className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream text-xs font-mono transition-all border border-cream/15 cursor-pointer shrink-0 group"
               title="Return to Grand Lobby"
             >
-              <ArrowLeft className="w-3.5 h-3.5 text-cream" />
-              <span className="hidden sm:inline">Grand Lobby</span>
-              <span className="sm:hidden">Lobby</span>
+              <ArrowLeft className="w-3.5 h-3.5 text-cream group-hover:-translate-x-0.5 transition-transform" />
+              <span>Grand Lobby</span>
             </button>
 
-            <div className="h-4 w-px bg-cream/20 hidden sm:block" />
+            <div className="h-5 w-px bg-cream/20" />
 
-            <div>
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="font-serif text-sm sm:text-lg font-medium text-cream tracking-tight">
-                  RENOOS HOTEL
-                </span>
-                <span className="px-1.5 sm:px-2 py-0.5 rounded-full bg-cream/15 text-cream/90 text-[9px] sm:text-[10px] font-mono uppercase tracking-wider hidden xs:inline-block">
-                  Suites
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono text-cream/70">
+            <div className="flex items-center gap-3">
+              <span className="font-serif text-lg font-medium text-cream tracking-tight">
+                RENOOS HOTEL
+              </span>
+
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-cream/10 border border-cream/15 text-xs font-mono text-cream/80">
+                <Calendar className="w-3.5 h-3.5 text-amber-200 shrink-0" />
                 <span>
                   {formatShortDate(checkInDate)} – {formatShortDate(checkOutDate)} ({nights}{' '}
                   {nights === 1 ? 'nt' : 'nts'})
                 </span>
-                <span className="hidden xs:inline">·</span>
-                <span className="hidden xs:inline">
+                <span className="text-cream/40">·</span>
+                <span>
                   {adults} {adults === 1 ? 'Adult' : 'Adults'}
                 </span>
                 {onModifyDates && (
@@ -250,18 +436,39 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
                 )}
               </div>
             </div>
+
+            {/* View Mode Toggle (Photo, 360°) - Left Side */}
+            <div className="flex items-center p-1 bg-[#0f1b13]/90 rounded-2xl border border-cream/20 text-xs font-mono">
+              <button
+                type="button"
+                onClick={() => setViewMode('photo')}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-xl transition-all cursor-pointer ${
+                  viewMode === 'photo'
+                    ? 'bg-cream text-[#16251C] font-bold shadow-sm'
+                    : 'text-cream/70 hover:text-white hover:bg-cream/10'
+                }`}
+              >
+                <Camera className="w-3.5 h-3.5" />
+                <span>Photo</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setViewMode('360')}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-xl transition-all cursor-pointer ${
+                  viewMode === '360'
+                    ? 'bg-cream text-[#16251C] font-bold shadow-sm'
+                    : 'text-cream/70 hover:text-white hover:bg-cream/10'
+                }`}
+              >
+                <Compass className="w-3.5 h-3.5" />
+                <span>360°</span>
+              </button>
+            </div>
           </div>
 
-          {/* Right: Guest Account Portal */}
-          <div className="shrink-0">
-            <GuestAccountButton variant="dark" />
-          </div>
-        </div>
-
-        {/* Second Row: Suite Switcher Tabs & View Mode Toggle */}
-        <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 mt-2 pt-2 border-t border-cream/10">
-          {/* Suite Switcher Tabs (Room 201, 202, 203) */}
-          <div className="flex items-center p-0.5 sm:p-1 bg-[#0f1b13]/90 rounded-2xl border border-cream/20 shadow-inner overflow-x-auto no-scrollbar">
+          {/* Center: Suite Switcher Tabs (Rooms 201–205) */}
+          <div className="flex items-center p-1 bg-[#0f1b13]/90 rounded-2xl border border-cream/20 shadow-inner overflow-x-auto no-scrollbar shrink-0">
             {ROOMS_DATA.map((room) => {
               const isSelected = room.id === selectedRoom.id
               const price = room.pricePerNight || 5200
@@ -272,8 +479,8 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
                 <button
                   key={room.id}
                   type="button"
-                  onClick={() => setSelectedRoomId(room.id)}
-                  className={`flex items-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-xl text-[11px] sm:text-xs transition-all cursor-pointer whitespace-nowrap ${
+                  onClick={() => handleSelectRoom(room.id)}
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                     isSelected
                       ? isAvailable
                         ? 'bg-cream text-[#16251C] font-bold shadow-md'
@@ -284,17 +491,24 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
                   }`}
                 >
                   <span className="font-mono font-bold">{room.roomNumber}</span>
-                  <span className="hidden md:inline font-serif">{room.name}</span>
+                  <span className="font-serif hidden xl:inline">{room.name}</span>
+                  <span className="font-serif xl:hidden">
+                    {room.roomNumber === '204'
+                      ? 'Horizon'
+                      : room.roomNumber === '205'
+                      ? 'Bohemian'
+                      : room.name.split(' ')[0]}
+                  </span>
                   {isAvailable ? (
                     <span
-                      className={`text-[9px] sm:text-[10px] font-mono ${
+                      className={`text-[10px] font-mono ${
                         isSelected ? 'text-[#16251C]/80 font-bold' : 'text-amber-200'
                       }`}
                     >
-                      ₹{(price).toLocaleString('en-IN')}
+                      ₹{price.toLocaleString('en-IN')}
                     </span>
                   ) : (
-                    <span className="text-[8px] sm:text-[9px] font-mono uppercase px-1 py-0.2 rounded bg-red-500/30 text-red-200 border border-red-500/50 font-bold">
+                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-red-500/30 text-red-200 border border-red-500/50 font-bold">
                       Booked
                     </span>
                   )}
@@ -303,48 +517,10 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
             })}
           </div>
 
-          {/* Three Viewing Modes Toggle (Photo, 360°, 3D) */}
-          <div className="flex items-center p-0.5 sm:p-1 bg-[#0f1b13]/90 rounded-2xl border border-cream/20 text-[11px] sm:text-xs font-mono shrink-0">
-            <button
-              type="button"
-              onClick={() => setViewMode('photo')}
-              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl transition-all cursor-pointer ${
-                viewMode === 'photo'
-                  ? 'bg-cream text-[#16251C] font-bold shadow-sm'
-                  : 'text-cream/70 hover:text-white'
-              }`}
-            >
-              <Camera className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-              <span>Photo</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setViewMode('360')}
-              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl transition-all cursor-pointer ${
-                viewMode === '360'
-                  ? 'bg-cream text-[#16251C] font-bold shadow-sm'
-                  : 'text-cream/70 hover:text-white'
-              }`}
-            >
-              <Compass className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-              <span>360°</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setViewMode('3d')}
-              title="3D Preview — Coming Soon"
-              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl transition-all cursor-pointer ${
-                viewMode === '3d'
-                  ? 'bg-cream text-[#16251C] font-bold shadow-sm'
-                  : 'text-cream/70 hover:text-white'
-              }`}
-            >
-              <BoxIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-              <span className="hidden sm:inline">3D (Coming Soon)</span>
-              <span className="sm:hidden">3D · Soon</span>
-            </button>
+          {/* Right: Language Selector & Guest Portal */}
+          <div className="flex items-center gap-2.5 xl:gap-3 shrink-0">
+            <LanguageSelector variant="compact" />
+            <GuestAccountButton variant="dark" />
           </div>
         </div>
       </header>
@@ -353,6 +529,17 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
           2. MAIN STAGE VIEWPORT (Photography, 360° Tour, 3D View)
           ========================================================================= */}
       <div className="relative flex-1 w-full h-full overflow-hidden">
+        {/* Live Audio Announcement Floating Subtitle Pill */}
+        {((isAudioPlaying && currentText) || missingAudioNotice) && (
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-40 pointer-events-none max-w-[92%] sm:max-w-md animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="px-4 py-2 rounded-full bg-[#16251C]/92 backdrop-blur-md border border-emerald-400/35 text-cream text-[11px] sm:text-xs font-serif shadow-2xl flex items-center gap-2.5">
+              <Volume2 className="w-4 h-4 text-emerald-300 shrink-0 animate-pulse" />
+              <span className="truncate italic">
+                "{missingAudioNotice || currentText}"
+              </span>
+            </div>
+          </div>
+        )}
         {/* MODE 1: PHOTOGRAPHY (Real Images in public/IMG/) */}
         {viewMode === 'photo' && (
           <div className="absolute inset-0 flex flex-col justify-between p-3 sm:p-5 overflow-y-auto">
@@ -415,7 +602,7 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
               roomNumber={selectedRoom.roomNumber}
               onNavigateSpace={(spaceId) => {
                 if (selectedRoom.spaces[spaceId]) {
-                  setSelectedSpaceKey(spaceId)
+                  handleSelectSpace(spaceId)
                 }
               }}
               hideHotspotList={true}
@@ -425,30 +612,17 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
             />
           </div>
         )}
-
-        {/* MODE 3: 3D VIEW (via Model3DViewer) */}
-        {viewMode === '3d' && (
-          <div className="absolute inset-0 p-3 sm:p-5 flex items-center justify-center">
-            <Model3DViewer
-              config={model3DConfig}
-              spaceTitle={activeSpace?.title || 'Suite'}
-              roomNumber={selectedRoom.roomNumber}
-              onReturnToPhoto={() => setViewMode('photo')}
-              onExplore360={() => setViewMode('360')}
-              className="w-full h-full"
-            />
-          </div>
-        )}
       </div>
 
       {/* =========================================================================
-          3. SPACE NAVIGATION BAR (Bedroom, Bathroom)
+          3. SPACE NAVIGATION BAR (Bedroom, Bathroom) — Mobile only (< lg)
           ========================================================================= */}
-      <div className="relative z-20 shrink-0 px-3 sm:px-6 py-2 bg-[#16251C]/90 backdrop-blur-md border-t border-cream/15">
+      <div className="lg:hidden relative z-20 shrink-0 px-3 sm:px-6 py-2 bg-[#16251C]/90 backdrop-blur-md border-t border-cream/15">
         <SpaceSelector
+          variant="dark"
           spaces={selectedRoom.spaces}
           activeSpaceId={selectedSpaceKey}
-          onSelectSpace={(spaceId) => setSelectedSpaceKey(spaceId)}
+          onSelectSpace={handleSelectSpace}
         />
       </div>
 
@@ -477,62 +651,142 @@ export const RoomPreviewScene: React.FC<RoomPreviewSceneProps> = ({
       {/* =========================================================================
           4. BOTTOM RESERVATION BAR (Pricing breakdown & Instant Booking Modal)
           ========================================================================= */}
-      {/* =========================================================================
-          4. BOTTOM RESERVATION BAR (Pricing breakdown & Instant Booking Modal)
-          ========================================================================= */}
-      <footer className="relative z-30 shrink-0 bg-[#0f1b13]/95 backdrop-blur-md border-t border-cream/20 px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-3 shadow-2xl pb-safe">
-        {/* Left: Room Specifications Strip */}
-        <div className="flex items-center gap-1.5 sm:gap-3 text-[11px] sm:text-xs font-mono text-cream/70">
-          <div className="flex items-center gap-1 sm:gap-1.5 text-cream">
-            <Bed className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-300" />
-            <span className="font-semibold">Room {selectedRoom.roomNumber}</span>
-          </div>
-          <span>·</span>
-          <span>{formatArea(selectedRoom.area)}</span>
-          <span className="hidden xs:inline">·</span>
-          <span className="text-amber-200 font-bold hidden xs:inline">
-            ₹{tariffPerNight.toLocaleString('en-IN')}/nt
-          </span>
-          {!isCurrentRoomAvailable && (
-            <span className="px-1.5 py-0.5 rounded-full bg-red-500/30 border border-red-500/50 text-red-200 text-[9px] sm:text-[10px] font-mono font-bold uppercase">
-              Unavailable
+      <footer className="relative z-30 shrink-0 bg-[#0f1b13]/95 backdrop-blur-xl border-t border-cream/20 px-3 sm:px-6 py-2.5 sm:py-3 lg:py-2.5 shadow-2xl pb-safe">
+        {/* MOBILE FOOTER (< lg): Preserved original layout */}
+        <div className="flex lg:hidden items-center justify-between gap-2 sm:gap-3 w-full">
+          {/* Left: Room Specifications Strip */}
+          <div className="flex items-center gap-1.5 sm:gap-3 text-[11px] sm:text-xs font-mono text-cream/70">
+            <div className="flex items-center gap-1 sm:gap-1.5 text-cream">
+              <Bed className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-300" />
+              <span className="font-semibold">Room {selectedRoom.roomNumber}</span>
+            </div>
+            <span>·</span>
+            <span>{formatArea(selectedRoom.area)}</span>
+            <span className="hidden xs:inline">·</span>
+            <span className="text-amber-200 font-bold hidden xs:inline">
+              ₹{tariffPerNight.toLocaleString('en-IN')}/nt
             </span>
-          )}
-        </div>
+            {!isCurrentRoomAvailable && (
+              <span className="px-1.5 py-0.5 rounded-full bg-red-500/30 border border-red-500/50 text-red-200 text-[9px] sm:text-[10px] font-mono font-bold uppercase">
+                Unavailable
+              </span>
+            )}
+          </div>
 
-        {/* Right: Tariff Total & Primary Booking CTA */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="text-right">
-            <div className="flex items-center gap-1">
-              <span className="text-[9px] sm:text-[10px] font-mono uppercase text-cream/60 hidden xs:inline">Total</span>
-              <span className="text-sm sm:text-lg font-serif font-bold text-cream">
-                ₹{totalAmount.toLocaleString('en-IN')}
+          {/* Right: Tariff Total & Primary Booking CTA */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="text-right">
+              <div className="flex items-center gap-1">
+                <span className="text-[9px] sm:text-[10px] font-mono uppercase text-cream/60 hidden xs:inline">Total</span>
+                <span className="text-sm sm:text-lg font-serif font-bold text-cream">
+                  ₹{totalAmount.toLocaleString('en-IN')}
+                </span>
+              </div>
+              <span className="text-[9px] sm:text-[10px] font-mono text-cream/60 block">
+                {nights} {nights === 1 ? 'nt' : 'nts'} · incl. GST
               </span>
             </div>
-            <span className="text-[9px] sm:text-[10px] font-mono text-cream/60 block">
-              {nights} {nights === 1 ? 'nt' : 'nts'} · incl. GST
-            </span>
+
+            <button
+              type="button"
+              disabled={!isCurrentRoomAvailable}
+              onClick={() => setIsBookingModalOpen(true)}
+              className={`py-2 sm:py-3 px-3.5 sm:px-6 rounded-xl sm:rounded-2xl text-[11px] sm:text-xs uppercase tracking-wider font-bold shadow-xl flex items-center gap-1.5 transition-all duration-300 ${
+                isCurrentRoomAvailable
+                  ? 'bg-cream hover:bg-white text-[#16251C] transform hover:scale-105 cursor-pointer'
+                  : 'bg-red-950/70 border border-red-500/40 text-red-300 cursor-not-allowed opacity-90'
+              }`}
+            >
+              {isCurrentRoomAvailable ? (
+                <>
+                  <span>Book <span className="hidden xs:inline">Room </span>{selectedRoom.roomNumber}</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-[#16251C]" />
+                </>
+              ) : (
+                <span>Booked</span>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* LAPTOP / DESKTOP FOOTER (lg:flex): Unified Luxury Console with Integrated Space Selector */}
+        <div className="hidden lg:flex items-center justify-between gap-4 xl:gap-8 w-full">
+          {/* Left: Suite Details & Architectural Metadata */}
+          <div className="flex items-center gap-3.5 shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-cream/10 border border-cream/20 flex items-center justify-center text-amber-200 shrink-0 shadow-inner">
+              <Bed className="w-5 h-5 text-emerald-300" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <span className="font-mono font-bold text-amber-200 text-xs px-2 py-0.5 rounded-md bg-amber-400/10 border border-amber-400/20">
+                  Room {selectedRoom.roomNumber}
+                </span>
+                <h4 className="font-serif text-base font-medium text-cream tracking-tight truncate max-w-[200px] xl:max-w-xs">
+                  {selectedRoom.name}
+                </h4>
+                {!isCurrentRoomAvailable && (
+                  <span className="px-2 py-0.5 rounded-full bg-red-500/30 border border-red-500/50 text-red-200 text-[10px] font-mono font-bold uppercase">
+                    Unavailable
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2 text-xs font-mono text-cream/70 mt-0.5">
+                <span>{formatArea(selectedRoom.area)}</span>
+                <span>·</span>
+                <span className="text-amber-200 font-bold">₹{tariffPerNight.toLocaleString('en-IN')}/night</span>
+                <span className="hidden xl:inline">·</span>
+                <span className="hidden xl:inline text-cream/60 truncate max-w-[200px]">
+                  {selectedRoom.tagline}
+                </span>
+              </div>
+            </div>
           </div>
 
-          <button
-            type="button"
-            disabled={!isCurrentRoomAvailable}
-            onClick={() => setIsBookingModalOpen(true)}
-            className={`py-2 sm:py-3 px-3.5 sm:px-6 rounded-xl sm:rounded-2xl text-[11px] sm:text-xs uppercase tracking-wider font-bold shadow-xl flex items-center gap-1.5 transition-all duration-300 ${
-              isCurrentRoomAvailable
-                ? 'bg-cream hover:bg-white text-[#16251C] transform hover:scale-105 cursor-pointer'
-                : 'bg-red-950/70 border border-red-500/40 text-red-300 cursor-not-allowed opacity-90'
-            }`}
-          >
-            {isCurrentRoomAvailable ? (
-              <>
-                <span>Book <span className="hidden xs:inline">Room </span>{selectedRoom.roomNumber}</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#16251C]" />
-              </>
-            ) : (
-              <span>Booked</span>
-            )}
-          </button>
+          {/* Center: Integrated Space Switcher (Bedroom / Bathroom) */}
+          <div className="flex items-center justify-center shrink-0">
+            <SpaceSelector
+              variant="dark"
+              spaces={selectedRoom.spaces}
+              activeSpaceId={selectedSpaceKey}
+              onSelectSpace={handleSelectSpace}
+              className="w-auto min-w-[260px]"
+            />
+          </div>
+
+          {/* Right: Tariff Total & Primary Booking CTA */}
+          <div className="flex items-center gap-4 shrink-0">
+            <div className="text-right">
+              <div className="flex items-center justify-end gap-1.5">
+                <span className="text-[10px] font-mono uppercase text-cream/60">Total</span>
+                <span className="text-xl font-serif font-bold text-cream">
+                  ₹{totalAmount.toLocaleString('en-IN')}
+                </span>
+              </div>
+              <span className="text-[11px] font-mono text-cream/60 block">
+                {nights} {nights === 1 ? 'night' : 'nights'} · taxes & GST incl.
+              </span>
+            </div>
+
+            <button
+              type="button"
+              disabled={!isCurrentRoomAvailable}
+              onClick={() => setIsBookingModalOpen(true)}
+              className={`py-3 px-6 rounded-xl text-xs uppercase tracking-wider font-bold shadow-xl flex items-center gap-2 transition-all duration-300 ${
+                isCurrentRoomAvailable
+                  ? 'bg-cream hover:bg-white text-[#16251C] transform hover:scale-105 cursor-pointer'
+                  : 'bg-red-950/70 border border-red-500/40 text-red-300 cursor-not-allowed opacity-90'
+              }`}
+            >
+              {isCurrentRoomAvailable ? (
+                <>
+                  <span>Book Room {selectedRoom.roomNumber}</span>
+                  <ArrowRight className="w-4 h-4 text-[#16251C]" />
+                </>
+              ) : (
+                <span>Unavailable</span>
+              )}
+            </button>
+          </div>
         </div>
       </footer>
 

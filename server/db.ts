@@ -93,6 +93,20 @@ const DEFAULT_ROOMS_CONFIG: RoomConfig[] = [
     operationalStatus: 'available',
     housekeepingNotes: 'Executive penthouse cleaned and scented with pine essence.',
   },
+  {
+    roomNumber: '204',
+    name: 'The Royal Horizon Suite',
+    baseTariff: 9800,
+    operationalStatus: 'available',
+    housekeepingNotes: 'Royal Horizon Suite inspected. 360° tour and panoramas live.',
+  },
+  {
+    roomNumber: '205',
+    name: 'The Tropical Bohemian Suite',
+    baseTariff: 8900,
+    operationalStatus: 'available',
+    housekeepingNotes: 'Artisan suite sanitized. Rattan decor & botanical diffuser refreshed.',
+  },
 ]
 
 // Ensure data directory and files exist
@@ -338,13 +352,13 @@ export function isRoomAvailable(
 }
 
 /**
- * Get availability status for all specified rooms (201, 202, 203) for the given dates.
+ * Get availability status for all specified rooms (201, 202, 203, 204, 205) for the given dates.
  */
 export function getAvailabilityForAllRooms(
   checkInDate: string,
   checkOutDate: string
 ): Record<string, { available: boolean; conflictingBooking?: BookingRecord }> {
-  const roomIds = ['201', '202', '203']
+  const roomIds = ['201', '202', '203', '204', '205']
   const result: Record<string, { available: boolean; conflictingBooking?: BookingRecord }> = {}
 
   for (const rid of roomIds) {
@@ -550,7 +564,7 @@ export function getAdminStats(): AdminStats {
     }
   }
 
-  const occupancyRate = Math.min(100, Math.round((currentlyOccupiedRooms / 3) * 100))
+  const occupancyRate = Math.min(100, Math.round((currentlyOccupiedRooms / 5) * 100))
 
   return {
     totalRevenue,

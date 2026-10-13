@@ -1,5 +1,85 @@
 [
   {
+    "roomId": "201",
+    "roomNumber": "201",
+    "roomName": "The Forest Sanctuary Suite",
+    "checkInDate": "2026-12-10",
+    "checkOutDate": "2026-12-14",
+    "nights": 4,
+    "adults": 2,
+    "children": 0,
+    "tariffPerNight": 4800,
+    "subtotal": 19200,
+    "discount": 1920,
+    "taxesAndGst": 2074,
+    "totalAmount": 19354,
+    "guestDetails": {
+      "fullName": "Test Auditor Guest",
+      "email": "auditor@renooshotel.com",
+      "phone": "9876543210"
+    },
+    "paymentMethod": "pay_at_checkin",
+    "paymentStatus": "pay_at_checkin",
+    "id": "res-1791826245417-491",
+    "bookingReference": "RENOOS-2026-99513",
+    "createdAt": "2026-10-12T17:30:45.417Z",
+    "status": "cancelled"
+  },
+  {
+    "roomId": "205",
+    "roomNumber": "205",
+    "roomName": "The Tropical Bohemian Suite",
+    "checkInDate": "2026-10-22",
+    "checkOutDate": "2026-10-23",
+    "nights": 1,
+    "adults": 2,
+    "children": 0,
+    "tariffPerNight": 8900,
+    "subtotal": 8900,
+    "discount": 890,
+    "taxesAndGst": 961,
+    "totalAmount": 8971,
+    "guestDetails": {
+      "fullName": "Mr Arjun  Kapoor",
+      "email": "arjun@gmail.com",
+      "phone": "8669223448",
+      "specialRequests": "Honeymoon / Anniversary Flower Setup"
+    },
+    "paymentMethod": "upi",
+    "paymentStatus": "paid",
+    "id": "res-1791810200239-139",
+    "bookingReference": "RENOOS-2026-58994",
+    "createdAt": "2026-10-12T13:03:20.239Z",
+    "status": "confirmed"
+  },
+  {
+    "roomId": "202",
+    "roomNumber": "202",
+    "roomName": "Premium Room",
+    "checkInDate": "2026-10-13",
+    "checkOutDate": "2026-10-15",
+    "nights": 2,
+    "adults": 2,
+    "children": 0,
+    "tariffPerNight": 7400,
+    "subtotal": 14800,
+    "discount": 1480,
+    "taxesAndGst": 1598,
+    "totalAmount": 14918,
+    "guestDetails": {
+      "fullName": "Mr sujay pawar",
+      "email": "sujay@gmail.com",
+      "phone": "7620636449",
+      "specialRequests": "Complimentary Renoos Hotel Nature Tour"
+    },
+    "paymentMethod": "pay_at_hotel",
+    "paymentStatus": "pay_at_checkin",
+    "id": "res-1791794441627-139",
+    "bookingReference": "RENOOS-2026-16277",
+    "createdAt": "2026-10-12T08:40:41.629Z",
+    "status": "confirmed"
+  },
+  {
     "roomId": "202",
     "roomNumber": "202",
     "roomName": "Panoramic Master Suite",
@@ -50,7 +130,7 @@
     "id": "res-1791528929997-747",
     "bookingReference": "RENOOS-2026-67805",
     "createdAt": "2026-10-09T06:55:29.997Z",
-    "status": "confirmed"
+    "status": "checked_out"
   },
   {
     "roomId": "202",

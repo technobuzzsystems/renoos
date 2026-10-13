@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   X,
   CheckCircle2,
@@ -26,6 +26,7 @@ import type { Room, ConfirmedReservation, GuestDetails, PaymentMethod } from '@/
 import { generateReservationPDF, printReservationInvoice } from '@/lib/pdfBillGenerator'
 import { submitBookingToApi } from '@/services/api'
 import { useAuth } from '@/context/AuthContext'
+import { useLanguage } from '@/context/LanguageContext'
 
 interface BookingModalProps {
   room: Room
@@ -88,6 +89,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [submissionError, setSubmissionError] = useState<string | null>(null)
 
   const { user, refreshUserBookings, setIsAuthModalOpen, setIsBookingsModalOpen } = useAuth()
+  const { playAudio, stopAudio } = useLanguage()
+  const hasPlayedReviewRef = useRef(false)
 
   // Auto-populate guest details when user is logged in
   useEffect(() => {
@@ -105,21 +108,27 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     }
   }, [isOpen, user])
 
-  // Reset or lock scroll when modal opens
+  // Reset or lock scroll when modal opens & trigger bookingReview audio
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
+      if (!hasPlayedReviewRef.current) {
+        hasPlayedReviewRef.current = true
+        playAudio('bookingReview')
+      }
     } else {
       document.body.style.overflow = 'unset'
+      hasPlayedReviewRef.current = false
       setStep('guest')
       setErrors({})
       setIsSubmitting(false)
       setSubmissionError(null)
+      stopAudio()
     }
     return () => {
       document.body.style.overflow = 'unset'
     }
-  }, [isOpen])
+  }, [isOpen, playAudio, stopAudio])
 
   if (!isOpen) return null
 
@@ -211,6 +220,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       setConfirmedReservation(newReservation)
       setIsSubmitting(false)
       setStep('confirmed')
+      playAudio('thankYou')
 
       if (onBookingSuccess) {
         onBookingSuccess(newReservation)

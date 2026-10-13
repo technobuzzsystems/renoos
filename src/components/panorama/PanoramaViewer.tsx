@@ -91,7 +91,7 @@ function PanoramaMesh({
     )
     currentFov.current = THREE.MathUtils.lerp(
       currentFov.current,
-      targetFovRef.current ?? 82,
+      targetFovRef.current ?? initialFov,
       factor
     )
 
@@ -172,7 +172,7 @@ function PanoramaMesh({
 
   return (
     <mesh scale={[-1, 1, 1]}>
-      <sphereGeometry args={[500, 64, 40]} />
+      <sphereGeometry args={[500, 128, 64]} />
       <meshBasicMaterial map={texture} side={THREE.DoubleSide} />
     </mesh>
   )
@@ -203,9 +203,9 @@ export const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
   )
 
   // Camera limits and defaults from configuration
-  const minFov = config.minFov ?? 40
+  const minFov = config.minFov ?? 45
   const maxFov = config.maxFov ?? 105
-  const defaultFov = config.initialFov ?? 82
+  const defaultFov = config.initialFov ?? 85
   const initialYaw = config.initialYaw ?? 0
   const initialPitch = config.initialPitch ?? 0
 
@@ -283,9 +283,10 @@ export const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
           return
         }
         loadedTexture.colorSpace = THREE.SRGBColorSpace
+        loadedTexture.generateMipmaps = false
         loadedTexture.minFilter = THREE.LinearFilter
         loadedTexture.magFilter = THREE.LinearFilter
-        loadedTexture.generateMipmaps = false
+        loadedTexture.anisotropy = 16
 
         // Update texture and cleanly dispose previous texture to eliminate GPU VRAM leaks
         setTexture((prevTexture) => {
@@ -676,6 +677,7 @@ export const PanoramaViewer: React.FC<PanoramaViewerProps> = ({
               powerPreference: 'high-performance',
               alpha: false,
             }}
+            dpr={[1, 2]}
             className="w-full h-full"
           >
             <PanoramaMesh

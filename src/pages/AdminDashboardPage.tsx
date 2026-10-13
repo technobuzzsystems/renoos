@@ -1,15 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard,
-  Calendar,
-  Bed,
-  Users,
-  Plus,
-  ShieldCheck,
-  Sparkles,
-} from 'lucide-react'
-import {
   getStoredAdminSession,
   clearAdminSession,
   adminLogoutApi,
@@ -27,32 +18,38 @@ import {
 } from '@/services/adminApi'
 
 import { AdminLoginView } from '@/components/admin/AdminLoginView'
-import { AdminHeader } from '@/components/admin/AdminHeader'
-import { AdminOverviewTab } from '@/components/admin/AdminOverviewTab'
+import { AdminSidebarRail, type AdminTabType } from '@/components/admin/AdminSidebarRail'
+import { AdminTopBar } from '@/components/admin/AdminTopBar'
+import { AdminReferenceDashboard } from '@/components/admin/AdminReferenceDashboard'
 import { AdminBookingsTab } from '@/components/admin/AdminBookingsTab'
 import { AdminRoomsTab } from '@/components/admin/AdminRoomsTab'
 import { AdminGuestsTab } from '@/components/admin/AdminGuestsTab'
+import { AdminFinancialsTab } from '@/components/admin/AdminFinancialsTab'
 import { AdminWalkInModal } from '@/components/admin/AdminWalkInModal'
 import { AdminBookingDetailsModal } from '@/components/admin/AdminBookingDetailsModal'
+import { AdminCommandPalette } from '@/components/admin/AdminCommandPalette'
+import { AdminThemeProvider, useAdminTheme } from '@/context/AdminThemeContext'
 
-export const AdminDashboardPage: React.FC = () => {
+const AdminDashboardInner: React.FC = () => {
   const navigate = useNavigate()
+  const { isDark, toggleTheme } = useAdminTheme()
 
   // 1. Session State
   const [session, setSession] = useState<AdminSession | null>(() => getStoredAdminSession())
 
-  // 2. Active Tab State
-  const [activeTab, setActiveTab] = useState<'overview' | 'bookings' | 'rooms' | 'guests'>('overview')
+  // 2. Active Tab State ('overview' matches the reference image bento grid)
+  const [activeTab, setActiveTab] = useState<AdminTabType>('overview')
 
-  // 3. PMS Data State
+  // 4. PMS Data State
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [bookings, setBookings] = useState<BookingRecord[]>([])
   const [rooms, setRooms] = useState<any[]>([])
   const [guests, setGuests] = useState<any[]>([])
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  // 4. Modal States
+  // 5. Modal States
   const [isWalkInModalOpen, setIsWalkInModalOpen] = useState(false)
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
   const [selectedBookingForDetails, setSelectedBookingForDetails] = useState<BookingRecord | null>(null)
 
   // Load all PMS data
@@ -99,6 +96,18 @@ export const AdminDashboardPage: React.FC = () => {
       loadPmsData()
     }
   }, [session, loadPmsData])
+
+  // Global Keyboard listener for Command Palette (Cmd+K / Ctrl+K / Cmd+Space)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.code === 'Space')) {
+        e.preventDefault()
+        setIsCommandPaletteOpen((prev) => !prev)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   // Handlers
   const handleLoginSuccess = (newSession: AdminSession) => {
@@ -156,152 +165,122 @@ export const AdminDashboardPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0E1712] text-cream flex flex-col select-none w-full max-w-full overflow-x-hidden">
-      {/* 1. Master Sticky Header Container (Header + Subnav Tabs) */}
-      <header className="sticky top-0 z-40 shadow-xl w-full max-w-full overflow-hidden">
-        <AdminHeader
+    <div
+      className={`h-[100dvh] max-h-[100dvh] select-none font-sans overflow-hidden flex flex-col md:flex-row relative transition-colors duration-300 ${
+        isDark ? 'dark bg-[#0B110E] text-slate-100' : 'bg-[#f8f9fa] text-slate-900'
+      }`}
+    >
+      {/* Subtle Fresh Emerald Ambient Lighting Glow Orbs */}
+      <div
+        className={`fixed top-0 left-1/4 w-[600px] h-[350px] rounded-full blur-[140px] pointer-events-none z-0 transition-opacity duration-500 ${
+          isDark ? 'bg-emerald-500/[0.08]' : 'bg-emerald-400/[0.04]'
+        }`}
+      />
+      <div
+        className={`fixed bottom-0 right-1/4 w-[500px] h-[300px] rounded-full blur-[140px] pointer-events-none z-0 transition-opacity duration-500 ${
+          isDark ? 'bg-teal-500/[0.06]' : 'bg-teal-400/[0.03]'
+        }`}
+      />
+
+      {/* 1. Left Vertical Sidebar Rail Dock */}
+      <AdminSidebarRail
+        activeTab={activeTab}
+        onTabChange={(t) => setActiveTab(t)}
+        bookingsCount={bookings.length}
+        guestsCount={guests.length}
+        onExitToWebsite={() => navigate('/')}
+        onOpenSettings={() => setIsCommandPaletteOpen(true)}
+      />
+
+      {/* 2. Main App Canvas (Top Bar + Dynamic View Container) */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 z-10 w-full h-full overflow-hidden">
+        {/* Top Header Bar (Fixed on spot - never moves) */}
+        <AdminTopBar
           session={session}
-          onRefresh={loadPmsData}
+          bookings={bookings}
           isRefreshing={isRefreshing}
+          onRefresh={loadPmsData}
+          onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
           onLogout={handleLogout}
           onExitToWebsite={() => navigate('/')}
+          onSelectBooking={(b) => setSelectedBookingForDetails(b)}
+          isDark={isDark}
+          onToggleTheme={toggleTheme}
         />
 
-        {/* 2. Sub-Header Navigation Tabs Bar */}
-        <div className="bg-[#142018]/95 border-b border-cream/15 px-2.5 sm:px-6 md:px-8 py-2 flex items-center justify-between gap-2 backdrop-blur-md w-full max-w-full overflow-hidden">
-          <div className="flex items-center gap-1 sm:gap-1.5 p-1 bg-black/40 rounded-2xl border border-cream/15 text-xs font-mono overflow-x-auto no-scrollbar touch-pan-x flex-1 min-w-0">
-            {/* Tab 1: Overview */}
-            <button
-              type="button"
-              onClick={() => setActiveTab('overview')}
-              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition-all cursor-pointer shrink-0 ${
-                activeTab === 'overview'
-                  ? 'bg-cream text-[#16251C] font-bold shadow-md'
-                  : 'text-cream/70 hover:text-white'
-              }`}
-            >
-              <LayoutDashboard className="w-3.5 h-3.5 shrink-0" />
-              <span>Overview</span>
-            </button>
+        {/* Dynamic Viewport Container (Right content moves and scrolls smoothly) */}
+        <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-3.5 sm:p-6 lg:p-7 max-w-full pb-24 md:pb-12 [scrollbar-gutter:stable]">
+          {activeTab === 'overview' && (
+            <AdminReferenceDashboard
+              stats={stats}
+              rooms={rooms}
+              recentBookings={bookings}
+              onOpenWalkInModal={() => setIsWalkInModalOpen(true)}
+              onNavigateToTab={(t) => setActiveTab(t)}
+              onSelectBooking={(b) => setSelectedBookingForDetails(b)}
+            />
+          )}
 
-            {/* Tab 2: Reservations */}
-            <button
-              type="button"
-              onClick={() => setActiveTab('bookings')}
-              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition-all cursor-pointer shrink-0 ${
-                activeTab === 'bookings'
-                  ? 'bg-cream text-[#16251C] font-bold shadow-md'
-                  : 'text-cream/70 hover:text-white'
-              }`}
-            >
-              <Calendar className="w-3.5 h-3.5 shrink-0" />
-              <span>Reservations</span>
-              {bookings.length > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">
-                  {bookings.length}
-                </span>
-              )}
-            </button>
+          {activeTab === 'bookings' && (
+            <AdminBookingsTab
+              bookings={bookings}
+              isLoading={isRefreshing}
+              onStatusChange={handleStatusChange}
+              onDeleteBooking={handleDeleteBooking}
+              onOpenWalkInModal={() => setIsWalkInModalOpen(true)}
+              onSelectBooking={(b) => setSelectedBookingForDetails(b)}
+              onRefresh={loadPmsData}
+            />
+          )}
 
-            {/* Tab 3: Rooms & Inventory */}
-            <button
-              type="button"
-              onClick={() => setActiveTab('rooms')}
-              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition-all cursor-pointer shrink-0 ${
-                activeTab === 'rooms'
-                  ? 'bg-cream text-[#16251C] font-bold shadow-md'
-                  : 'text-cream/70 hover:text-white'
-              }`}
-            >
-              <Bed className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden sm:inline">Suites & Inventory</span>
-              <span className="sm:hidden">Suites</span>
-            </button>
+          {activeTab === 'rooms' && (
+            <AdminRoomsTab
+              rooms={rooms}
+              bookings={bookings}
+              onUpdateRoom={handleUpdateRoom}
+              onSelectBooking={(b) => setSelectedBookingForDetails(b)}
+            />
+          )}
 
-            {/* Tab 4: Guests CRM */}
-            <button
-              type="button"
-              onClick={() => setActiveTab('guests')}
-              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-medium transition-all cursor-pointer shrink-0 ${
-                activeTab === 'guests'
-                  ? 'bg-cream text-[#16251C] font-bold shadow-md'
-                  : 'text-cream/70 hover:text-white'
-              }`}
-            >
-              <Users className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden sm:inline">Guest CRM</span>
-              <span className="sm:hidden">Guests</span>
-              {guests.length > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full bg-amber-400/20 text-amber-200 text-[10px] font-bold">
-                  {guests.length}
-                </span>
-              )}
-            </button>
-          </div>
+          {activeTab === 'guests' && (
+            <AdminGuestsTab
+              guests={guests}
+              isLoading={isRefreshing}
+              onFilterBookingsByGuest={handleFilterBookingsByGuest}
+            />
+          )}
 
-          {/* Action Button: Quick Walk-In Reservation */}
-          <button
-            type="button"
-            onClick={() => setIsWalkInModalOpen(true)}
-            className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-emerald-700 hover:bg-emerald-600 text-cream font-mono text-[11px] sm:text-xs uppercase tracking-wider font-semibold flex items-center gap-1 transition-all shadow-md cursor-pointer shrink-0 whitespace-nowrap min-h-[36px]"
-          >
-            <Plus className="w-3.5 h-3.5 shrink-0" />
-            <span className="hidden xs:inline">Walk-in</span>
-            <span className="xs:hidden">New</span>
-            <span className="hidden sm:inline">Reservation</span>
-          </button>
-        </div>
-      </header>
+          {activeTab === 'financials' && (
+            <AdminFinancialsTab
+              stats={stats}
+              bookings={bookings}
+              onOpenWalkInModal={() => setIsWalkInModalOpen(true)}
+              onSelectBooking={(b) => setSelectedBookingForDetails(b)}
+            />
+          )}
+        </main>
+      </div>
 
-      {/* 3. Main Body Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 md:p-8 space-y-6 pb-safe overflow-x-hidden">
-        {activeTab === 'overview' && (
-          <AdminOverviewTab
-            stats={stats}
-            rooms={rooms}
-            recentBookings={bookings}
-            onOpenWalkInModal={() => setIsWalkInModalOpen(true)}
-            onNavigateToTab={(t) => setActiveTab(t)}
-            onSelectBooking={(b) => setSelectedBookingForDetails(b)}
-          />
-        )}
+      {/* 3. Global Command Palette Modal (⌘ + Space / ⌘K) */}
+      <AdminCommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onOpenWalkIn={() => setIsWalkInModalOpen(true)}
+        onNavigateToTab={(t) => setActiveTab(t)}
+        onRefresh={loadPmsData}
+        onExitToWebsite={() => navigate('/')}
+        bookings={bookings}
+        onSelectBooking={(b) => setSelectedBookingForDetails(b)}
+      />
 
-        {activeTab === 'bookings' && (
-          <AdminBookingsTab
-            bookings={bookings}
-            isLoading={isRefreshing}
-            onStatusChange={handleStatusChange}
-            onDeleteBooking={handleDeleteBooking}
-            onOpenWalkInModal={() => setIsWalkInModalOpen(true)}
-            onSelectBooking={(b) => setSelectedBookingForDetails(b)}
-            onRefresh={loadPmsData}
-          />
-        )}
-
-        {activeTab === 'rooms' && (
-          <AdminRoomsTab
-            rooms={rooms}
-            bookings={bookings}
-            onUpdateRoom={handleUpdateRoom}
-          />
-        )}
-
-        {activeTab === 'guests' && (
-          <AdminGuestsTab
-            guests={guests}
-            isLoading={isRefreshing}
-            onFilterBookingsByGuest={handleFilterBookingsByGuest}
-          />
-        )}
-      </main>
-
-      {/* 4. Modals */}
+      {/* 4. Front Desk Walk-In Reservation Modal */}
       <AdminWalkInModal
         isOpen={isWalkInModalOpen}
         onClose={() => setIsWalkInModalOpen(false)}
         onSuccess={loadPmsData}
       />
 
+      {/* 5. Booking Details & Folio Tax Bill Modal */}
       <AdminBookingDetailsModal
         booking={selectedBookingForDetails}
         isOpen={!!selectedBookingForDetails}
@@ -309,6 +288,14 @@ export const AdminDashboardPage: React.FC = () => {
         onStatusChange={handleStatusChange}
       />
     </div>
+  )
+}
+
+export const AdminDashboardPage: React.FC = () => {
+  return (
+    <AdminThemeProvider>
+      <AdminDashboardInner />
+    </AdminThemeProvider>
   )
 }
 

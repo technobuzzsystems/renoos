@@ -253,10 +253,10 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
       {/* Top Header & Search / Filters Toolbar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="font-serif text-xl sm:text-2xl text-cream font-semibold">
+          <h2 className="font-serif text-xl sm:text-2xl text-slate-900 dark:text-white font-semibold">
             All Reservations & PMS Folios
           </h2>
-          <p className="text-xs text-cream/70 font-mono">
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">
             Manage confirmed stays, check-ins, check-outs, and official tax bills
           </p>
         </div>
@@ -265,7 +265,7 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
           <button
             type="button"
             onClick={onOpenWalkInModal}
-            className="flex-1 sm:flex-none justify-center px-4 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-600 text-cream font-mono text-xs uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-md cursor-pointer min-h-[38px]"
+            className="flex-1 sm:flex-none justify-center px-4 py-2.5 rounded-full bg-[#047857] hover:bg-[#065f46] text-white font-mono text-xs uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-md shadow-emerald-700/20 cursor-pointer min-h-[38px]"
           >
             <Plus className="w-4 h-4" />
             <span>New Walk-in Reservation</span>
@@ -274,42 +274,42 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
           <button
             type="button"
             onClick={handleExportCSV}
-            className="px-3.5 py-2.5 rounded-full bg-[#1c2e22] hover:bg-[#253e2e] text-cream border border-cream/20 font-mono text-xs uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-md cursor-pointer min-h-[38px]"
+            className="px-3.5 py-2.5 rounded-full bg-slate-100 dark:bg-[#131D17] hover:bg-slate-200/80 dark:hover:bg-[#1a2820] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-emerald-950/80 font-mono text-xs uppercase tracking-wider font-semibold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer min-h-[38px]"
             title="Export filtered reservations to CSV"
           >
-            <Download className="w-4 h-4 text-amber-200" />
+            <Download className="w-4 h-4 text-slate-600 dark:text-slate-400" />
             <span className="hidden sm:inline">Export CSV</span>
           </button>
 
           <button
             type="button"
             onClick={onRefresh}
-            className="p-2.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream border border-cream/20 transition-all cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center shrink-0"
+            className="p-2.5 rounded-full bg-slate-100 dark:bg-[#131D17] hover:bg-slate-200/80 dark:hover:bg-[#1a2820] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-emerald-950/80 transition-all cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center shrink-0"
             title="Refresh list"
             aria-label="Refresh reservations"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[#047857]' : ''}`} />
           </button>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-4 sm:p-5 bg-[#16251C]/80 backdrop-blur-xl border border-cream/15 rounded-3xl shadow-xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      <div className="p-4 sm:p-5 bg-white dark:bg-[#131D17] border border-slate-200/80 dark:border-emerald-950/80 rounded-3xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
         {/* Search Input */}
         <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-cream/50 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search by Guest Name, Mobile, Email or Ref (e.g. 2026-13196)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-black/30 border border-cream/20 rounded-2xl text-xs font-mono text-cream placeholder-cream/40 focus:outline-none focus:border-amber-300/80"
+            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#0B110E] border border-slate-200 dark:border-emerald-950 rounded-2xl text-xs font-mono text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-[#0B110E] focus:border-emerald-500"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-cream/60 hover:text-cream"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
             >
               Clear
             </button>
@@ -319,7 +319,7 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
         {/* Filter Pills & Controls */}
         <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 text-xs font-mono w-full md:w-auto">
           {/* Status Dropdown Filter */}
-          <div className="flex items-center gap-1 bg-black/30 p-1 rounded-2xl border border-cream/15 overflow-x-auto no-scrollbar touch-pan-x w-full sm:w-auto shrink-0">
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-[#0B110E] p-1 rounded-2xl border border-slate-200/70 dark:border-emerald-950/70 overflow-x-auto no-scrollbar touch-pan-x w-full sm:w-auto shrink-0">
             {(['all', 'confirmed', 'checked_in', 'checked_out', 'cancelled'] as const).map(
               (st) => (
                 <button
@@ -328,8 +328,8 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
                   onClick={() => setStatusFilter(st)}
                   className={`px-2.5 sm:px-3 py-1.5 sm:py-1 rounded-xl uppercase text-[10px] font-bold transition-all shrink-0 whitespace-nowrap ${
                     statusFilter === st
-                      ? 'bg-cream text-[#16251C] shadow-sm'
-                      : 'text-cream/70 hover:text-white'
+                      ? 'bg-[#047857] text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   {st.replace('_', ' ')}
@@ -340,14 +340,14 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
 
           <div className="grid grid-cols-1 xs:grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
             {/* Stay Date Filter */}
-            <div className="flex items-center justify-between xs:justify-start gap-1.5 bg-black/30 px-3 py-2 rounded-xl border border-cream/15 text-xs font-mono">
+            <div className="flex items-center justify-between xs:justify-start gap-1.5 bg-slate-50 dark:bg-[#0B110E] px-3 py-2 rounded-xl border border-slate-200 dark:border-emerald-950 text-xs font-mono">
               <div className="flex items-center gap-1.5 min-w-0">
-                <Calendar className="w-3.5 h-3.5 text-amber-200/80 shrink-0" />
+                <Calendar className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0" />
                 <input
                   type="date"
                   value={dateFilter}
                   onChange={(e) => setDateFilter(e.target.value)}
-                  className="bg-transparent text-cream text-xs font-mono focus:outline-none cursor-pointer [color-scheme:dark] w-full"
+                  className="bg-transparent text-slate-900 dark:text-white text-xs font-mono focus:outline-none cursor-pointer w-full"
                   title="Filter by stay date"
                 />
               </div>
@@ -355,7 +355,7 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
                 <button
                   type="button"
                   onClick={() => setDateFilter('')}
-                  className="text-xs text-cream/60 hover:text-white ml-1"
+                  className="text-xs text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 ml-1"
                   title="Clear date filter"
                 >
                   ✕
@@ -367,29 +367,31 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
             <select
               value={roomFilter}
               onChange={(e) => setRoomFilter(e.target.value)}
-              className="w-full sm:w-auto px-3 py-2 bg-black/30 border border-cream/15 rounded-xl text-xs font-mono text-cream focus:outline-none"
+              className="w-full sm:w-auto px-3 py-2 bg-slate-50 dark:bg-[#0B110E] border border-slate-200 dark:border-emerald-950 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none"
             >
-              <option value="all">All Suites (201-203)</option>
+              <option value="all">All Suites (201-205)</option>
               <option value="201">Room 201 — Forest</option>
               <option value="202">Room 202 — Mountain</option>
               <option value="203">Room 203 — Executive</option>
+              <option value="204">Room 204 — Royal Horizon</option>
+              <option value="205">Room 205 — Bohemian Suite</option>
             </select>
           </div>
         </div>
       </div>
 
       {/* Bookings Table */}
-      <div className="bg-[#16251C]/80 backdrop-blur-xl border border-cream/15 rounded-3xl shadow-xl overflow-hidden">
+      <div className="bg-white dark:bg-[#131D17] border border-slate-200/80 dark:border-emerald-950/80 rounded-3xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
         {isLoading && bookings.length === 0 ? (
           <div className="py-20 text-center space-y-3">
-            <div className="w-8 h-8 rounded-full border-2 border-emerald-400/20 border-t-emerald-400 animate-spin mx-auto" />
-            <p className="text-xs font-mono text-cream/70">Syncing reservations with Renoos Hotel PMS...</p>
+            <div className="w-8 h-8 rounded-full border-2 border-emerald-500/20 border-t-[#047857] animate-spin mx-auto" />
+            <p className="text-xs font-mono text-slate-500 dark:text-slate-400">Syncing reservations with Renoos Hotel PMS...</p>
           </div>
         ) : filteredBookings.length === 0 ? (
           <div className="py-16 text-center space-y-2">
-            <FileText className="w-8 h-8 text-cream/40 mx-auto" />
-            <h4 className="font-serif text-base text-cream font-medium">No Reservations Found</h4>
-            <p className="text-xs font-mono text-cream/60">
+            <FileText className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto" />
+            <h4 className="font-serif text-base text-slate-800 dark:text-slate-200 font-medium">No Reservations Found</h4>
+            <p className="text-xs font-mono text-slate-500 dark:text-slate-400">
               {searchQuery || statusFilter !== 'all' || roomFilter !== 'all'
                 ? 'Try adjusting your search criteria or filter options.'
                 : 'No bookings in database. Use "New Walk-in Reservation" to add one.'}
@@ -398,7 +400,7 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
         ) : (
           <>
             {/* Mobile Cards (Visible on <md) */}
-            <div className="md:hidden divide-y divide-cream/10">
+            <div className="md:hidden divide-y divide-slate-100 dark:divide-emerald-950/60">
               {filteredBookings.map((b) => {
                 const isCancelled = b.status === 'cancelled'
                 const isCheckedIn = b.status === 'checked_in'
@@ -409,10 +411,10 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
                     {/* Top line: Reference + Status selector */}
                     <div className="flex items-center justify-between gap-2">
                       <div>
-                        <span className="font-bold text-amber-200 text-xs block">
+                        <span className="font-bold text-[#047857] dark:text-emerald-400 text-xs block">
                           {b.bookingReference}
                         </span>
-                        <span className="text-[10px] text-cream/50">
+                        <span className="text-[10px] text-slate-400">
                           {b.createdAt ? new Date(b.createdAt).toLocaleDateString('en-IN') : 'Direct'}
                         </span>
                       </div>
@@ -426,26 +428,26 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
                             e.target.value as 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled'
                           )
                         }
-                        className={`px-2 py-1 rounded-xl text-[10px] font-mono font-bold uppercase border cursor-pointer focus:outline-none ${
+                        className={`px-2.5 py-1 rounded-xl text-[10px] font-mono font-bold uppercase border cursor-pointer focus:outline-none ${
                           isCancelled
-                            ? 'bg-red-500/20 text-red-200 border-red-500/40'
+                            ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800/80'
                             : isCheckedIn
-                            ? 'bg-blue-500/20 text-blue-200 border-blue-400/40'
+                            ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/80'
                             : isCheckedOut
-                            ? 'bg-gray-500/20 text-gray-300 border-gray-400/40'
-                            : 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40'
+                            ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                            : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/80'
                         }`}
                       >
-                        <option value="confirmed" className="bg-[#16251C] text-emerald-300">
+                        <option value="confirmed" className="bg-white dark:bg-[#131D17] text-emerald-700 dark:text-emerald-300">
                           Confirmed
                         </option>
-                        <option value="checked_in" className="bg-[#16251C] text-blue-300">
+                        <option value="checked_in" className="bg-white dark:bg-[#131D17] text-blue-700 dark:text-blue-300">
                           Checked In
                         </option>
-                        <option value="checked_out" className="bg-[#16251C] text-gray-300">
+                        <option value="checked_out" className="bg-white dark:bg-[#131D17] text-slate-700 dark:text-slate-300">
                           Checked Out
                         </option>
-                        <option value="cancelled" className="bg-[#16251C] text-red-300">
+                        <option value="cancelled" className="bg-white dark:bg-[#131D17] text-rose-700 dark:text-rose-300">
                           Cancelled
                         </option>
                       </select>
@@ -454,31 +456,31 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
                     {/* Guest info */}
                     <div className="flex items-start justify-between text-xs">
                       <div>
-                        <div className="font-sans font-semibold text-cream text-sm">
+                        <div className="font-sans font-semibold text-slate-900 dark:text-white text-sm">
                           {b.guestDetails?.fullName || 'Guest'}
                         </div>
-                        <div className="text-[11px] text-amber-200/80 font-mono">
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                           +91 {b.guestDetails?.phone}
                         </div>
                       </div>
 
                       <div className="text-right">
-                        <div className="font-bold text-cream text-sm">
+                        <div className="font-bold text-slate-900 dark:text-white text-sm">
                           {formatCurrency(b.totalAmount)}
                         </div>
-                        <div className="text-[10px] text-cream/50 capitalize">
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 capitalize">
                           {b.paymentStatus === 'paid' ? 'Paid Online' : 'Pay at Hotel'}
                         </div>
                       </div>
                     </div>
 
                     {/* Room and Dates */}
-                    <div className="p-2.5 bg-black/30 rounded-xl text-xs space-y-1">
+                    <div className="p-2.5 bg-slate-50 dark:bg-[#0B110E] border border-slate-100 dark:border-emerald-950/60 rounded-xl text-xs space-y-1">
                       <div className="flex items-center justify-between text-[11px]">
-                        <span className="font-serif font-bold text-cream">Room {b.roomNumber} ({b.roomName})</span>
-                        <span className="text-cream/60">{b.nights} {b.nights === 1 ? 'Night' : 'Nights'}</span>
+                        <span className="font-serif font-bold text-slate-900 dark:text-white">Room {b.roomNumber} ({b.roomName})</span>
+                        <span className="text-slate-500 dark:text-slate-400">{b.nights} {b.nights === 1 ? 'Night' : 'Nights'}</span>
                       </div>
-                      <div className="text-[10px] text-cream/60 flex items-center justify-between">
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
                         <span>{b.checkInDate} → {b.checkOutDate}</span>
                         <span>{b.adults} Ad / {b.children} Ch</span>
                       </div>
@@ -490,7 +492,7 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
                         <button
                           type="button"
                           onClick={() => onSelectBooking(b)}
-                          className="px-2.5 py-1.5 rounded-lg bg-cream/10 hover:bg-cream/20 text-cream text-[11px] flex items-center gap-1 min-h-[34px]"
+                          className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-[#0B110E] hover:bg-slate-200 dark:hover:bg-[#1a2820] text-slate-700 dark:text-slate-300 text-[11px] flex items-center gap-1 min-h-[34px]"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>Details</span>
@@ -498,7 +500,7 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
                         <button
                           type="button"
                           onClick={() => handleDownloadPDF(b)}
-                          className="px-2.5 py-1.5 rounded-lg bg-terracotta/80 hover:bg-terracotta text-cream text-[11px] flex items-center gap-1 min-h-[34px]"
+                          className="px-2.5 py-1.5 rounded-lg bg-[#047857] hover:bg-[#065f46] text-white text-[11px] flex items-center gap-1 min-h-[34px] shadow-xs"
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span>PDF</span>
@@ -506,7 +508,7 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
                         <button
                           type="button"
                           onClick={() => handlePrint(b)}
-                          className="px-2.5 py-1.5 rounded-lg bg-cream/15 hover:bg-cream/25 text-cream text-[11px] flex items-center gap-1 min-h-[34px]"
+                          className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-[#0B110E] hover:bg-slate-200 dark:hover:bg-[#1a2820] text-slate-700 dark:text-slate-300 text-[11px] flex items-center gap-1 min-h-[34px]"
                         >
                           <Printer className="w-3.5 h-3.5" />
                           <span>Print</span>
@@ -516,7 +518,7 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
                       <button
                         type="button"
                         onClick={() => onDeleteBooking(b.id)}
-                        className="p-1.5 rounded-lg hover:bg-red-950/60 text-red-400 hover:text-red-200 min-h-[34px] min-w-[34px] flex items-center justify-center"
+                        className="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/60 text-rose-500 hover:text-rose-700 min-h-[34px] min-w-[34px] flex items-center justify-center transition-colors"
                         title="Delete Record"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -530,178 +532,178 @@ export const AdminBookingsTab: React.FC<AdminBookingsTabProps> = ({
             {/* Desktop Table (Visible on md+) */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-xs font-mono">
-                <thead className="bg-black/40 border-b border-cream/15 text-[10px] uppercase tracking-wider text-cream/70">
+                <thead className="bg-slate-50/80 dark:bg-[#0B110E]/80 border-b border-slate-200/80 dark:border-emerald-950/80 text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   <tr>
                     <th className="py-3 px-4">Ref & Created</th>
                     <th className="py-3 px-4">Guest Information</th>
                     <th className="py-3 px-4">Suite</th>
                     <th className="py-3 px-4">Stay Dates</th>
-                  <th className="py-3 px-4">Total Amount</th>
-                  <th className="py-3 px-4">Status & Action</th>
-                  <th className="py-3 px-4 text-right">Documents</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-cream/10 text-cream/90">
-                {filteredBookings.map((b) => {
-                  const isCancelled = b.status === 'cancelled'
-                  const isCheckedIn = b.status === 'checked_in'
-                  const isCheckedOut = b.status === 'checked_out'
+                    <th className="py-3 px-4">Total Amount</th>
+                    <th className="py-3 px-4">Status & Action</th>
+                    <th className="py-3 px-4 text-right">Documents</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-emerald-950/60 text-slate-800 dark:text-slate-200">
+                  {filteredBookings.map((b) => {
+                    const isCancelled = b.status === 'cancelled'
+                    const isCheckedIn = b.status === 'checked_in'
+                    const isCheckedOut = b.status === 'checked_out'
 
-                  return (
-                    <tr
-                      key={b.id}
-                      className="hover:bg-cream/5 transition-colors group"
-                    >
-                      {/* Booking Ref */}
-                      <td className="py-4 px-4 align-top">
-                        <div className="font-bold text-amber-200">
-                          {b.bookingReference}
-                        </div>
-                        <div className="text-[10px] text-cream/50 mt-0.5">
-                          {b.createdAt ? new Date(b.createdAt).toLocaleDateString('en-IN') : 'Direct'}
-                        </div>
-                      </td>
-
-                      {/* Guest Details */}
-                      <td className="py-4 px-4 align-top">
-                        <div className="font-sans font-semibold text-cream text-sm">
-                          {b.guestDetails?.fullName || 'Guest'}
-                        </div>
-                        <div className="text-[11px] text-amber-200/80 font-mono">
-                          +91 {b.guestDetails?.phone}
-                        </div>
-                        {b.guestDetails?.email && (
-                          <div className="text-[10px] text-cream/50 truncate max-w-[180px]">
-                            {b.guestDetails.email}
+                    return (
+                      <tr
+                        key={b.id}
+                        className="hover:bg-slate-50/80 dark:hover:bg-[#0B110E]/60 transition-colors group"
+                      >
+                        {/* Booking Ref */}
+                        <td className="py-4 px-4 align-top">
+                          <div className="font-bold text-[#047857] dark:text-emerald-400">
+                            {b.bookingReference}
                           </div>
-                        )}
-                      </td>
+                          <div className="text-[10px] text-slate-400 mt-0.5">
+                            {b.createdAt ? new Date(b.createdAt).toLocaleDateString('en-IN') : 'Direct'}
+                          </div>
+                        </td>
 
-                      {/* Room */}
-                      <td className="py-4 px-4 align-top">
-                        <div className="font-serif font-bold text-cream">
-                          Room {b.roomNumber}
-                        </div>
-                        <div className="text-[10px] text-cream/60 truncate max-w-[140px]">
-                          {b.roomName}
-                        </div>
-                      </td>
-
-                      {/* Stay Dates */}
-                      <td className="py-4 px-4 align-top">
-                        <div className="text-[11px] text-cream font-medium">
-                          {b.checkInDate} → {b.checkOutDate}
-                        </div>
-                        <div className="text-[10px] text-cream/60 mt-0.5">
-                          {b.nights} {b.nights === 1 ? 'Night' : 'Nights'} · {b.adults} Ad / {b.children} Ch
-                        </div>
-                      </td>
-
-                      {/* Financials */}
-                      <td className="py-4 px-4 align-top">
-                        <div className="font-bold text-cream text-sm">
-                          {formatCurrency(b.totalAmount)}
-                        </div>
-                        <div className="text-[10px] text-cream/50 capitalize">
-                          {b.paymentStatus === 'paid' ? 'Paid Online' : 'Pay at Check-in'}
-                        </div>
-                      </td>
-
-                      {/* Status Selector */}
-                      <td className="py-4 px-4 align-top">
-                        <div className="space-y-1.5">
-                          <select
-                            value={b.status}
-                            disabled={isUpdatingId === b.id}
-                            onChange={(e) =>
-                              handleStatusSelect(
-                                b,
-                                e.target.value as 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled'
-                              )
-                            }
-                            className={`px-2.5 py-1 rounded-xl text-[10px] font-mono font-bold uppercase border cursor-pointer focus:outline-none ${
-                              isCancelled
-                                ? 'bg-red-500/20 text-red-200 border-red-500/40'
-                                : isCheckedIn
-                                ? 'bg-blue-500/20 text-blue-200 border-blue-400/40'
-                                : isCheckedOut
-                                ? 'bg-gray-500/20 text-gray-300 border-gray-400/40'
-                                : 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40'
-                            }`}
-                          >
-                            <option value="confirmed" className="bg-[#16251C] text-emerald-300">
-                              Confirmed
-                            </option>
-                            <option value="checked_in" className="bg-[#16251C] text-blue-300">
-                              Checked In
-                            </option>
-                            <option value="checked_out" className="bg-[#16251C] text-gray-300">
-                              Checked Out
-                            </option>
-                            <option value="cancelled" className="bg-[#16251C] text-red-300">
-                              Cancelled (Release Room)
-                            </option>
-                          </select>
-
-                          {isUpdatingId === b.id && (
-                            <span className="block text-[9px] text-amber-200 animate-pulse">
-                              Syncing status...
-                            </span>
+                        {/* Guest Details */}
+                        <td className="py-4 px-4 align-top">
+                          <div className="font-sans font-semibold text-slate-900 dark:text-white text-sm">
+                            {b.guestDetails?.fullName || 'Guest'}
+                          </div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                            +91 {b.guestDetails?.phone}
+                          </div>
+                          {b.guestDetails?.email && (
+                            <div className="text-[10px] text-slate-400 truncate max-w-[180px]">
+                              {b.guestDetails.email}
+                            </div>
                           )}
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* Document Actions */}
-                      <td className="py-4 px-4 align-top text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          {/* Details */}
-                          <button
-                            type="button"
-                            onClick={() => onSelectBooking(b)}
-                            className="p-1.5 rounded-lg bg-cream/10 hover:bg-cream/20 text-cream transition-colors"
-                            title="Inspect Reservation Details"
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                          </button>
+                        {/* Room */}
+                        <td className="py-4 px-4 align-top">
+                          <div className="font-serif font-bold text-slate-900 dark:text-white">
+                            Room {b.roomNumber}
+                          </div>
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate max-w-[140px]">
+                            {b.roomName}
+                          </div>
+                        </td>
 
-                          {/* PDF Tax Bill */}
-                          <button
-                            type="button"
-                            onClick={() => handleDownloadPDF(b)}
-                            className="p-1.5 rounded-lg bg-terracotta/80 hover:bg-terracotta text-cream transition-colors"
-                            title="Download PDF Tax Bill"
-                          >
-                            <Download className="w-3.5 h-3.5" />
-                          </button>
+                        {/* Stay Dates */}
+                        <td className="py-4 px-4 align-top">
+                          <div className="text-[11px] text-slate-900 dark:text-white font-medium">
+                            {b.checkInDate} → {b.checkOutDate}
+                          </div>
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                            {b.nights} {b.nights === 1 ? 'Night' : 'Nights'} · {b.adults} Ad / {b.children} Ch
+                          </div>
+                        </td>
 
-                          {/* Print Invoice */}
-                          <button
-                            type="button"
-                            onClick={() => handlePrint(b)}
-                            className="p-1.5 rounded-lg bg-cream/15 hover:bg-cream/25 text-cream transition-colors"
-                            title="Print Tax Invoice"
-                          >
-                            <Printer className="w-3.5 h-3.5" />
-                          </button>
+                        {/* Financials */}
+                        <td className="py-4 px-4 align-top">
+                          <div className="font-bold text-slate-900 dark:text-white text-sm">
+                            {formatCurrency(b.totalAmount)}
+                          </div>
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400 capitalize">
+                            {b.paymentStatus === 'paid' ? 'Paid Online' : 'Pay at Check-in'}
+                          </div>
+                        </td>
 
-                          {/* Delete permanently */}
-                          <button
-                            type="button"
-                            onClick={() => onDeleteBooking(b.id)}
-                            className="p-1.5 rounded-lg hover:bg-red-950/60 text-red-400 hover:text-red-200 transition-colors"
-                            title="Delete Record"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </>
+                        {/* Status Selector */}
+                        <td className="py-4 px-4 align-top">
+                          <div className="space-y-1.5">
+                            <select
+                              value={b.status}
+                              disabled={isUpdatingId === b.id}
+                              onChange={(e) =>
+                                handleStatusSelect(
+                                  b,
+                                  e.target.value as 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled'
+                                )
+                              }
+                              className={`px-2.5 py-1 rounded-xl text-[10px] font-mono font-bold uppercase border cursor-pointer focus:outline-none ${
+                                isCancelled
+                                  ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800/80'
+                                  : isCheckedIn
+                                  ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/80'
+                                  : isCheckedOut
+                                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                                  : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/80'
+                              }`}
+                            >
+                              <option value="confirmed" className="bg-white dark:bg-[#131D17] text-emerald-700 dark:text-emerald-300">
+                                Confirmed
+                              </option>
+                              <option value="checked_in" className="bg-white dark:bg-[#131D17] text-blue-700 dark:text-blue-300">
+                                Checked In
+                              </option>
+                              <option value="checked_out" className="bg-white dark:bg-[#131D17] text-slate-700 dark:text-slate-300">
+                                Checked Out
+                              </option>
+                              <option value="cancelled" className="bg-white dark:bg-[#131D17] text-rose-700 dark:text-rose-300">
+                                Cancelled (Release Room)
+                              </option>
+                            </select>
+
+                            {isUpdatingId === b.id && (
+                              <span className="block text-[9px] text-[#047857] dark:text-emerald-400 animate-pulse">
+                                Syncing status...
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Document Actions */}
+                        <td className="py-4 px-4 align-top text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            {/* Details */}
+                            <button
+                              type="button"
+                              onClick={() => onSelectBooking(b)}
+                              className="p-1.5 rounded-lg bg-slate-100 dark:bg-[#0B110E] hover:bg-slate-200 dark:hover:bg-[#1a2820] text-slate-700 dark:text-slate-300 transition-colors"
+                              title="Inspect Reservation Details"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* PDF Tax Bill */}
+                            <button
+                              type="button"
+                              onClick={() => handleDownloadPDF(b)}
+                              className="p-1.5 rounded-lg bg-[#047857] hover:bg-[#065f46] text-white shadow-xs transition-colors"
+                              title="Download PDF Tax Bill"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* Print Invoice */}
+                            <button
+                              type="button"
+                              onClick={() => handlePrint(b)}
+                              className="p-1.5 rounded-lg bg-slate-100 dark:bg-[#0B110E] hover:bg-slate-200 dark:hover:bg-[#1a2820] text-slate-700 dark:text-slate-300 transition-colors"
+                              title="Print Tax Invoice"
+                            >
+                              <Printer className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* Delete permanently */}
+                            <button
+                              type="button"
+                              onClick={() => onDeleteBooking(b.id)}
+                              className="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/60 text-rose-500 hover:text-rose-700 transition-colors"
+                              title="Delete Record"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>

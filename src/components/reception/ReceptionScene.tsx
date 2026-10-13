@@ -17,6 +17,8 @@ import {
 import { PanoramaViewer } from '../panorama/PanoramaViewer'
 import { GuestAccountButton } from '@/components/auth'
 import { useAuth } from '@/context/AuthContext'
+import { useLanguage } from '@/context/LanguageContext'
+import { LanguageSelector } from '@/components/common/LanguageSelector'
 
 interface BookingDates {
   checkIn: string
@@ -32,14 +34,11 @@ interface ReceptionSceneProps {
   initialMode?: 'desk-photo' | '360-lobby'
 }
 
-const RECEPTIONIST_AUDIO_PATH =
-  '/audio/ElevenLabs_2026-10-09T05_21_42_Anika%20-%20Marathi%20Customer%20Care%20Agent_pvc_sp100_s50_sb75_v4.mp3'
-const RECEPTIONIST_AUDIO_FALLBACK = '/audio/receptionist-voice.mp3'
-
 /**
  * STAGE 2: Grand Lobby & Reception Scene
  * Styled with direct reference to Renoos Hotel Resort Welcome:
- * - Plays authentic high-fidelity receptionist greeting audio on customer arrival
+ * - Plays authentic high-fidelity multilingual receptionist voice audio on arrival
+ * - Seamless language selector for English, मराठी (Marathi), and हिंदी (Hindi)
  * - Modern luxury resort lobby with curved Calacatta marble counter and vertical timber fluting
  * - Real photographic presentation of the reception desk
  * - Floating transparent/frosted-glass concierge interface (translucent cream/forest glass)
@@ -54,6 +53,17 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
   const { user, isAuthenticated, setIsAuthModalOpen, setIsBookingsModalOpen, userBookings } =
     useAuth()
 
+  const {
+    language,
+    isPlaying: isAudioPlaying,
+    currentText,
+    playAudio,
+    togglePlayPause,
+    replayAudio,
+    stopAudio,
+    getText,
+  } = useLanguage()
+
   // Mode: Front Desk View (Matching Reference Photo) vs 360° Grand Lobby Tour
   const [receptionMode, setReceptionMode] = useState<'desk-photo' | '360-lobby'>(initialMode)
 
@@ -61,96 +71,22 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
   // 'greeting' -> 'dates' -> 'free-explore' (minimized)
   const [viewState, setViewState] = useState<'greeting' | 'dates' | 'free-explore'>('free-explore')
 
-  // Receptionist Audio State & Controller
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const [isAudioPlaying, setIsAudioPlaying] = useState<boolean>(false)
+  // Play welcome greeting once upon entering the reception
+  const hasGreetedRef = useRef(false)
 
   useEffect(() => {
-    // Instantiate audio object with the customer receptionist voice file
-    const audio = new Audio(RECEPTIONIST_AUDIO_PATH)
-    audio.preload = 'auto'
-    audioRef.current = audio
-
-    const onPlay = () => setIsAudioPlaying(true)
-    const onPause = () => setIsAudioPlaying(false)
-    const onEnded = () => setIsAudioPlaying(false)
-    const onError = () => {
-      // Fallback to alias if URL encoding has any edge case
-      if (audio.src.includes('ElevenLabs')) {
-        audio.src = RECEPTIONIST_AUDIO_FALLBACK
-        audio.play().catch(() => {})
-      }
+    if (!hasGreetedRef.current) {
+      hasGreetedRef.current = true
+      playAudio('welcome')
     }
-
-    audio.addEventListener('play', onPlay)
-    audio.addEventListener('pause', onPause)
-    audio.addEventListener('ended', onEnded)
-    audio.addEventListener('error', onError)
-
-    // Automatically speak the voice when any customer arrives at reception
-    const startPlayback = () => {
-      if (!audioRef.current) return
-      audioRef.current
-        .play()
-        .then(() => {
-          setIsAudioPlaying(true)
-        })
-        .catch((err) => {
-          console.log('Autoplay waiting for first customer interaction:', err)
-          // If browser restricts initial unprompted autoplay, play on very first touch/click
-          const unlockGesture = () => {
-            if (audioRef.current) {
-              audioRef.current
-                .play()
-                .then(() => setIsAudioPlaying(true))
-                .catch(() => {})
-            }
-            window.removeEventListener('click', unlockGesture)
-            window.removeEventListener('touchstart', unlockGesture)
-            window.removeEventListener('pointerdown', unlockGesture)
-          }
-
-          window.addEventListener('click', unlockGesture, { once: true })
-          window.addEventListener('touchstart', unlockGesture, { once: true })
-          window.addEventListener('pointerdown', unlockGesture, { once: true })
-        })
-    }
-
-    startPlayback()
 
     return () => {
-      audio.removeEventListener('play', onPlay)
-      audio.removeEventListener('pause', onPause)
-      audio.removeEventListener('ended', onEnded)
-      audio.removeEventListener('error', onError)
-      audio.pause()
-      audio.currentTime = 0
-      audioRef.current = null
+      stopAudio()
     }
-  }, [])
-
-  const toggleVoicePlayback = () => {
-    if (!audioRef.current) return
-    if (isAudioPlaying) {
-      audioRef.current.pause()
-    } else {
-      if (audioRef.current.ended) {
-        audioRef.current.currentTime = 0
-      }
-      audioRef.current.play().catch(console.error)
-    }
-  }
-
-  const replayVoice = () => {
-    if (!audioRef.current) return
-    audioRef.current.currentTime = 0
-    audioRef.current.play().catch(console.error)
-  }
+  }, [playAudio, stopAudio])
 
   const handleBackToExterior = () => {
-    if (audioRef.current) {
-      audioRef.current.pause()
-    }
+    stopAudio()
     onBackToExterior()
   }
 
@@ -193,6 +129,53 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
     }
   }, [checkInDate, checkOutDate])
 
+  // Timer for triggering guestCount prompt after selecting date
+  const guestPromptTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const triggerGuestCountPrompt = () => {
+    if (guestPromptTimeoutRef.current) {
+      clearTimeout(guestPromptTimeoutRef.current)
+    }
+    guestPromptTimeoutRef.current = setTimeout(() => {
+      playAudio('guestCount')
+    }, 600)
+  }
+
+  // When viewing reservation dates, prompt the user to select dates
+  useEffect(() => {
+    if (viewState === 'dates') {
+      playAudio('selectDates')
+    }
+  }, [viewState, playAudio])
+
+  useEffect(() => {
+    return () => {
+      if (guestPromptTimeoutRef.current) {
+        clearTimeout(guestPromptTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  const handleCheckInChange = (newDateStr: string) => {
+    setCheckInDate(newDateStr)
+    try {
+      const dIn = new Date(newDateStr).getTime()
+      const dOut = new Date(checkOutDate).getTime()
+      if (dOut <= dIn) {
+        const nextDay = new Date(dIn + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        setCheckOutDate(nextDay)
+      }
+    } catch {
+      // keep current checkOutDate
+    }
+    triggerGuestCountPrompt()
+  }
+
+  const handleCheckOutChange = (newDateStr: string) => {
+    setCheckOutDate(newDateStr)
+    triggerGuestCountPrompt()
+  }
+
   // Format date in Indian readable format (e.g. 14 Oct 2026)
   const formatIndianDate = (dateStr: string) => {
     try {
@@ -210,9 +193,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
 
   // Handle continuing to Room Preview
   const handleContinue = (_targetRoomId?: string) => {
-    if (audioRef.current) {
-      audioRef.current.pause()
-    }
+    stopAudio()
     if (nights <= 0) return
     onContinueToRoomPreview({
       checkIn: checkInDate,
@@ -225,12 +206,12 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
   // 360° Grand Lobby Configuration
   const lobbyPanoramaConfig = useMemo(
     () => ({
-      imageSrc: '/images/Luxury Mountain Resort Lobby.png',
+      imageSrc: '/images/Gemini_Generated_Image_w07y9ew07y9ew07y.png',
       aspectRatio: '2:1' as const,
-      initialFov: 82,
-      minFov: 42,
-      maxFov: 105,
-      initialPitch: -4,
+      initialFov: 85,
+      minFov: 48,
+      maxFov: 98,
+      initialPitch: -5,
       initialYaw: 180,
       isPlaceholder: false,
       isAvailable: true,
@@ -269,7 +250,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
       {receptionMode === 'desk-photo' ? (
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
-            src="/images/Luxury Mountain Resort Lobby.png"
+            src="/images/Gemini_Generated_Image_w07y9ew07y9ew07y.png"
             alt="Renoos Hotel Front Desk Receptionist and Grand Lobby"
             className="w-full h-full object-cover object-center filter brightness-100 contrast-105"
           />
@@ -284,7 +265,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                 type="button"
                 onClick={() => {
                   setViewState('greeting')
-                  replayVoice()
+                  playAudio('welcome', true)
                 }}
                 className="group flex flex-col items-center gap-1 sm:gap-1.5 cursor-pointer transition-all transform hover:scale-105 active:scale-95"
                 aria-label="Welcome Menu"
@@ -303,7 +284,10 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
             <div className="absolute top-[52%] sm:top-[54%] left-[72%] sm:left-[62%] -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
               <button
                 type="button"
-                onClick={() => setViewState('dates')}
+                onClick={() => {
+                  setViewState('dates')
+                  playAudio('selectDates')
+                }}
                 className="group flex flex-col items-center gap-1 sm:gap-1.5 cursor-pointer transition-all transform hover:scale-105 active:scale-95"
                 aria-label="Book a Suite"
               >
@@ -327,16 +311,20 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
             onHotspotClick={(hs) => {
               if (hs.id === 'hs-lobby-welcome') {
                 setViewState('greeting')
-                replayVoice()
+                playAudio('welcome', true)
                 return true
               }
               if (hs.id === 'hs-lobby-book' || hs.targetSpaceId === 'dates') {
                 setViewState('dates')
+                playAudio('selectDates')
                 return true
               }
               return false
             }}
-            onNavigateSpace={() => setViewState('dates')}
+            onNavigateSpace={() => {
+              setViewState('dates')
+              playAudio('selectDates')
+            }}
             hideHotspotList={true}
             hideInternalHeader={true}
             bottomBarOffsetClass="bottom-28 sm:bottom-20"
@@ -376,12 +364,15 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
           </div>
         </div>
 
-        {/* View Mode Toggle: Voice Audio, Front Desk Photo vs 360° Lobby Tour & Guest Account */}
-        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+        {/* View Mode Toggle: Language Selector, Voice Audio, Front Desk Photo vs 360° Lobby Tour & Guest Account */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          {/* Multilingual Selector (English, मराठी, हिंदी) */}
+          <LanguageSelector variant="compact" />
+
           {/* Receptionist Voice Play/Pause Audio Button */}
           <button
             type="button"
-            onClick={toggleVoicePlayback}
+            onClick={togglePlayPause}
             className={`flex items-center gap-1 sm:gap-1.5 p-2 sm:px-3 sm:py-1.5 rounded-full border text-[11px] sm:text-xs font-mono transition-all cursor-pointer shadow-md min-h-[34px] min-w-[34px] justify-center shrink-0 ${
               isAudioPlaying
                 ? 'bg-emerald-500/25 border-emerald-400/50 text-emerald-200'
@@ -390,14 +381,14 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
             title={
               isAudioPlaying
                 ? 'Receptionist Voice is Playing (Click to Pause)'
-                : 'Play Receptionist Voice Welcome (मराठी)'
+                : 'Play / Replay Receptionist Voice'
             }
             aria-label="Toggle Receptionist Voice Audio"
           >
             <Volume2 className={`w-3.5 h-3.5 ${isAudioPlaying ? 'text-emerald-300 animate-pulse' : 'text-amber-300'}`} />
             {isAudioPlaying ? (
               <>
-                <span className="hidden md:inline">Voice Playing</span>
+                <span className="hidden md:inline">Speaking</span>
                 <span className="hidden sm:flex items-center gap-0.5">
                   <span className="w-1 h-2 bg-emerald-400 animate-pulse rounded-full" />
                   <span className="w-1 h-3 bg-emerald-300 animate-pulse delay-75 rounded-full" />
@@ -456,63 +447,125 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                 <Sparkles className="w-5 h-5 text-amber-200" />
               </div>
               <span className="text-[10px] font-mono tracking-widest text-amber-200/80 uppercase mt-1">
-                Welcome to
+                {language === 'mr' ? 'स्वागत आहे' : language === 'hi' ? 'स्वागत है' : 'Welcome to'}
               </span>
               <h2 className="font-serif text-2xl sm:text-3xl text-cream font-medium tracking-tight">
                 Renoos Hotel
               </h2>
-              <p className="text-xs sm:text-sm text-cream/80 font-light mt-1">
-                Hello, and welcome to Renoos Hotel.
-                <br />
-                How can we help you today?
+              {isAuthenticated && user?.fullName ? (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/15 border border-amber-300/40 text-amber-200 text-xs font-mono my-1">
+                  <User className="w-3.5 h-3.5" />
+                  <span>
+                    {language === 'mr'
+                      ? `स्वागत आहे, ${user.fullName}!`
+                      : language === 'hi'
+                      ? `स्वागत है, ${user.fullName}!`
+                      : `Welcome, ${user.fullName}!`}
+                  </span>
+                </div>
+              ) : null}
+              <p className="text-xs sm:text-sm text-cream/90 font-light mt-1 max-w-sm">
+                {getText('welcome')}
               </p>
             </div>
 
-            {/* Receptionist Audio Greeting Bar */}
-            <div className="p-3 rounded-2xl bg-black/45 border border-amber-300/30 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                    isAudioPlaying
-                      ? 'bg-emerald-500/20 text-emerald-300'
-                      : 'bg-amber-400/20 text-amber-200'
-                  }`}
-                >
-                  <Volume2 className={`w-4 h-4 ${isAudioPlaying ? 'animate-pulse' : ''}`} />
+            {/* Language Selector Inside Concierge Card */}
+            <div className="flex justify-center pt-0.5">
+              <LanguageSelector variant="segmented" className="w-full justify-center" />
+            </div>
+
+            {/* Receptionist Audio Greeting Bar with Live Subtitles */}
+            <div className="p-3 sm:p-3.5 rounded-2xl bg-black/45 border border-amber-300/30 flex flex-col gap-2.5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                      isAudioPlaying
+                        ? 'bg-emerald-500/20 text-emerald-300'
+                        : 'bg-amber-400/20 text-amber-200'
+                    }`}
+                  >
+                    <Volume2 className={`w-4 h-4 ${isAudioPlaying ? 'animate-pulse' : ''}`} />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[11px] font-mono text-amber-200 block font-medium truncate">
+                      {isAudioPlaying ? 'Receptionist Speaking...' : 'Receptionist Voice Guide'}
+                    </span>
+                    <span className="text-[10px] text-cream/60 block truncate">
+                      {language === 'mr'
+                        ? 'मराठी स्वागत · Marathi Voice'
+                        : language === 'hi'
+                        ? 'हिंदी वार्तालाप · Hindi Voice'
+                        : 'English Greeting · Front Desk Voice'}
+                    </span>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <span className="text-[11px] font-mono text-amber-200 block font-medium truncate">
-                    {isAudioPlaying ? 'Receptionist Speaking...' : 'Receptionist Voice Welcome'}
-                  </span>
-                  <span className="text-[10px] text-cream/60 block truncate">
-                    मराठी स्वागत · Marathi Customer Care Voice
-                  </span>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={togglePlayPause}
+                    className="px-3 py-1.5 rounded-full bg-cream hover:bg-white text-[#16251C] text-xs font-mono font-semibold cursor-pointer shadow-sm transition-all"
+                  >
+                    {isAudioPlaying ? 'Pause' : 'Play'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => replayAudio()}
+                    title="Replay Voice"
+                    className="p-1.5 rounded-full bg-cream/15 hover:bg-cream/25 text-cream border border-cream/20 cursor-pointer transition-all"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={toggleVoicePlayback}
-                className="px-3 py-1.5 rounded-full bg-cream hover:bg-white text-[#16251C] text-xs font-mono font-semibold shrink-0 cursor-pointer shadow-sm transition-all"
-              >
-                {isAudioPlaying ? 'Pause' : 'Play / Replay'}
-              </button>
+
+              {/* Spoken Subtitle Caption Box */}
+              {currentText && (
+                <div className="p-2.5 rounded-xl bg-[#111c14]/80 border border-emerald-400/20 text-xs font-serif text-cream/95 leading-relaxed">
+                  <div className="flex items-center gap-1.5 mb-1 text-[9px] font-mono text-emerald-300 uppercase tracking-wider">
+                    <Sparkles className="w-2.5 h-2.5" />
+                    <span>Spoken Script ({language.toUpperCase()})</span>
+                  </div>
+                  <p className="italic">"{currentText}"</p>
+                </div>
+              )}
             </div>
 
             {/* Action Buttons: Matching Reference Image Style */}
-            <div className="space-y-2.5 pt-1">
+            <div className="space-y-2 pt-1">
               {/* Primary Action Button: Book a Room */}
               <button
                 type="button"
-                onClick={() => setViewState('dates')}
-                className="w-full py-3.5 px-5 rounded-2xl bg-[#1E3325] hover:bg-[#254230] text-cream border border-emerald-400/30 shadow-lg flex items-center justify-between transition-all duration-300 transform hover:scale-[1.01] cursor-pointer group"
+                onClick={() => {
+                  setViewState('dates')
+                  playAudio('selectDates')
+                }}
+                className="w-full py-3 sm:py-3.5 px-5 rounded-2xl bg-[#1E3325] hover:bg-[#254230] text-cream border border-emerald-400/30 shadow-lg flex items-center justify-between transition-all duration-300 transform hover:scale-[1.01] cursor-pointer group"
               >
                 <div className="flex items-center gap-2.5">
                   <Calendar className="w-4 h-4 text-emerald-300" />
                   <span className="text-xs uppercase tracking-wider font-semibold font-mono">
-                    Book a Room
+                    {language === 'mr' ? 'रूम बुक करा (Book a Room)' : language === 'hi' ? 'कमरा बुक करें (Book a Room)' : 'Book a Room'}
                   </span>
                 </div>
                 <ArrowRight className="w-4 h-4 text-cream/80 group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              {/* Assistance / Help Button */}
+              <button
+                type="button"
+                onClick={() => playAudio('help', true)}
+                className="w-full py-2.5 px-5 rounded-2xl bg-amber-400/10 hover:bg-amber-400/20 text-amber-100 border border-amber-300/30 shadow-sm flex items-center justify-between transition-all text-xs font-mono group cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Sparkles className="w-4 h-4 text-amber-300" />
+                  <span>
+                    {language === 'mr' ? 'मदत हवी आहे का?' : language === 'hi' ? 'मदद चाहिए?' : 'Need Assistance?'}
+                  </span>
+                </div>
+                <span className="text-[10px] text-amber-300/80 uppercase tracking-widest font-mono">
+                  Voice Guide →
+                </span>
               </button>
 
               {/* Guest Portal Action: Reservations or Sign In */}
@@ -520,7 +573,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsBookingsModalOpen(true)}
-                  className="w-full py-3 px-5 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-100 border border-amber-300/30 shadow-md flex items-center justify-between transition-all text-xs font-mono group cursor-pointer"
+                  className="w-full py-2.5 px-5 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-100 border border-amber-300/30 shadow-md flex items-center justify-between transition-all text-xs font-mono group cursor-pointer"
                 >
                   <div className="flex items-center gap-2.5">
                     <User className="w-4 h-4 text-amber-300" />
@@ -534,7 +587,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsAuthModalOpen(true)}
-                  className="w-full py-3 px-5 rounded-2xl bg-white/10 hover:bg-white/15 text-cream border border-white/20 shadow-md flex items-center justify-between transition-all text-xs font-mono group cursor-pointer"
+                  className="w-full py-2.5 px-5 rounded-2xl bg-white/10 hover:bg-white/15 text-cream border border-white/20 shadow-md flex items-center justify-between transition-all text-xs font-mono group cursor-pointer"
                 >
                   <div className="flex items-center gap-2.5">
                     <LogIn className="w-4 h-4 text-amber-200" />
@@ -547,12 +600,17 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
               {/* Secondary Action Button: Explore the Sanctuary */}
               <button
                 type="button"
-                onClick={() => setViewState('free-explore')}
-                className="w-full py-3 px-5 rounded-2xl bg-white/10 hover:bg-white/15 text-cream border border-white/20 shadow-md flex items-center justify-between transition-all text-xs font-mono group cursor-pointer"
+                onClick={() => {
+                  setViewState('free-explore')
+                  playAudio('exploreHotel')
+                }}
+                className="w-full py-2.5 px-5 rounded-2xl bg-white/10 hover:bg-white/15 text-cream border border-white/20 shadow-md flex items-center justify-between transition-all text-xs font-mono group cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
                   <Leaf className="w-4 h-4 text-amber-200" />
-                  <span className="tracking-wider">Explore the Sanctuary</span>
+                  <span className="tracking-wider">
+                    {language === 'mr' ? 'हॉटेल एक्सप्लोर करा' : language === 'hi' ? 'होटल एक्सप्लोर करें' : 'Explore the Sanctuary'}
+                  </span>
                 </div>
                 <ArrowRight className="w-4 h-4 text-cream/70 group-hover:translate-x-1 transition-transform" />
               </button>
@@ -573,14 +631,32 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                   Select Check-in & Check-out
                 </h3>
               </div>
-              <button
-                type="button"
-                onClick={() => setViewState('greeting')}
-                className="text-xs font-mono text-cream/70 hover:text-cream px-2.5 py-1 rounded-full bg-cream/10 border border-cream/15 cursor-pointer"
-              >
-                ← Back
-              </button>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => replayAudio()}
+                  title="Replay Voice Prompt"
+                  className="p-1.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream border border-cream/15 cursor-pointer transition-all"
+                >
+                  <Volume2 className={`w-3.5 h-3.5 ${isAudioPlaying ? 'text-emerald-300 animate-pulse' : 'text-amber-200'}`} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewState('greeting')}
+                  className="text-xs font-mono text-cream/70 hover:text-cream px-2.5 py-1 rounded-full bg-cream/10 border border-cream/15 cursor-pointer"
+                >
+                  ← Back
+                </button>
+              </div>
             </div>
+
+            {/* Live Receptionist Voice Subtitle Pill */}
+            {currentText && (
+              <div className="p-2.5 rounded-2xl bg-black/45 border border-emerald-400/25 flex items-center gap-2.5 text-xs font-serif text-cream/95 shadow-inner">
+                <Volume2 className="w-4 h-4 text-emerald-300 shrink-0 animate-pulse" />
+                <span className="italic leading-snug">"{currentText}"</span>
+              </div>
+            )}
 
             {/* Date Pickers Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 pt-1">
@@ -593,7 +669,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                   type="date"
                   value={checkInDate}
                   min={new Date().toISOString().split('T')[0]}
-                  onChange={(e) => setCheckInDate(e.target.value)}
+                  onChange={(e) => handleCheckInChange(e.target.value)}
                   className="w-full bg-transparent text-cream text-xs font-mono outline-none cursor-pointer"
                 />
                 <span className="text-[11px] font-serif text-amber-200 block font-medium">
@@ -610,7 +686,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                   type="date"
                   value={checkOutDate}
                   min={checkInDate}
-                  onChange={(e) => setCheckOutDate(e.target.value)}
+                  onChange={(e) => handleCheckOutChange(e.target.value)}
                   className="w-full bg-transparent text-cream text-xs font-mono outline-none cursor-pointer"
                 />
                 <span className="text-[11px] font-serif text-amber-200 block font-medium">
@@ -641,7 +717,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                   <button
                     type="button"
                     onClick={() => setAdults(Math.max(1, adults - 1))}
-                    className="w-8 h-8 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer active:scale-95 transition-all"
                     aria-label="Decrease adults"
                   >
                     -
@@ -650,7 +726,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                   <button
                     type="button"
                     onClick={() => setAdults(Math.min(4, adults + 1))}
-                    className="w-8 h-8 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer active:scale-95 transition-all"
                     aria-label="Increase adults"
                   >
                     +
@@ -670,7 +746,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                   <button
                     type="button"
                     onClick={() => setChildren(Math.max(0, children - 1))}
-                    className="w-8 h-8 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer active:scale-95 transition-all"
                     aria-label="Decrease children"
                   >
                     -
@@ -679,7 +755,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
                   <button
                     type="button"
                     onClick={() => setChildren(Math.min(3, children + 1))}
-                    className="w-8 h-8 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-cream/15 text-cream flex items-center justify-center text-xs font-mono hover:bg-cream/25 cursor-pointer active:scale-95 transition-all"
                     aria-label="Increase children"
                   >
                     +
@@ -722,7 +798,7 @@ export const ReceptionScene: React.FC<ReceptionSceneProps> = ({
               type="button"
               onClick={() => {
                 setViewState('greeting')
-                replayVoice()
+                replayAudio()
               }}
               className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-[#18261E]/95 hover:bg-[#18261E] text-cream text-[11px] sm:text-xs font-mono border border-cream/25 flex items-center gap-1.5 shadow-2xl transition-all active:scale-95 cursor-pointer backdrop-blur-md"
             >

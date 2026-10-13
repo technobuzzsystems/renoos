@@ -108,6 +108,17 @@ export async function handleApiRequest(
     return false
   }
 
+  // Health check endpoint for load balancers & container monitors
+  if (req.method === 'GET' && (pathname === '/api/health' || pathname === '/api/ping')) {
+    sendJson(res, 200, {
+      status: 'healthy',
+      service: 'Renoos Hotel PMS',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+    })
+    return true
+  }
+
   try {
     // =============================================================
     // ADMIN ROUTES: RENOOS HOTEL PMS MANAGEMENT
@@ -500,14 +511,10 @@ export async function handleApiRequest(
         userId,
         checkInDate,
         checkOutDate,
-        nights,
         adults,
         children = 0,
         tariffPerNight,
-        subtotal,
         discount = 0,
-        taxesAndGst,
-        totalAmount,
         guestDetails,
         paymentMethod = 'credit_card',
         paymentStatus = 'paid',
@@ -544,6 +551,28 @@ export async function handleApiRequest(
         return true
       }
 
+      // 1. Trusted nights calculation from validated ISO dates
+      const dIn = new Date(String(checkInDate)).getTime()
+      const dOut = new Date(String(checkOutDate)).getTime()
+      const calculatedNights = Math.max(1, Math.ceil((dOut - dIn) / (1000 * 60 * 60 * 24)))
+
+      // 2. Guest count normalization & bounds check
+      const validAdults = Math.max(1, Math.min(10, Number(adults) || 1))
+      const validChildren = Math.max(0, Math.min(10, Number(children) || 0))
+
+      // 3. Trusted room tariff from server-side room configuration
+      const roomConfigs = getRoomsConfig()
+      const cleanRoomNum = String(roomNumber || roomId).replace(/^room-/, '')
+      const matchedConfig = roomConfigs.find((c) => c.roomNumber === cleanRoomNum)
+      const trustedTariff = matchedConfig?.baseTariff || Number(tariffPerNight) || 5200
+
+      // 4. Trusted financial calculation (subtotal, promotional discount, GST taxes)
+      const calculatedSubtotal = trustedTariff * calculatedNights
+      const trustedDiscount = Number(discount) > 0 ? Number(discount) : Math.round(calculatedSubtotal * 0.1)
+      const taxableAmount = Math.max(0, calculatedSubtotal - trustedDiscount)
+      const calculatedTaxesAndGst = Math.round(taxableAmount * 0.12) // 12% standard hotel GST
+      const calculatedTotal = taxableAmount + calculatedTaxesAndGst
+
       try {
         const result = createBooking({
           userId: userId ? String(userId) : undefined,
@@ -552,14 +581,14 @@ export async function handleApiRequest(
           roomName: String(roomName || `Room ${roomId}`),
           checkInDate: String(checkInDate),
           checkOutDate: String(checkOutDate),
-          nights: Number(nights) || 1,
-          adults: Number(adults) || 1,
-          children: Number(children) || 0,
-          tariffPerNight: Number(tariffPerNight) || 0,
-          subtotal: Number(subtotal) || 0,
-          discount: Number(discount) || 0,
-          taxesAndGst: Number(taxesAndGst) || 0,
-          totalAmount: Number(totalAmount) || 0,
+          nights: calculatedNights,
+          adults: validAdults,
+          children: validChildren,
+          tariffPerNight: trustedTariff,
+          subtotal: calculatedSubtotal,
+          discount: trustedDiscount,
+          taxesAndGst: calculatedTaxesAndGst,
+          totalAmount: calculatedTotal,
           guestDetails: {
             fullName: String(guestFullName),
             email: String(guestDetails.email || ''),

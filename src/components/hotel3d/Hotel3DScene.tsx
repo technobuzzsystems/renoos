@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { PanoramaViewer } from '../panorama/PanoramaViewer'
 import { GuestAccountButton } from '@/components/auth'
+import { LanguageSelector } from '@/components/common/LanguageSelector'
 import { ESTATE_GARDEN_DATA } from '@/data/rooms'
 
 export type OutdoorArea = 'entrance' | 'garden'
@@ -166,7 +167,7 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({
   // 1. Hotel Exterior Grand Entrance 360° Panorama
   const entrancePanoramaConfig = useMemo(
     () => ({
-      imageSrc: '/images/Renos Hotel at Golden Hour.png',
+      imageSrc: '/panoramas/hotel/Tropical Sunset Resort Entrance.png',
       aspectRatio: '2:1' as const,
       initialFov: 90,
       minFov: 40,
@@ -204,7 +205,7 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({
   const gardenPanoramaConfig = useMemo(() => {
     return (
       ESTATE_GARDEN_DATA.panorama || {
-        imageSrc: '/panoramas/garden/garden.jpg',
+        imageSrc: '/panoramas/garden/garden.png',
         aspectRatio: '2:1' as const,
         initialFov: 82,
         minFov: 40,
@@ -406,6 +407,9 @@ export const Hotel3DScene: React.FC<Hotel3DSceneProps> = ({
               <span className="sm:hidden">Entrance</span>
             </button>
           )}
+
+          {/* Language Selector */}
+          <LanguageSelector variant="compact" />
 
           {/* Guest Account / Portal Trigger */}
           <GuestAccountButton variant="dark" />

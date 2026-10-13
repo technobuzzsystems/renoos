@@ -59,7 +59,7 @@ export const Gallery: React.FC<GalleryProps> = ({ images, title = 'Suite Gallery
               loading="lazy"
               onError={(e) => {
                 e.currentTarget.onerror = null
-                e.currentTarget.src = '/IMG/203/kitchen.avif'
+                e.currentTarget.src = '/IMG/203/BEDROOM1.avif'
               }}
               className="w-full h-full object-cover object-center group-hover:scale-[1.03] transition-transform duration-700 ease-out"
             />
@@ -127,7 +127,7 @@ export const Gallery: React.FC<GalleryProps> = ({ images, title = 'Suite Gallery
                 alt={images[activeModalIndex].alt}
                 onError={(e) => {
                   e.currentTarget.onerror = null
-                  e.currentTarget.src = '/IMG/203/kitchen.avif'
+                  e.currentTarget.src = '/IMG/203/BEDROOM1.avif'
                 }}
                 className="max-h-[68vh] w-auto max-w-full object-contain"
               />

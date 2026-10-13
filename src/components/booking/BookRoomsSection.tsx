@@ -90,7 +90,7 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
   }, [initialChildren])
 
   // Filters & Sorting
-  const [categoryFilter, setCategoryFilter] = useState<'All' | 'Deluxe' | 'Premium' | 'Executive'>('All')
+  const [categoryFilter, setCategoryFilter] = useState<'All' | 'Deluxe' | 'Premium' | 'Executive' | 'Presidential' | 'Bohemian'>('All')
   const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'area-desc'>('featured')
 
   // Selected Room for Preview on the Right
@@ -128,6 +128,8 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
     '201': { available: true },
     '202': { available: true },
     '203': { available: true },
+    '204': { available: true },
+    '205': { available: true },
   })
 
   const refreshAvailability = async () => {
@@ -399,7 +401,7 @@ export const BookRoomsSection: React.FC<BookRoomsSectionProps> = ({
           <div className="pt-2 border-t border-[#E9E4DB] flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs text-charcoal-muted uppercase font-mono mr-1">Filter:</span>
-              {(['All', 'Deluxe', 'Premium', 'Executive'] as const).map((cat) => (
+              {(['All', 'Deluxe', 'Premium', 'Executive', 'Presidential', 'Bohemian'] as const).map((cat) => (
                 <button
                   key={cat}
                   type="button"

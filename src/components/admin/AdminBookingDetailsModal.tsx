@@ -128,27 +128,27 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
   const isCheckedIn = booking.status === 'checked_in'
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
       <div
-        className="relative w-full max-w-2xl max-h-[96dvh] sm:max-h-[90vh] bg-[#16251C] border border-cream/20 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-cream"
+        className="relative w-full max-w-2xl max-h-[96dvh] sm:max-h-[90vh] bg-white dark:bg-[#131D17] border border-slate-200/80 dark:border-emerald-950/80 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-slate-800 dark:text-slate-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Accent */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-emerald-600 via-amber-300 to-terracotta shrink-0" />
+        <div className="h-1.5 w-full bg-gradient-to-r from-[#047857] via-[#059669] to-[#10b981] shrink-0" />
 
         {/* Header */}
-        <div className="p-4 sm:p-6 pb-3 sm:pb-4 flex items-center justify-between border-b border-cream/15 shrink-0">
+        <div className="p-4 sm:p-6 pb-3 sm:pb-4 flex items-center justify-between border-b border-slate-100 dark:border-emerald-950/60 shrink-0">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] sm:text-xs font-mono uppercase tracking-widest text-amber-200 font-semibold">
+              <span className="text-[11px] sm:text-xs font-mono uppercase tracking-widest text-[#047857] dark:text-emerald-400 font-semibold">
                 Folio Details
               </span>
-              <span className="text-cream/40">·</span>
-              <span className="text-[11px] sm:text-xs font-mono font-bold text-cream">
+              <span className="text-slate-300 dark:text-slate-600">·</span>
+              <span className="text-[11px] sm:text-xs font-mono font-bold text-slate-900 dark:text-white">
                 {booking.bookingReference}
               </span>
             </div>
-            <h3 className="font-serif text-xl sm:text-2xl font-bold text-cream mt-0.5">
+            <h3 className="font-serif text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-0.5">
               Room {booking.roomNumber} — {booking.roomName}
             </h3>
           </div>
@@ -156,7 +156,7 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-full text-cream/70 hover:text-cream hover:bg-white/10 transition-colors min-h-[38px] min-w-[38px] flex items-center justify-center cursor-pointer"
+            className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1a2820] transition-colors min-h-[38px] min-w-[38px] flex items-center justify-center cursor-pointer"
             aria-label="Close details modal"
           >
             <X className="w-5 h-5" />
@@ -166,16 +166,16 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
         {/* Scrollable Content */}
         <div className="overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5 flex-1 no-scrollbar">
           {/* Status Quick Bar */}
-          <div className="p-4 bg-black/30 rounded-2xl border border-cream/10 flex flex-wrap items-center justify-between gap-3">
+          <div className="p-4 bg-slate-50 dark:bg-[#0B110E] rounded-2xl border border-slate-200/80 dark:border-emerald-950/80 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono text-cream/70">Current PMS Status:</span>
+              <span className="text-xs font-mono text-slate-500 dark:text-slate-400">Current PMS Status:</span>
               <span
                 className={`px-3 py-1 rounded-full text-xs font-mono uppercase font-bold border ${
                   isCancelled
-                    ? 'bg-red-500/20 text-red-200 border-red-500/40'
+                    ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800/80'
                     : isCheckedIn
-                    ? 'bg-blue-500/20 text-blue-200 border-blue-400/40'
-                    : 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40'
+                    ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/80'
+                    : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/80'
                 }`}
               >
                 {booking.status}
@@ -183,12 +183,12 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
             </div>
 
             <div className="flex flex-wrap items-center gap-1.5 font-mono text-xs w-full sm:w-auto">
-              <span className="text-cream/50 text-[11px] mr-1">Update:</span>
+              <span className="text-slate-400 text-[11px] mr-1">Update:</span>
               <button
                 type="button"
                 disabled={isUpdating || booking.status === 'checked_in'}
                 onClick={() => handleStatusSelect('checked_in')}
-                className="px-3 py-1.5 rounded-lg bg-blue-600/80 hover:bg-blue-500 text-white font-bold transition-colors disabled:opacity-30 cursor-pointer min-h-[34px] flex items-center justify-center text-xs"
+                className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold transition-colors disabled:opacity-30 cursor-pointer min-h-[34px] flex items-center justify-center text-xs"
               >
                 Check In
               </button>
@@ -196,7 +196,7 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
                 type="button"
                 disabled={isUpdating || booking.status === 'checked_out'}
                 onClick={() => handleStatusSelect('checked_out')}
-                className="px-3 py-1.5 rounded-lg bg-gray-600/80 hover:bg-gray-500 text-white font-bold transition-colors disabled:opacity-30 cursor-pointer min-h-[34px] flex items-center justify-center text-xs"
+                className="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-bold transition-colors disabled:opacity-30 cursor-pointer min-h-[34px] flex items-center justify-center text-xs"
               >
                 Check Out
               </button>
@@ -204,7 +204,7 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
                 type="button"
                 disabled={isUpdating || isCancelled}
                 onClick={() => handleStatusSelect('cancelled')}
-                className="px-3 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-500 text-white font-bold transition-colors disabled:opacity-30 cursor-pointer min-h-[34px] flex items-center justify-center text-xs"
+                className="px-3 py-1.5 rounded-lg bg-[#ef4444] hover:bg-[#dc2626] text-white font-bold transition-colors disabled:opacity-30 cursor-pointer min-h-[34px] flex items-center justify-center text-xs shadow-xs"
               >
                 Cancel Stay
               </button>
@@ -212,29 +212,29 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
           </div>
 
           {/* Guest Information */}
-          <div className="p-4 bg-black/25 rounded-2xl border border-cream/10 space-y-2">
-            <h4 className="text-[11px] font-mono uppercase tracking-wider text-amber-200 font-bold flex items-center gap-1.5">
+          <div className="p-4 bg-slate-50 dark:bg-[#0B110E] rounded-2xl border border-slate-200/80 dark:border-emerald-950/80 space-y-2">
+            <h4 className="text-[11px] font-mono uppercase tracking-wider text-[#047857] dark:text-emerald-400 font-bold flex items-center gap-1.5">
               <User className="w-3.5 h-3.5" />
               <span>Primary Guest Information</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono pt-1">
               <div>
-                <span className="text-cream/50 block">Full Name:</span>
-                <span className="font-sans font-semibold text-cream text-sm">
+                <span className="text-slate-500 dark:text-slate-400 block">Full Name:</span>
+                <span className="font-sans font-semibold text-slate-900 dark:text-white text-sm">
                   {booking.guestDetails?.fullName || 'Guest'}
                 </span>
               </div>
               <div>
-                <span className="text-cream/50 block">Mobile Number:</span>
-                <span className="text-amber-200 font-bold">+91 {booking.guestDetails?.phone}</span>
+                <span className="text-slate-500 dark:text-slate-400 block">Mobile Number:</span>
+                <span className="text-[#047857] dark:text-emerald-400 font-bold">+91 {booking.guestDetails?.phone}</span>
               </div>
               <div>
-                <span className="text-cream/50 block">Email Address:</span>
-                <span className="text-cream/80">{booking.guestDetails?.email || '—'}</span>
+                <span className="text-slate-500 dark:text-slate-400 block">Email Address:</span>
+                <span className="text-slate-700 dark:text-slate-300">{booking.guestDetails?.email || '—'}</span>
               </div>
               <div>
-                <span className="text-cream/50 block">Booking Timestamp:</span>
-                <span className="text-cream/80">
+                <span className="text-slate-500 dark:text-slate-400 block">Booking Timestamp:</span>
+                <span className="text-slate-700 dark:text-slate-300">
                   {booking.createdAt ? new Date(booking.createdAt).toLocaleString('en-IN') : 'Direct'}
                 </span>
               </div>
@@ -242,27 +242,27 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
           </div>
 
           {/* Stay & Room Dates */}
-          <div className="p-4 bg-black/25 rounded-2xl border border-cream/10 space-y-2">
-            <h4 className="text-[11px] font-mono uppercase tracking-wider text-amber-200 font-bold flex items-center gap-1.5">
+          <div className="p-4 bg-slate-50 dark:bg-[#0B110E] rounded-2xl border border-slate-200/80 dark:border-emerald-950/80 space-y-2">
+            <h4 className="text-[11px] font-mono uppercase tracking-wider text-[#047857] dark:text-emerald-400 font-bold flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
               <span>Stay Timeline</span>
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono pt-1">
               <div>
-                <span className="text-cream/50 block">Check-In:</span>
-                <span className="font-bold text-cream">{booking.checkInDate}</span>
+                <span className="text-slate-500 dark:text-slate-400 block">Check-In:</span>
+                <span className="font-bold text-slate-900 dark:text-white">{booking.checkInDate}</span>
               </div>
               <div>
-                <span className="text-cream/50 block">Check-Out:</span>
-                <span className="font-bold text-cream">{booking.checkOutDate}</span>
+                <span className="text-slate-500 dark:text-slate-400 block">Check-Out:</span>
+                <span className="font-bold text-slate-900 dark:text-white">{booking.checkOutDate}</span>
               </div>
               <div>
-                <span className="text-cream/50 block">Duration:</span>
-                <span className="text-cream">{booking.nights} {booking.nights === 1 ? 'Night' : 'Nights'}</span>
+                <span className="text-slate-500 dark:text-slate-400 block">Duration:</span>
+                <span className="text-slate-800 dark:text-slate-200">{booking.nights} {booking.nights === 1 ? 'Night' : 'Nights'}</span>
               </div>
               <div>
-                <span className="text-cream/50 block">Party Size:</span>
-                <span className="text-cream">
+                <span className="text-slate-500 dark:text-slate-400 block">Party Size:</span>
+                <span className="text-slate-800 dark:text-slate-200">
                   {booking.adults} Adults · {booking.children} Children
                 </span>
               </div>
@@ -270,53 +270,53 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
           </div>
 
           {/* Financial Breakdown */}
-          <div className="p-4 bg-black/30 rounded-2xl border border-cream/15 space-y-2">
-            <h4 className="text-[11px] font-mono uppercase tracking-wider text-amber-200 font-bold flex items-center gap-1.5">
+          <div className="p-4 bg-slate-50 dark:bg-[#0B110E] rounded-2xl border border-slate-200 dark:border-emerald-950 space-y-2">
+            <h4 className="text-[11px] font-mono uppercase tracking-wider text-[#047857] dark:text-emerald-400 font-bold flex items-center gap-1.5">
               <CreditCard className="w-3.5 h-3.5" />
               <span>Tariff & Bill Folio</span>
             </h4>
             <div className="space-y-1.5 text-xs font-mono pt-1">
-              <div className="flex justify-between text-cream/70">
+              <div className="flex justify-between text-slate-600 dark:text-slate-400">
                 <span>Room Tariff ({booking.nights} nights @ {formatCurrency(booking.tariffPerNight)})</span>
                 <span>{formatCurrency(booking.subtotal)}</span>
               </div>
               {booking.discount > 0 && (
-                <div className="flex justify-between text-emerald-300">
+                <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
                   <span>Promotional Discount:</span>
                   <span>-{formatCurrency(booking.discount)}</span>
                 </div>
               )}
-              <div className="flex justify-between text-cream/70">
+              <div className="flex justify-between text-slate-600 dark:text-slate-400">
                 <span>GST & Hospitality Taxes (18%):</span>
                 <span>{formatCurrency(booking.taxesAndGst)}</span>
               </div>
-              <div className="pt-2 border-t border-cream/15 flex justify-between items-baseline font-bold text-sm">
-                <span className="text-amber-200">Total Net Folio:</span>
-                <span className="font-serif text-xl text-cream">{formatCurrency(booking.totalAmount)}</span>
+              <div className="pt-2 border-t border-slate-200 dark:border-emerald-950/60 flex justify-between items-baseline font-bold text-sm">
+                <span className="text-slate-800 dark:text-slate-200">Total Net Folio:</span>
+                <span className="font-serif text-xl text-slate-900 dark:text-white">{formatCurrency(booking.totalAmount)}</span>
               </div>
-              <div className="text-[11px] text-cream/60 flex items-center justify-between pt-1">
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between pt-1">
                 <span>Payment Settlement:</span>
-                <span className="capitalize">{booking.paymentStatus === 'paid' ? 'Paid in Full' : 'Pay at Check-in'}</span>
+                <span className="capitalize font-semibold text-slate-800 dark:text-slate-200">{booking.paymentStatus === 'paid' ? 'Paid in Full' : 'Pay at Check-in'}</span>
               </div>
             </div>
           </div>
 
           {/* Special Requests or Admin Notes */}
           {booking.guestDetails?.specialRequests && (
-            <div className="p-3.5 bg-black/20 rounded-2xl border border-cream/10 text-xs font-mono space-y-1">
-              <span className="text-[10px] uppercase text-cream/50 block">Guest Notes & Requests:</span>
-              <p className="text-cream/80 italic">{booking.guestDetails.specialRequests}</p>
+            <div className="p-3.5 bg-slate-50 dark:bg-[#0B110E] rounded-2xl border border-slate-200 dark:border-emerald-950 text-xs font-mono space-y-1">
+              <span className="text-[10px] uppercase text-slate-400 block">Guest Notes & Requests:</span>
+              <p className="text-slate-700 dark:text-slate-300 italic">{booking.guestDetails.specialRequests}</p>
             </div>
           )}
         </div>
 
         {/* Footer Actions */}
-        <div className="p-3 sm:p-4 sm:px-6 border-t border-cream/15 bg-black/30 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 shrink-0">
+        <div className="p-3 sm:p-4 sm:px-6 border-t border-slate-100 dark:border-emerald-950/60 bg-slate-50 dark:bg-[#0B110E] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 shrink-0">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <button
               type="button"
               onClick={handleDownloadPDF}
-              className="px-3.5 py-2.5 sm:py-2 rounded-full bg-terracotta hover:bg-terracotta-dark text-cream text-[11px] sm:text-xs font-mono uppercase font-semibold transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer min-h-[38px]"
+              className="px-3.5 py-2.5 sm:py-2 rounded-full bg-[#047857] hover:bg-[#065f46] text-white text-[11px] sm:text-xs font-mono uppercase font-semibold transition-all flex items-center justify-center gap-1.5 shadow-md shadow-emerald-700/20 cursor-pointer min-h-[38px]"
             >
               <Download className="w-3.5 h-3.5 shrink-0" />
               <span>Download Tax Bill (PDF)</span>
@@ -325,7 +325,7 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
             <button
               type="button"
               onClick={handlePrint}
-              className="px-3.5 py-2.5 sm:py-2 rounded-full bg-cream/15 hover:bg-cream/25 text-cream text-[11px] sm:text-xs font-mono uppercase font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px]"
+              className="px-3.5 py-2.5 sm:py-2 rounded-full bg-slate-200 dark:bg-[#1a2820] hover:bg-slate-300 dark:hover:bg-[#23352b] text-slate-800 dark:text-slate-200 border dark:border-emerald-950 text-[11px] sm:text-xs font-mono uppercase font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px]"
             >
               <Printer className="w-3.5 h-3.5 shrink-0" />
               <span>Print Tax Bill</span>
@@ -335,7 +335,7 @@ export const AdminBookingDetailsModal: React.FC<AdminBookingDetailsModalProps> =
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 rounded-full bg-cream/10 hover:bg-cream/20 text-cream text-xs font-mono transition-colors cursor-pointer text-center min-h-[38px] flex items-center justify-center"
+            className="px-5 py-2.5 rounded-full bg-slate-200 dark:bg-[#1a2820] hover:bg-slate-300 dark:hover:bg-[#23352b] text-slate-800 dark:text-slate-200 border dark:border-emerald-950 text-xs font-mono transition-colors cursor-pointer text-center min-h-[38px] flex items-center justify-center font-semibold"
           >
             Close
           </button>

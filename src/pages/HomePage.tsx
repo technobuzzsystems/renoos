@@ -179,7 +179,7 @@ export const HomePage: React.FC = () => {
                 <div className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 rounded-full bg-terracotta-light mt-2 flex-shrink-0" />
                   <p className="text-xs text-cream/80 font-light leading-relaxed">
-                    <strong className="text-cream font-medium">Full Room Autonomy:</strong> Fully enabled across Rooms 201, 202, and 203 for comprehensive guest comparison.
+                    <strong className="text-cream font-medium">Full Room Autonomy:</strong> Fully enabled across Rooms 201, 202, 203, 204, and 205 for comprehensive guest comparison.
                   </p>
                 </div>
               </div>
@@ -263,7 +263,7 @@ export const HomePage: React.FC = () => {
                   <div className="p-4 bg-ivory rounded-2xl border border-[#E9E4DB] space-y-2 text-xs text-charcoal-muted">
                     <div className="flex items-center justify-between">
                       <span>Available Accommodations:</span>
-                      <span className="text-forest font-medium">Room 201, 202, 203</span>
+                      <span className="text-forest font-medium">Room 201, 202, 203, 204, 205</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>Exploration Modes:</span>

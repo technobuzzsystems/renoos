@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Image, Compass, Box, Check } from 'lucide-react'
+import { Image, Compass, Check } from 'lucide-react'
 import type { Space } from '@/types'
 import { PanoramaViewer } from '../panorama'
 import { Model3DViewer } from '../model3d'
@@ -78,22 +78,6 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" title="Live 360° tour available" />
             )}
           </button>
-
-          {space.model3d && (
-            <button
-              onClick={() => setActiveMode('model3d')}
-              data-testid="mode-model3d"
-              className={`inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 min-h-[40px] text-xs uppercase tracking-wider rounded-full transition-all duration-300 font-medium flex-1 sm:flex-initial ${
-                activeMode === 'model3d'
-                  ? 'bg-forest text-cream font-semibold shadow-warm'
-                  : 'text-charcoal-muted hover:text-forest hover:bg-cream/60'
-              }`}
-            >
-              <Box className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden sm:inline">3D View</span>
-              <span className="inline sm:hidden">3D</span>
-            </button>
-          )}
         </div>
 
         {/* Space Meta Pill */}

@@ -7,6 +7,7 @@ interface SpaceSelectorProps {
   activeSpaceId: string
   onSelectSpace: (spaceId: string) => void
   className?: string
+  variant?: 'dark' | 'light'
 }
 
 export const SpaceSelector: React.FC<SpaceSelectorProps> = ({
@@ -14,6 +15,7 @@ export const SpaceSelector: React.FC<SpaceSelectorProps> = ({
   activeSpaceId,
   onSelectSpace,
   className = '',
+  variant = 'dark',
 }) => {
   const getSpaceIcon = (type: string) => {
     switch (type) {
@@ -41,10 +43,16 @@ export const SpaceSelector: React.FC<SpaceSelectorProps> = ({
       )
   )
 
+  const isDark = variant === 'dark'
+
   return (
     <div className={`w-full ${className}`}>
       <div
-        className="flex flex-row overflow-x-auto no-scrollbar items-center gap-1.5 sm:gap-2 p-1 sm:p-1.5 bg-[#142018]/90 sm:bg-cream/90 backdrop-blur-md rounded-2xl border border-cream/20 sm:border-[#E9E4DB] shadow-sm"
+        className={`flex flex-row overflow-x-auto no-scrollbar items-center gap-1.5 sm:gap-2 p-1 sm:p-1.5 rounded-2xl backdrop-blur-md shadow-sm transition-colors ${
+          isDark
+            ? 'bg-[#142018]/90 border border-cream/20'
+            : 'bg-[#142018]/90 sm:bg-cream/90 border border-cream/20 sm:border-[#E9E4DB]'
+        }`}
         role="tablist"
         aria-label="Room Spaces Selector"
       >
@@ -59,10 +67,14 @@ export const SpaceSelector: React.FC<SpaceSelectorProps> = ({
               aria-controls={`space-panel-${space.id}`}
               id={`space-tab-${space.id}`}
               onClick={() => onSelectSpace(space.id)}
-              className={`shrink-0 sm:flex-1 flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs tracking-wider uppercase rounded-xl transition-all duration-300 relative group cursor-pointer ${
+              className={`flex-1 flex items-center justify-center sm:justify-between gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs tracking-wider uppercase rounded-xl transition-all duration-300 relative group cursor-pointer ${
                 isActive
-                  ? 'bg-cream sm:bg-forest text-[#16251C] sm:text-cream font-bold shadow-md'
-                  : 'text-cream/70 sm:text-charcoal-muted hover:text-white sm:hover:text-forest hover:bg-white/10 sm:hover:bg-ivory/60'
+                  ? isDark
+                    ? 'bg-cream text-[#16251C] font-bold shadow-md'
+                    : 'bg-cream sm:bg-forest text-[#16251C] sm:text-cream font-bold shadow-md'
+                  : isDark
+                    ? 'text-cream/70 hover:text-white hover:bg-white/10'
+                    : 'text-cream/70 sm:text-charcoal-muted hover:text-white sm:hover:text-forest hover:bg-white/10 sm:hover:bg-ivory/60'
               }`}
             >
               <div className="flex items-center gap-2 sm:gap-2.5">
@@ -70,8 +82,12 @@ export const SpaceSelector: React.FC<SpaceSelectorProps> = ({
                   <div
                     className={`relative w-6 h-6 sm:w-8 sm:h-8 rounded-lg overflow-hidden border shrink-0 transition-transform duration-300 ${
                       isActive
-                        ? 'border-[#16251C]/30 sm:border-cream/30 shadow-sm'
-                        : 'border-white/20 sm:border-[#E9E4DB] opacity-80 group-hover:opacity-100 group-hover:scale-105'
+                        ? isDark
+                          ? 'border-[#16251C]/30 shadow-sm'
+                          : 'border-[#16251C]/30 sm:border-cream/30 shadow-sm'
+                        : isDark
+                          ? 'border-white/20 opacity-80 group-hover:opacity-100 group-hover:scale-105'
+                          : 'border-white/20 sm:border-[#E9E4DB] opacity-80 group-hover:opacity-100 group-hover:scale-105'
                     }`}
                   >
                     <img
@@ -84,7 +100,17 @@ export const SpaceSelector: React.FC<SpaceSelectorProps> = ({
                 )}
 
                 <div className="flex items-center gap-1.5 sm:gap-2 text-left whitespace-nowrap">
-                  <span className={isActive ? 'text-[#16251C] sm:text-terracotta-light' : 'text-amber-200/80 sm:text-sage'}>
+                  <span
+                    className={
+                      isActive
+                        ? isDark
+                          ? 'text-[#16251C]'
+                          : 'text-[#16251C] sm:text-terracotta-light'
+                        : isDark
+                          ? 'text-amber-200/80'
+                          : 'text-amber-200/80 sm:text-sage'
+                    }
+                  >
                     {getSpaceIcon(space.type)}
                   </span>
                   <span className="font-semibold sm:font-medium">
@@ -103,8 +129,12 @@ export const SpaceSelector: React.FC<SpaceSelectorProps> = ({
                 <span
                   className={`text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full font-mono hidden xs:inline shrink-0 ${
                     isActive
-                      ? 'bg-black/10 sm:bg-cream/20 text-[#16251C] sm:text-cream font-bold'
-                      : 'bg-white/10 sm:bg-ivory text-cream/70 sm:text-charcoal-muted border border-white/10 sm:border-[#E9E4DB]'
+                      ? isDark
+                        ? 'bg-black/10 text-[#16251C] font-bold'
+                        : 'bg-black/10 sm:bg-cream/20 text-[#16251C] sm:text-cream font-bold'
+                      : isDark
+                        ? 'bg-white/10 text-cream/70 border border-white/10'
+                        : 'bg-white/10 sm:bg-ivory text-cream/70 sm:text-charcoal-muted border border-white/10 sm:border-[#E9E4DB]'
                   }`}
                 >
                   {space.area} m²
